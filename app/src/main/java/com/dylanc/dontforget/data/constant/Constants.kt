@@ -6,7 +6,7 @@ package com.dylanc.dontforget.data.constant
  */
 const val BASE_URL = "https://www.wanandroid.com/"
 
-const val KEY_ADD_INFO = "add_info"
+const val KEY_INFO = "info"
 
 const val CHANNEL_ID = "not_forget"
 const val CHANNEL_NAME = "勿忘消息"

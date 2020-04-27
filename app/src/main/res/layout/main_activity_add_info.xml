@@ -1,42 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  tools:context=".ui.main.add_info.AddInfoActivity">
+  xmlns:tools="http://schemas.android.com/tools">
 
-  <include
-    android:id="@+id/toolbar"
-    layout="@layout/common_layout_toolbar" />
+  <data>
 
-  <EditText
-    android:id="@+id/edt_title"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
-    android:layout_marginTop="8dp"
-    android:layout_marginEnd="8dp"
-    android:ems="10"
-    android:hint="标题"
-    android:inputType="textPersonName"
-    android:text="新增的标题"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+    <variable
+      name="viewModel"
+      type="com.dylanc.dontforget.ui.main.add_info.AddInfoViewModel" />
+  </data>
 
-  <EditText
-    android:id="@+id/edt_content"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:layout_marginEnd="8dp"
-    android:layout_marginRight="8dp"
-    android:ems="10"
-    android:hint="内容"
-    android:inputType="textPersonName"
-    android:text="新增的内容"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="@+id/edt_title"
-    app:layout_constraintTop_toBottomOf="@+id/edt_title" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.main.add_info.AddInfoActivity">
+
+    <include
+      android:id="@+id/toolbar"
+      layout="@layout/layout_toolbar" />
+
+    <EditText
+      android:id="@+id/edt_title"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
+      android:layout_marginTop="8dp"
+      android:layout_marginEnd="8dp"
+      android:ems="10"
+      android:hint="标题"
+      android:inputType="textPersonName"
+      android:text="@={viewModel.title}"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+    <EditText
+      android:id="@+id/edt_content"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="8dp"
+      android:ems="10"
+      android:hint="内容"
+      android:inputType="textPersonName"
+      android:text="@={viewModel.content}"
+      app:layout_constraintEnd_toEndOf="@+id/edt_title"
+      app:layout_constraintStart_toStartOf="@+id/edt_title"
+      app:layout_constraintTop_toBottomOf="@+id/edt_title" />
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

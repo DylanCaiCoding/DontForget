@@ -18,15 +18,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include layout="@layout/common_layout_toolbar" />
+    <include layout="@layout/layout_toolbar" />
 
     <androidx.recyclerview.widget.RecyclerView
       android:id="@+id/recycler_view"
+      adapter="@{adapter}"
+      list="@{viewModel.list}"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      app:adapter="@{adapter}"
-      app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-      app:list="@{viewModel.list}" />
+      app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
   </LinearLayout>
 </layout>

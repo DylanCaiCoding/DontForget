@@ -1,4 +1,4 @@
-package com.dylanc.dontforget.adapter.item
+package com.dylanc.dontforget.adapter.recycler
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -15,7 +15,7 @@ import com.dylanc.dontforget.data.bean.DontForgetInfo
  * @since 2020/1/23
  */
 class DontForgetInfoDelegate :
-  ItemViewDelegate<DontForgetInfo,DontForgetInfoDelegate.ViewHolder>() {
+  ItemViewDelegate<DontForgetInfo, DontForgetInfoDelegate.ViewHolder>() {
 
   override fun onCreateViewHolder(context: Context, parent: ViewGroup) = ViewHolder(
     LayoutInflater.from(parent.context)

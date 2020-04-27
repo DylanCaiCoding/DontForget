@@ -7,14 +7,14 @@ import com.drakeet.multitype.MultiTypeAdapter
 /**
  * Create by KunMinX at 20/4/18
  */
-@BindingAdapter(value = ["app:adapter"])
+@BindingAdapter(value = ["adapter"])
 fun RecyclerView.setRecyclerAdapter(adapter: RecyclerView.Adapter<*>?) {
   if (adapter != null) {
     this.adapter = adapter
   }
 }
 
-@BindingAdapter(value = ["app:list"])
+@BindingAdapter(value = ["list"])
 fun RecyclerView.refreshList(list: List<Any>?) {
   val adapter = this.adapter
   if (list != null && adapter is MultiTypeAdapter) {

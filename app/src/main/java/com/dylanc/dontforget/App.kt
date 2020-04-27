@@ -3,8 +3,11 @@
 package com.dylanc.dontforget
 
 import android.app.Application
+import com.dylanc.dontforget.adapter.loading.LoadingAdapter
 import com.dylanc.dontforget.data.constant.BASE_URL
 import com.dylanc.dontforget.data.net.persistentCookies
+import com.dylanc.loadinghelper.LoadingHelper
+import com.dylanc.loadinghelper.ViewType
 import com.dylanc.retrofit.helper.RetrofitHelper
 import com.dylanc.utilktx.logJson
 
@@ -27,5 +30,9 @@ class App : Application() {
         }
       }
       .init()
+
+    LoadingHelper.setDefaultAdapterPool {
+      register(ViewType.LOADING, LoadingAdapter())
+    }
   }
 }

@@ -4,8 +4,7 @@ import com.dylanc.dontforget.data.bean.ApiResponse
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.bean.ListPage
 import io.reactivex.Single
-import retrofit2.http.GET
-import retrofit2.http.Url
+import retrofit2.http.*
 
 /**
  * @author Dylan Cai
@@ -17,5 +16,14 @@ interface TodoApi {
   }
 
   @GET
-  fun getTodoList(@Url url: String): Single<ApiResponse<ListPage<DontForgetInfo>>>
+  fun getTodoList(
+    @Url url: String
+  ): Single<ApiResponse<ListPage<DontForgetInfo>>>
+
+  @FormUrlEncoded
+  @POST("$TODO/add/json")
+  fun addTodo(
+    @Field("title") title: String,
+    @Field("content") content: String
+  ): Single<ApiResponse<DontForgetInfo>>
 }

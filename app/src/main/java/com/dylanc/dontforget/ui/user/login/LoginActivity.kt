@@ -10,6 +10,8 @@ import com.dylanc.dontforget.data.repository.UserRepository
 import com.dylanc.dontforget.databinding.ActivityLoginBinding
 import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.dontforget.ui.main.MainViewModel
+import com.dylanc.dontforget.utils.setBindingContentView
+import com.dylanc.dontforget.utils.viewModelOf
 import com.dylanc.retrofit.helper.apiServiceOf
 import com.dylanc.retrofit.helper.transformer.io2mainThread
 import com.dylanc.utilktx.startActivity
@@ -22,9 +24,8 @@ class LoginActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    val binding: ActivityLoginBinding =
-      DataBindingUtil.setContentView(this, R.layout.activity_login)
-    viewModel = LoginViewModel()
+    val binding: ActivityLoginBinding = setBindingContentView(R.layout.activity_login)
+    viewModel = viewModelOf()
     binding.viewModel = viewModel
     binding.lifecycleOwner = this
 
