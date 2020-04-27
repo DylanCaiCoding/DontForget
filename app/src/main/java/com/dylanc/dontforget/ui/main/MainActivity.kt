@@ -33,6 +33,7 @@ import com.dylanc.utilktx.startActivity
 import com.dylanc.utilktx.startActivityForResult
 import com.dylanc.utilktx.toast
 import kotlinx.android.synthetic.main.layout_toolbar.*
+import update.UpdateAppUtils
 import java.util.*
 
 
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity() {
   private val adapter = MultiTypeAdapter()
 
   private val viewModel: MainViewModel by viewModels()
+  private var notifyStarted = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -53,15 +55,21 @@ class MainActivity : AppCompatActivity() {
     binding.adapter = adapter
     binding.lifecycleOwner = this
 
-    viewModel.requestList(this)
-    viewModel.list.observe(this, androidx.lifecycle.Observer {
-      startNotifyAlarm()
-    })
+    if (DontForgetInfoRepository.infos.isEmpty()) {
+      viewModel.requestList(this)
+      viewModel.list.observe(this, androidx.lifecycle.Observer {
+        startNotifyAlarm()
+      })
+    }
   }
 
   private fun startNotifyAlarm() {
     if (DontForgetInfoRepository.infos.isEmpty()) {
       return
+    }
+
+    if (!notifyStarted) {
+      notifyStarted = true
     }
     val intent = Intent(this, AlarmNotifyService::class.java)
     val pendingIntent = PendingIntent.getService(
@@ -112,10 +120,12 @@ class MainActivity : AppCompatActivity() {
         apiServiceOf<VersionApi>()
           .check()
           .io2mainThread()
-          .subscribe({
-            val uri: Uri = Uri.parse(it.update_url)
-            val intent = Intent("android.intent.action.VIEW", uri)
-            startActivity(intent)
+          .subscribe({ appVersion ->
+            UpdateAppUtils
+              .getInstance()
+              .apkUrl(appVersion.installUrl)
+              .updateTitle("检查到新版本 v${appVersion.versionShort}")
+              .update()
           }, {})
         true
       }

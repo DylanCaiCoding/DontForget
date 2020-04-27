@@ -9,6 +9,7 @@ import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.dontforget.ui.user.login.LoginActivity
 import com.dylanc.utilktx.startActivity
 import kotlinx.coroutines.*
+import update.UpdateAppUtils
 
 class SplashActivity : AppCompatActivity() {
 
@@ -17,6 +18,7 @@ class SplashActivity : AppCompatActivity() {
     setContentView(R.layout.activity_splash)
 
     BarUtils.setStatusBarLightMode(this, true)
+
     GlobalScope.launch {
       delay(1000)
       if (UserRepository.isLogin()) {

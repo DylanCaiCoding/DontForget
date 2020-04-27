@@ -10,6 +10,7 @@ import com.dylanc.loadinghelper.LoadingHelper
 import com.dylanc.loadinghelper.ViewType
 import com.dylanc.retrofit.helper.RetrofitHelper
 import com.dylanc.utilktx.logJson
+import update.UpdateAppUtils
 
 
 /**
@@ -34,5 +35,7 @@ class App : Application() {
     LoadingHelper.setDefaultAdapterPool {
       register(ViewType.LOADING, LoadingAdapter())
     }
+
+    UpdateAppUtils.init(this)
   }
 }

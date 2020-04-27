@@ -5,13 +5,13 @@
   android:layout_height="match_parent">
 
   <com.google.android.material.card.MaterialCardView
-    android:layout_width="150dp"
-    android:layout_height="150dp"
+    android:layout_width="120dp"
+    android:layout_height="120dp"
     android:layout_marginStart="32dp"
     android:layout_marginEnd="32dp"
     app:cardBackgroundColor="@android:color/white"
-    app:cardElevation="2dp"
     app:cardCornerRadius="24dp"
+    app:cardElevation="2dp"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
@@ -19,8 +19,8 @@
 
     <ProgressBar
       android:id="@+id/progressBar2"
-      android:layout_width="80dp"
-      android:layout_height="80dp"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
       android:layout_gravity="center"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
