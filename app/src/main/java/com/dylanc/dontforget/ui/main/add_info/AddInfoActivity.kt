@@ -11,7 +11,7 @@ import com.dylanc.dontforget.R
 import com.dylanc.dontforget.data.api.TodoApi
 import com.dylanc.dontforget.data.constant.KEY_INFO
 import com.dylanc.dontforget.data.net.RxLoadingDialog
-import com.dylanc.dontforget.databinding.MainActivityAddInfoBinding
+import com.dylanc.dontforget.databinding.ActivityAddInfoBinding
 import com.dylanc.dontforget.utils.setBindingContentView
 import com.dylanc.retrofit.helper.apiServiceOf
 import com.dylanc.retrofit.helper.transformer.io2mainThread
@@ -21,11 +21,11 @@ import kotlinx.android.synthetic.main.layout_toolbar.*
 class AddInfoActivity : AppCompatActivity() {
 
   private val viewModel: AddInfoViewModel by viewModels()
-  private lateinit var binding: MainActivityAddInfoBinding
+  private lateinit var binding: ActivityAddInfoBinding
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    binding = setBindingContentView(R.layout.main_activity_add_info)
+    binding = setBindingContentView(R.layout.activity_add_info)
     binding.viewModel = viewModel
     binding.lifecycleOwner = this
 

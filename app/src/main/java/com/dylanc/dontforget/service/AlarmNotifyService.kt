@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import androidx.recyclerview.widget.ListAdapter
 
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.data.constant.CHANNEL_ID
@@ -21,6 +22,10 @@ import com.dylanc.dontforget.data.repository.DontForgetInfoRepository
 import com.dylanc.utilktx.logDebug
 
 class AlarmNotifyService : Service() {
+
+  companion object{
+    var alreadyStarted = false
+  }
 
   override fun onBind(intent: Intent): IBinder? {
     return null
@@ -59,16 +64,14 @@ class AlarmNotifyService : Service() {
       .build()
     notification.flags = Notification.FLAG_ONGOING_EVENT
     manager.notify(1, notification)
-
+    alreadyStarted = true
     return super.onStartCommand(intent, flags, startId)
   }
 
   @TargetApi(Build.VERSION_CODES.O)
   private fun createNotificationChannel(channelId: String, channelName: String, importance: Int) {
     val channel = NotificationChannel(channelId, channelName, importance)
-    val notificationManager = getSystemService(
-      Context.NOTIFICATION_SERVICE
-    ) as NotificationManager
-    notificationManager?.createNotificationChannel(channel)
+    val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.createNotificationChannel(channel)
   }
 }

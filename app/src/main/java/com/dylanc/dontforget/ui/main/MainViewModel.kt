@@ -47,11 +47,11 @@ class MainViewModel : ViewModel() {
     return apiServiceOf<TodoApi>()
       .getTodoList("${TodoApi.TODO}/v2/list/$page/json").flatMap { response ->
         if (response.data.over) {
-          items.addAll(response.data.datas)
+          items.addAll(response.data.list)
           Single.just(response)
         } else {
           page++
-          items.addAll(response.data.datas)
+          items.addAll(response.data.list)
           loadList()
         }
       }

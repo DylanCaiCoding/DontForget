@@ -6,7 +6,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -14,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.blankj.utilcode.util.BarUtils
 import com.drakeet.multitype.MultiTypeAdapter
 import com.dylanc.dontforget.R
+import com.dylanc.dontforget.adapter.recycler.DontForgetInfoAdapter
 import com.dylanc.dontforget.adapter.recycler.DontForgetInfoDelegate
 import com.dylanc.dontforget.data.api.VersionApi
 import com.dylanc.dontforget.data.bean.DontForgetInfo
@@ -22,6 +25,7 @@ import com.dylanc.dontforget.data.constant.REQUEST_CODE_ADD_INFO
 import com.dylanc.dontforget.data.constant.REQUEST_CODE_ALARM_NOTIFY
 import com.dylanc.dontforget.data.repository.DontForgetInfoRepository
 import com.dylanc.dontforget.data.repository.UserRepository
+import com.dylanc.dontforget.data.repository.db.infoDb
 import com.dylanc.dontforget.databinding.ActivityMainBinding
 import com.dylanc.dontforget.service.AlarmNotifyService
 import com.dylanc.dontforget.ui.main.add_info.AddInfoActivity
@@ -40,47 +44,51 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
 
   private lateinit var binding: ActivityMainBinding
-  private val adapter = MultiTypeAdapter()
+  //  private val adapter = MultiTypeAdapter()
+  private val adapter = DontForgetInfoAdapter()
 
   private val viewModel: MainViewModel by viewModels()
-  private var notifyStarted = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     binding = setBindingContentView(R.layout.activity_main)
     setSupportActionBar(toolbar)
     BarUtils.setStatusBarLightMode(this, true)
-    adapter.register(DontForgetInfoDelegate())
+//    adapter.register(DontForgetInfoDelegate())
     binding.viewModel = viewModel
     binding.adapter = adapter
     binding.lifecycleOwner = this
 
-    if (DontForgetInfoRepository.infos.isEmpty()) {
-      viewModel.requestList(this)
-      viewModel.list.observe(this, androidx.lifecycle.Observer {
-        startNotifyAlarm()
-      })
-    }
+    viewModel.requestList(this)
+    viewModel.list.observe(this, androidx.lifecycle.Observer {
+      startNotifyAlarm()
+    })
   }
 
   private fun startNotifyAlarm() {
-    if (DontForgetInfoRepository.infos.isEmpty()) {
+    if (AlarmNotifyService.alreadyStarted || DontForgetInfoRepository.infos.isEmpty()) {
       return
     }
 
-    if (!notifyStarted) {
-      notifyStarted = true
-    }
     val intent = Intent(this, AlarmNotifyService::class.java)
     val pendingIntent = PendingIntent.getService(
       this, REQUEST_CODE_ALARM_NOTIFY, intent, PendingIntent.FLAG_UPDATE_CURRENT
     )
     val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val triggerAtMillis = Date().time
-    val intervalMillis = 60 * 2000
+    val intervalMillis = 60 * 1000
     alarmManager.setRepeating(
       AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis.toLong(), pendingIntent
     )
+//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//      alarmManager.setExactAndAllowWhileIdle(
+//        AlarmManager.ELAPSED_REALTIME_WAKEUP,
+//        SystemClock.elapsedRealtime(),
+//        pendingIntent
+//      )
+//    } else {
+//      alarmManager.setExact(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime(), pendingIntent)
+//    }
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -93,7 +101,7 @@ class MainActivity : AppCompatActivity() {
       R.id.action_add -> {
         startActivityForResult<AddInfoActivity>(REQUEST_CODE_ADD_INFO) { resultCode, data ->
           if (resultCode == Activity.RESULT_OK) {
-            val newInfo = data!!.getSerializableExtra(KEY_INFO) as DontForgetInfo
+            val newInfo = data!!.getParcelableExtra(KEY_INFO) as DontForgetInfo
             DontForgetInfoRepository.addInfo(newInfo)
             val list = viewModel.list.value!!
             if (list.isNotEmpty()) {

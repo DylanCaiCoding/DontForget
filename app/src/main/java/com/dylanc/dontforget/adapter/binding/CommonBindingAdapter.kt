@@ -6,12 +6,10 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 
-/**
- * Create by KunMinX at 19/9/18
- */
 @BindingAdapter(value = ["imageUrl", "placeHolder"], requireAll = false)
 fun ImageView.loadUrl(
   url: String?,
@@ -34,8 +32,8 @@ fun ImageView.showDrawable(
 }
 
 @BindingAdapter(value = ["textColor"], requireAll = false)
-fun TextView.setTextColor(textColorRes: Int) {
-  setTextColor(resources.getColor(textColorRes))
+fun TextView.bindTextColor(textColorRes: Int) {
+  setTextColor(ContextCompat.getColor(context, textColorRes))
 }
 
 @BindingAdapter(value = ["imageRes"], requireAll = false)

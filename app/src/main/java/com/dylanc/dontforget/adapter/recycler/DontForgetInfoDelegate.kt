@@ -19,7 +19,7 @@ class DontForgetInfoDelegate :
 
   override fun onCreateViewHolder(context: Context, parent: ViewGroup) = ViewHolder(
     LayoutInflater.from(parent.context)
-      .inflate(R.layout.mian_recycler_item_not_forget_info, parent, false)
+      .inflate(R.layout.recycler_item_info, parent, false)
   )
 
   override fun onBindViewHolder(holder: ViewHolder, item: DontForgetInfo) {

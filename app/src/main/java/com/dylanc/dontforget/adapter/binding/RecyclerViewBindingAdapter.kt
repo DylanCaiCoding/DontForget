@@ -1,12 +1,10 @@
 package com.dylanc.dontforget.adapter.binding
 
 import androidx.databinding.BindingAdapter
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.drakeet.multitype.MultiTypeAdapter
 
-/**
- * Create by KunMinX at 20/4/18
- */
 @BindingAdapter(value = ["adapter"])
 fun RecyclerView.setRecyclerAdapter(adapter: RecyclerView.Adapter<*>?) {
   if (adapter != null) {
@@ -14,10 +12,16 @@ fun RecyclerView.setRecyclerAdapter(adapter: RecyclerView.Adapter<*>?) {
   }
 }
 
+@Suppress("UNCHECKED_CAST")
 @BindingAdapter(value = ["list"])
-fun RecyclerView.refreshList(list: List<Any>?) {
+fun <T : Any> RecyclerView.refreshList(list: List<T>?) {
+  if (list == null) {
+    return
+  }
   val adapter = this.adapter
-  if (list != null && adapter is MultiTypeAdapter) {
+  if (adapter is ListAdapter<*, *>) {
+    (adapter as ListAdapter<T, *>).submitList(list)
+  } else if (adapter is MultiTypeAdapter) {
     adapter.items = list
     adapter.notifyDataSetChanged()
   }
