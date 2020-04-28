@@ -19,11 +19,12 @@ import com.dylanc.dontforget.data.constant.CHANNEL_ID
 import com.dylanc.dontforget.data.constant.CHANNEL_NAME
 import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.dontforget.data.repository.DontForgetInfoRepository
+import com.dylanc.utilktx.intentOf
 import com.dylanc.utilktx.logDebug
 
 class AlarmNotifyService : Service() {
 
-  companion object{
+  companion object {
     var alreadyStarted = false
   }
 
@@ -43,11 +44,7 @@ class AlarmNotifyService : Service() {
     val dontForgetInfo = DontForgetInfoRepository.randomDontForgetInfo
       ?: return super.onStartCommand(intent, flags, startId)
 
-    val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    val pendingIntent = PendingIntent.getActivity(
-      this, 1,
-      Intent(this, MainActivity::class.java), 0
-    )
+    val pendingIntent = PendingIntent.getActivity(this, 1, intentOf<MainActivity>(), 0)
 
     //        RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.notification_layout_not_forget_info);
     //        remoteViews.setTextViewText(R.id.tv_msg,contentText);
@@ -63,9 +60,14 @@ class AlarmNotifyService : Service() {
       .setContentIntent(pendingIntent)
       .build()
     notification.flags = Notification.FLAG_ONGOING_EVENT
-    manager.notify(1, notification)
+    startForeground(1, notification)
     alreadyStarted = true
     return super.onStartCommand(intent, flags, startId)
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    stopForeground(true)
   }
 
   @TargetApi(Build.VERSION_CODES.O)

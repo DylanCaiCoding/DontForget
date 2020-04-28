@@ -44,8 +44,8 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
 
   private lateinit var binding: ActivityMainBinding
-  //  private val adapter = MultiTypeAdapter()
-  private val adapter = DontForgetInfoAdapter()
+    private val adapter = MultiTypeAdapter()
+//  private val adapter = DontForgetInfoAdapter()
 
   private val viewModel: MainViewModel by viewModels()
 
@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
     binding = setBindingContentView(R.layout.activity_main)
     setSupportActionBar(toolbar)
     BarUtils.setStatusBarLightMode(this, true)
-//    adapter.register(DontForgetInfoDelegate())
+    adapter.register(DontForgetInfoDelegate())
     binding.viewModel = viewModel
     binding.adapter = adapter
     binding.lifecycleOwner = this
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
     )
     val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val triggerAtMillis = Date().time
-    val intervalMillis = 60 * 1000
+    val intervalMillis = 60 * 2000
     alarmManager.setRepeating(
       AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis.toLong(), pendingIntent
     )
