@@ -14,7 +14,7 @@ import androidx.room.PrimaryKey
 data class DontForgetInfo(
   @PrimaryKey val id: Int,
   val title: String,
-  val content: String,
+  val content: String?,
   val date: Long,
   @ColumnInfo(name = "data_str")val dateStr: String,
   val priority: Int,
@@ -24,7 +24,7 @@ data class DontForgetInfo(
   constructor(parcel: Parcel) : this(
     parcel.readInt(),
     parcel.readString()!!,
-    parcel.readString()!!,
+    parcel.readString(),
     parcel.readLong(),
     parcel.readString()!!,
     parcel.readInt(),

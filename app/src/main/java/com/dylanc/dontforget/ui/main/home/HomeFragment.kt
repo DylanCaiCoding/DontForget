@@ -1,5 +1,6 @@
 package com.dylanc.dontforget.ui.main.home
 
+import android.app.Activity
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -8,24 +9,29 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.drakeet.multitype.MultiTypeAdapter
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.recycler.DontForgetInfoDelegate
+import com.dylanc.dontforget.data.bean.DontForgetInfo
+import com.dylanc.dontforget.data.constant.KEY_EDIT_MODE
+import com.dylanc.dontforget.data.constant.KEY_INFO
+import com.dylanc.dontforget.data.constant.REQUEST_CODE_ADD_INFO
 import com.dylanc.dontforget.data.constant.REQUEST_CODE_ALARM_NOTIFY
 import com.dylanc.dontforget.data.repository.DontForgetInfoRepository
 import com.dylanc.dontforget.databinding.FragmentHomeBinding
 import com.dylanc.dontforget.service.AlarmNotifyService
+import com.dylanc.dontforget.ui.main.info.InfoActivity
 import com.dylanc.dontforget.view_model.request.InfoRequestViewModel
+import com.dylanc.utilktx.startActivityForResult
+import kotlinx.android.synthetic.main.fragment_home.*
 import java.util.*
 
 class HomeFragment : Fragment() {
 
-  private lateinit var binding:FragmentHomeBinding
+  private lateinit var binding: FragmentHomeBinding
   private val viewModel: HomeViewModel by viewModels()
   private val infoRequestViewModel: InfoRequestViewModel by viewModels()
 
@@ -37,8 +43,8 @@ class HomeFragment : Fragment() {
     savedInstanceState: Bundle?
   ): View {
     val view = inflater.inflate(R.layout.fragment_home, container, false)
-    binding = DataBindingUtil.bind(view)!!
     adapter.register(DontForgetInfoDelegate())
+    binding = DataBindingUtil.bind(view)!!
     binding.adapter = adapter
     binding.viewModel = infoRequestViewModel
     binding.lifecycleOwner = this
@@ -51,7 +57,46 @@ class HomeFragment : Fragment() {
     infoRequestViewModel.requestList(requireActivity())
     infoRequestViewModel.list.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
       startNotifyAlarm()
+      refresh_layout.isRefreshing = false
     })
+    refresh_layout.setOnRefreshListener {
+      infoRequestViewModel.requestList(requireActivity())
+    }
+    fab.setOnClickListener {
+      activity?.startActivityForResult<InfoActivity>(REQUEST_CODE_ADD_INFO) { resultCode, data ->
+        if (resultCode == Activity.RESULT_OK && data != null) {
+          val newInfo = data.getParcelableExtra(KEY_INFO) as DontForgetInfo
+          val editMode = data.getBooleanExtra(KEY_EDIT_MODE, false)
+          val list = infoRequestViewModel.list.value!!
+          if (editMode){
+            if (list.size > 0) {
+              for (i in list.indices) {
+                val info = list[i] as DontForgetInfo
+                if (newInfo.id == info.id) {
+                  list[i] = newInfo
+                  DontForgetInfoRepository.updateInfo(i,newInfo)
+                  break
+                }
+              }
+            }
+          }else {
+            DontForgetInfoRepository.addInfo(newInfo)
+            if (list.size > 0) {
+              for (i in list.indices) {
+                val info = list[i] as DontForgetInfo
+                if (newInfo.dateStr != info.dateStr || i == list.size - 1) {
+                  list.add(i, newInfo)
+                  break
+                }
+              }
+            } else {
+              list.add(newInfo)
+            }
+          }
+          infoRequestViewModel.list.value = list
+        }
+      }
+    }
   }
 
   private fun startNotifyAlarm() {
@@ -65,7 +110,7 @@ class HomeFragment : Fragment() {
     )
     val alarmManager = activity?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val triggerAtMillis = Date().time
-    val intervalMillis = 60 * 2000
+    val intervalMillis = 60 * 1000 * 5
     alarmManager.setRepeating(
       AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis.toLong(), pendingIntent
     )

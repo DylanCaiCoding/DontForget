@@ -55,9 +55,9 @@ dependencies {
     implementation 'com.dylanc:loadinghelper:2.0.0'
     implementation 'com.dylanc:retrofit-helper:1.0.0'
     implementation 'com.dylanc:utilktx:0.1.1'
-    implementation 'com.scwang.smart:refresh-layout-kernel:2.0.0'
-    implementation 'com.scwang.smart:refresh-header-material:2.0.0'
-    implementation 'com.scwang.smart:refresh-footer-classics:2.0.0'
+//    implementation 'com.scwang.smart:refresh-layout-kernel:2.0.0'
+//    implementation 'com.scwang.smart:refresh-header-material:2.0.0'
+//    implementation 'com.scwang.smart:refresh-footer-classics:2.0.0'
     implementation 'com.github.franmontiel:PersistentCookieJar:v1.0.1'
     implementation 'com.teprinciple:updateapputilsx:2.3.0'
 

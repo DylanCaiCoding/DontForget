@@ -21,6 +21,7 @@ class InfoModel {
   @SuppressLint("CheckResult")
   fun requestList(context: Context, list: MutableLiveData<MutableList<Any>>) {
     items.clear()
+    page = 1
     loadList()
       .io2mainThread()
       .showLoading(RxLoadingDialog(context))

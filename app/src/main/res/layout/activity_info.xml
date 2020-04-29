@@ -7,13 +7,13 @@
 
     <variable
       name="viewModel"
-      type="com.dylanc.dontforget.ui.main.add_info.AddInfoViewModel" />
+      type="com.dylanc.dontforget.ui.main.info.InfoViewModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.add_info.AddInfoActivity">
+    tools:context=".ui.main.info.InfoActivity">
 
     <include
       android:id="@+id/toolbar"
@@ -23,9 +23,9 @@
       android:id="@+id/edt_title"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
-      android:layout_marginStart="8dp"
+      android:layout_marginStart="16dp"
       android:layout_marginTop="16dp"
-      android:layout_marginEnd="8dp"
+      android:layout_marginEnd="16dp"
       android:ems="10"
       android:hint="标题"
       android:inputType="textPersonName"
@@ -40,7 +40,7 @@
       android:layout_height="wrap_content"
       android:layout_marginTop="8dp"
       android:ems="10"
-      android:hint="内容"
+      android:hint="详情（可选）"
       android:inputType="textPersonName"
       android:text="@={viewModel.content}"
       app:layout_constraintEnd_toEndOf="@+id/edt_title"

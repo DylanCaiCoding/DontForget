@@ -28,7 +28,7 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
-    <activity android:name="com.dylanc.dontforget.ui.main.add_info.AddInfoActivity" />
+    <activity android:name="com.dylanc.dontforget.ui.main.info.InfoActivity" />
     <activity android:name="com.dylanc.dontforget.ui.main.MainActivity"
       android:launchMode="singleInstance"/>
     <service android:name="com.dylanc.dontforget.service.AlarmNotifyService" />

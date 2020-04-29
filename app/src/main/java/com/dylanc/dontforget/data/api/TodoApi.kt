@@ -20,10 +20,24 @@ interface TodoApi {
     @Url url: String
   ): Single<ApiResponse<ListPage<DontForgetInfo>>>
 
+  @POST
+  fun deleteTodo(
+    @Url url: String
+  ): Single<ApiResponse<Any?>>
+
+  @FormUrlEncoded
+  @POST
+  fun updateTodo(
+    @Url url: String,
+    @Field("title") title: String,
+    @Field("content") content: String?,
+    @Field("date") date: String
+  ): Single<ApiResponse<DontForgetInfo>>
+
   @FormUrlEncoded
   @POST("$TODO/add/json")
   fun addTodo(
     @Field("title") title: String,
-    @Field("content") content: String
+    @Field("content") content: String?
   ): Single<ApiResponse<DontForgetInfo>>
 }

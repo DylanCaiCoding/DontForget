@@ -19,7 +19,7 @@ fun ImageView.loadUrl(
 }
 
 @BindingAdapter(value = ["visible"], requireAll = false)
-fun View.visible(visible: Boolean) {
+fun View.setVisible(visible: Boolean) {
   visibility = if (visible) View.VISIBLE else View.GONE
 }
 

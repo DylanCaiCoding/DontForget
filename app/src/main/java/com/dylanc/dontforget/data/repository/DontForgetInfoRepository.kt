@@ -28,6 +28,10 @@ object DontForgetInfoRepository {
     infos.removeAt(index)
   }
 
+  fun updateInfo(index: Int,info: DontForgetInfo) {
+    infos[index] = info
+  }
+
   fun updateInfos(list: List<DontForgetInfo>) {
     infos.clear()
     infos.addAll(list)
