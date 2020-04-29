@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  tools:showIn="navigation_view">
+
+  <group android:checkableBehavior="single">
+    <item
+      android:id="@+id/nav_notify"
+      android:title="开启通知" />
+    <item
+      android:id="@+id/nav_intervals"
+      android:title="设置间隔时间" />
+  </group>
+
+  <group android:checkableBehavior="single">
+    <item
+      android:id="@+id/nav_check_update"
+      android:title="检查更新" />
+    <item
+      android:id="@+id/nav_about"
+      android:title="关于" />
+  </group>
+</menu>

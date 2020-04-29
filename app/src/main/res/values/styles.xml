@@ -25,4 +25,9 @@
     <item name="android:backgroundDimAmount">0.5</item>
   </style>
 
+  <style name="ToolbarTitleTextAppearance">
+    <item name="android:textSize">18sp</item>
+    <item name="android:textColor">#666</item>
+  </style>
+
 </resources>

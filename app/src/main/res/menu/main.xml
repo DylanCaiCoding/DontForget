@@ -2,18 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto">
   <item
-    android:id="@+id/action_add"
-    android:title="添加"
-    app:showAsAction="never" />
-  <item
-    android:id="@+id/action_edit"
-    android:title="编辑"
-    app:showAsAction="never" />
-  <item
-    android:id="@+id/action_check_update"
-    android:title="检查更新"
-    app:showAsAction="never" />
-  <item
     android:id="@+id/action_logout"
     android:title="退出登录"
     app:showAsAction="never" />
