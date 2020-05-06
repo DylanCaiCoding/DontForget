@@ -5,7 +5,7 @@
   <data>
     <variable
       name="viewModel"
-      type="com.dylanc.dontforget.view_model.request.InfoRequestViewModel" />
+      type="com.dylanc.dontforget.ui.main.home.HomeViewModel" />
 
     <variable
       name="adapter"

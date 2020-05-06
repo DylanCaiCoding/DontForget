@@ -6,12 +6,14 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import com.blankj.utilcode.util.BarUtils
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.data.api.TodoApi
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.constant.KEY_EDIT_MODE
 import com.dylanc.dontforget.data.constant.KEY_INFO
+import com.dylanc.dontforget.data.constant.REQUEST_CODE_UPDATE_INFO
 import com.dylanc.dontforget.data.net.RxLoadingDialog
 import com.dylanc.dontforget.databinding.ActivityInfoBinding
 import com.dylanc.dontforget.utils.setBindingContentView
@@ -19,6 +21,7 @@ import com.dylanc.retrofit.helper.apiServiceOf
 import com.dylanc.retrofit.helper.transformer.io2mainThread
 import com.dylanc.retrofit.helper.transformer.showLoading
 import com.dylanc.utilktx.*
+import com.dylanc.utilktx.startActivityForResult
 import kotlinx.android.synthetic.main.layout_toolbar.*
 
 class InfoActivity : AppCompatActivity() {
@@ -27,9 +30,15 @@ class InfoActivity : AppCompatActivity() {
   private lateinit var binding: ActivityInfoBinding
 
   companion object {
-    fun start(info: DontForgetInfo? = null) {
-      startActivity<InfoActivity>(KEY_INFO to info)
-    }
+//    fun start(
+//      activity: FragmentActivity,
+//      info: DontForgetInfo? = null,
+//      callback: (resultCode: Int, data: Intent?) -> Unit
+//    ) {
+//      if (info!=null){
+//        activity.startActivityForResult<InfoActivity>(REQUEST_CODE_UPDATE_INFO, KEY_INFO to info, callback)
+//      }
+//    }
   }
 
   private var info: DontForgetInfo? = null
@@ -40,13 +49,18 @@ class InfoActivity : AppCompatActivity() {
     binding.viewModel = viewModel
     binding.lifecycleOwner = this
 
-    toolbar.title = "添加信息"
+    info = intent.getParcelableExtra(KEY_INFO)
+    if (info == null) {
+      toolbar.title = "添加信息"
+    } else {
+      toolbar.title = "修改信息"
+    }
     setSupportActionBar(toolbar)
     BarUtils.setStatusBarLightMode(this, true)
 
-    info = intent.getParcelableExtra(KEY_INFO)
     viewModel.title.value = info?.title
     viewModel.content.value = info?.content
+
   }
 
   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -77,7 +91,7 @@ class InfoActivity : AppCompatActivity() {
               "${TodoApi.TODO}/update/${info!!.id}/json",
               viewModel.title.value!!,
               viewModel.content.value,
-              nowDate.toTimeString(FORMAT_DATE)
+              info!!.dateStr
             )
             .io2mainThread()
             .showLoading(RxLoadingDialog(this))

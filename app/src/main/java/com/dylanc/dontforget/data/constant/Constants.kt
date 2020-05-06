@@ -12,5 +12,6 @@ const val KEY_EDIT_MODE = "edit_mode"
 const val CHANNEL_ID = "not_forget"
 const val CHANNEL_NAME = "勿忘消息"
 
+const val REQUEST_CODE_ALARM_NOTIFY = 0
 const val REQUEST_CODE_ADD_INFO = 1
-const val REQUEST_CODE_ALARM_NOTIFY = 2
+const val REQUEST_CODE_UPDATE_INFO = 2

@@ -9,13 +9,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.drakeet.multitype.MultiTypeAdapter
 import com.dylanc.dontforget.R
+import com.dylanc.dontforget.adapter.recycler.DateViewDelegate
 import com.dylanc.dontforget.adapter.recycler.DontForgetInfoDelegate
+import com.dylanc.dontforget.adapter.recycler.InfoGroupViewDelegate
 import com.dylanc.dontforget.data.bean.DontForgetInfo
+import com.dylanc.dontforget.data.bean.DontForgetInfoGroup
 import com.dylanc.dontforget.data.constant.KEY_EDIT_MODE
 import com.dylanc.dontforget.data.constant.KEY_INFO
 import com.dylanc.dontforget.data.constant.REQUEST_CODE_ADD_INFO
@@ -36,7 +41,6 @@ class HomeFragment : Fragment() {
   private val infoRequestViewModel: InfoRequestViewModel by viewModels()
 
   private val adapter = MultiTypeAdapter()
-//  private val adapter = DontForgetInfoAdapter()
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
@@ -44,9 +48,12 @@ class HomeFragment : Fragment() {
   ): View {
     val view = inflater.inflate(R.layout.fragment_home, container, false)
     adapter.register(DontForgetInfoDelegate())
+    adapter.register(DateViewDelegate())
+    adapter.register(InfoGroupViewDelegate())
     binding = DataBindingUtil.bind(view)!!
+    binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, LinearLayout.VERTICAL)
     binding.adapter = adapter
-    binding.viewModel = infoRequestViewModel
+    binding.viewModel = viewModel
     binding.lifecycleOwner = this
     return view
   }
@@ -58,6 +65,31 @@ class HomeFragment : Fragment() {
     infoRequestViewModel.list.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
       startNotifyAlarm()
       refresh_layout.isRefreshing = false
+
+//      val items = mutableListOf<Any>()
+//      var infoGroup: DontForgetInfoGroup? = null
+//      for (item in it) {
+//        if (item is DontForgetInfo) {
+//          when {
+//            infoGroup == null -> {
+//              infoGroup = DontForgetInfoGroup(item.dateStr, mutableListOf())
+//              infoGroup.list.add(item)
+//            }
+//            infoGroup.date == item.dateStr -> {
+//              infoGroup.list.add(item)
+//            }
+//            else -> {
+//              items.add(infoGroup)
+//              infoGroup = DontForgetInfoGroup(item.dateStr, mutableListOf())
+//              infoGroup.list.add(item)
+//            }
+//          }
+//          items.add(infoGroup)
+//        }
+//      }
+//      viewModel.list.value = items
+
+      viewModel.list.value = it
     })
     refresh_layout.setOnRefreshListener {
       infoRequestViewModel.requestList(requireActivity())
@@ -68,18 +100,18 @@ class HomeFragment : Fragment() {
           val newInfo = data.getParcelableExtra(KEY_INFO) as DontForgetInfo
           val editMode = data.getBooleanExtra(KEY_EDIT_MODE, false)
           val list = infoRequestViewModel.list.value!!
-          if (editMode){
+          if (editMode) {
             if (list.size > 0) {
               for (i in list.indices) {
                 val info = list[i] as DontForgetInfo
                 if (newInfo.id == info.id) {
                   list[i] = newInfo
-                  DontForgetInfoRepository.updateInfo(i,newInfo)
+                  DontForgetInfoRepository.updateInfo(i, newInfo)
                   break
                 }
               }
             }
-          }else {
+          } else {
             DontForgetInfoRepository.addInfo(newInfo)
             if (list.size > 0) {
               for (i in list.indices) {
