@@ -3,6 +3,7 @@ package com.dylanc.dontforget.ui.main
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -20,7 +21,6 @@ import com.dylanc.retrofit.helper.apiServiceOf
 import com.dylanc.retrofit.helper.transformer.io2mainThread
 import com.dylanc.utilktx.startActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.layout_toolbar.toolbar
 import update.UpdateAppUtils
 
 
@@ -41,7 +41,10 @@ class MainActivity : AppCompatActivity() {
     val navController = findNavController(R.id.nav_host_fragment)
     appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_home), drawer_layout)
     setupActionBarWithNavController(navController, appBarConfiguration)
+    val tvHeader: TextView = nav_view.getHeaderView(0).findViewById(R.id.tv_header)
+    BarUtils.addMarginTopEqualStatusBarHeight(tvHeader)
 //    nav_view.setupWithNavController(navController)
+    toolbar.title = "搜索"
 
     nav_view.setNavigationItemSelectedListener { menuItem ->
       when (menuItem.itemId) {

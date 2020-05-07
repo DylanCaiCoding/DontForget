@@ -67,6 +67,7 @@ class AlarmNotifyService : Service() {
 
   override fun onDestroy() {
     super.onDestroy()
+    alreadyStarted = false
     stopForeground(true)
   }
 

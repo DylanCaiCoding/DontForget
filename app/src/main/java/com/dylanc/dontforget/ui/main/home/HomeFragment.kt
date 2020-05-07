@@ -9,15 +9,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.drakeet.multitype.MultiTypeAdapter
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.recycler.DateViewDelegate
-import com.dylanc.dontforget.adapter.recycler.DontForgetInfoDelegate
 import com.dylanc.dontforget.adapter.recycler.InfoGroupViewDelegate
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.bean.DontForgetInfoGroup
@@ -47,11 +44,9 @@ class HomeFragment : Fragment() {
     savedInstanceState: Bundle?
   ): View {
     val view = inflater.inflate(R.layout.fragment_home, container, false)
-    adapter.register(DontForgetInfoDelegate())
     adapter.register(DateViewDelegate())
     adapter.register(InfoGroupViewDelegate())
     binding = DataBindingUtil.bind(view)!!
-    binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, LinearLayout.VERTICAL)
     binding.adapter = adapter
     binding.viewModel = viewModel
     binding.lifecycleOwner = this
@@ -66,30 +61,32 @@ class HomeFragment : Fragment() {
       startNotifyAlarm()
       refresh_layout.isRefreshing = false
 
-//      val items = mutableListOf<Any>()
-//      var infoGroup: DontForgetInfoGroup? = null
-//      for (item in it) {
-//        if (item is DontForgetInfo) {
-//          when {
-//            infoGroup == null -> {
-//              infoGroup = DontForgetInfoGroup(item.dateStr, mutableListOf())
-//              infoGroup.list.add(item)
-//            }
-//            infoGroup.date == item.dateStr -> {
-//              infoGroup.list.add(item)
-//            }
-//            else -> {
-//              items.add(infoGroup)
-//              infoGroup = DontForgetInfoGroup(item.dateStr, mutableListOf())
-//              infoGroup.list.add(item)
-//            }
-//          }
-//          items.add(infoGroup)
-//        }
-//      }
-//      viewModel.list.value = items
-
-      viewModel.list.value = it
+      val items = mutableListOf<Any>()
+      var infoGroup: DontForgetInfoGroup? = null
+      for (item in it) {
+        if (item is DontForgetInfo) {
+          when {
+            infoGroup == null -> {
+              infoGroup = DontForgetInfoGroup(item.dateStr, mutableListOf())
+              infoGroup.list.add(item)
+            }
+            infoGroup.dateStr == item.dateStr -> {
+              infoGroup.list.add(item)
+            }
+            else -> {
+              items.add(infoGroup.dateStr)
+              items.add(infoGroup)
+              infoGroup = DontForgetInfoGroup(item.dateStr, mutableListOf())
+              infoGroup.list.add(item)
+            }
+          }
+        }
+      }
+      infoGroup?.let { it1 ->
+        items.add(it1.dateStr)
+        items.add(it1)
+      }
+      viewModel.list.value = items
     })
     refresh_layout.setOnRefreshListener {
       infoRequestViewModel.requestList(requireActivity())

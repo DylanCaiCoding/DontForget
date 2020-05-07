@@ -40,6 +40,7 @@
           android:id="@+id/toolbar"
           android:layout_width="match_parent"
           android:layout_height="48dp"
+          app:title="搜索"
           android:background="@android:color/white"
           app:popupTheme="@style/Widget.AppCompat.PopupMenu.Overflow"
           app:titleTextAppearance="@style/ToolbarTitleTextAppearance" />
@@ -66,6 +67,7 @@
       android:layout_height="match_parent"
       android:layout_gravity="start"
       android:fitsSystemWindows="true"
+      app:headerLayout="@layout/nav_header_main"
       app:menu="@menu/activity_main_drawer"
       app:navGraph="@navigation/main_navigation" />
 

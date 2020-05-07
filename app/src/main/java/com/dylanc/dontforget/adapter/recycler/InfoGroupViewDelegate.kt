@@ -15,13 +15,12 @@ import com.dylanc.dontforget.databinding.RecyclerItemInfoGroupBinding
 class InfoGroupViewDelegate :
   BindingViewDelegate<DontForgetInfoGroup, RecyclerItemInfoGroupBinding>() {
 
-  private val infoAdapter = InfoAdapter()
-
   override fun getLayout(inflater: LayoutInflater, parent: ViewGroup) =
     R.layout.recycler_item_info_group
 
   override fun onViewCreated(itemView: View, binding: RecyclerItemInfoGroupBinding) {
-    binding.recyclerView.adapter = infoAdapter
+    binding.recyclerView.adapter = InfoAdapter()
+//    binding.recyclerView.layoutManager = LinearLayoutManager(context)
     binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
   }
 
@@ -29,6 +28,9 @@ class InfoGroupViewDelegate :
     holder: BindingViewHolder<RecyclerItemInfoGroupBinding>,
     item: DontForgetInfoGroup
   ) {
-    infoAdapter.submitList(item.list)
+    val adapter = holder.binding.recyclerView.adapter
+    if (adapter is InfoAdapter){
+      adapter.submitList(item.list)
+    }
   }
 }

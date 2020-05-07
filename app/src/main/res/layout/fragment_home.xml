@@ -39,6 +39,6 @@
       app:backgroundTint="@android:color/white"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
-      app:srcCompat="@drawable/ic_add_black" />
+      app:srcCompat="@drawable/ic_add_blue" />
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

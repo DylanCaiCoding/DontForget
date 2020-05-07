@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
   tools:showIn="navigation_view">
 
-  <group android:checkableBehavior="single">
-    <item
-      android:id="@+id/nav_notify"
-      android:title="开启通知" />
+  <group
+    android:id="@+id/group"
+    android:checkableBehavior="single">
     <item
       android:id="@+id/nav_intervals"
-      android:title="设置间隔时间" />
+      android:title="设置更新间隔时间" />
+    <item
+      android:id="@+id/nav_notify"
+      android:title="显示通知"
+      app:actionLayout="@layout/menu_item_switch"/>
+    <item
+      android:id="@+id/nav_night_mode"
+      android:title="夜间模式"
+      app:actionLayout="@layout/menu_item_switch"/>
   </group>
 
-  <group android:checkableBehavior="single">
+  <group
+    android:id="@+id/group2"
+    android:checkableBehavior="single">
     <item
       android:id="@+id/nav_check_update"
       android:title="检查更新" />
