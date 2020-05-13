@@ -1,8 +1,13 @@
 package com.dylanc.dontforget.ui.main
 
+import android.content.ComponentName
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Switch
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -13,13 +18,16 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.blankj.utilcode.util.BarUtils
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.data.api.VersionApi
+import com.dylanc.dontforget.data.constant.EVENT_NOTIFY
 import com.dylanc.dontforget.data.repository.UserRepository
 import com.dylanc.dontforget.databinding.ActivityMainBinding
+import com.dylanc.dontforget.service.NotifyService
 import com.dylanc.dontforget.ui.user.login.LoginActivity
 import com.dylanc.dontforget.utils.setBindingContentView
 import com.dylanc.retrofit.helper.apiServiceOf
 import com.dylanc.retrofit.helper.transformer.io2mainThread
 import com.dylanc.utilktx.startActivity
+import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.android.synthetic.main.activity_main.*
 import update.UpdateAppUtils
 
@@ -29,6 +37,8 @@ class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
   private val viewModel: MainViewModel by viewModels()
   private lateinit var appBarConfiguration: AppBarConfiguration
+  private lateinit var notifyService: NotifyService
+  private var bound = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -66,6 +76,15 @@ class MainActivity : AppCompatActivity() {
       }
       false
     }
+    val switch =
+      nav_view.menu.findItem(R.id.nav_notify).actionView.findViewById<Switch>(R.id.switch1)
+    switch.isChecked = true
+    switch.setOnCheckedChangeListener { _, isChecked ->
+      if (!isChecked) {
+        notifyService.hideNotification()
+      }
+      LiveEventBus.get(EVENT_NOTIFY).post(isChecked)
+    }
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -89,6 +108,30 @@ class MainActivity : AppCompatActivity() {
       else -> {
         super.onOptionsItemSelected(item)
       }
+    }
+  }
+
+  override fun onStart() {
+    super.onStart()
+    Intent(this, NotifyService::class.java).also {
+      bindService(it, connection, BIND_AUTO_CREATE)
+    }
+  }
+
+  override fun onStop() {
+    super.onStop()
+    unbindService(connection)
+  }
+
+  private val connection = object : ServiceConnection {
+    override fun onServiceConnected(name: ComponentName, service: IBinder) {
+      val binder = service as NotifyService.NotifyBinder
+      notifyService = binder.service
+      bound = true
+    }
+
+    override fun onServiceDisconnected(name: ComponentName) {
+      bound = false
     }
   }
 }

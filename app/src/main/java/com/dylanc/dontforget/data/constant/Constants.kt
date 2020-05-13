@@ -9,6 +9,8 @@ const val BASE_URL = "https://www.wanandroid.com/"
 const val KEY_INFO = "info"
 const val KEY_EDIT_MODE = "edit_mode"
 
+const val EVENT_NOTIFY = "notify"
+
 const val CHANNEL_ID = "not_forget"
 const val CHANNEL_NAME = "勿忘消息"
 

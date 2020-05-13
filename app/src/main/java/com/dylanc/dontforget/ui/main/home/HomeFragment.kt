@@ -18,18 +18,17 @@ import com.dylanc.dontforget.adapter.recycler.DateViewDelegate
 import com.dylanc.dontforget.adapter.recycler.InfoGroupViewDelegate
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.bean.DontForgetInfoGroup
-import com.dylanc.dontforget.data.constant.KEY_EDIT_MODE
-import com.dylanc.dontforget.data.constant.KEY_INFO
-import com.dylanc.dontforget.data.constant.REQUEST_CODE_ADD_INFO
-import com.dylanc.dontforget.data.constant.REQUEST_CODE_ALARM_NOTIFY
+import com.dylanc.dontforget.data.constant.*
 import com.dylanc.dontforget.data.repository.DontForgetInfoRepository
 import com.dylanc.dontforget.databinding.FragmentHomeBinding
-import com.dylanc.dontforget.service.AlarmNotifyService
+import com.dylanc.dontforget.service.NotifyService
 import com.dylanc.dontforget.ui.main.info.InfoActivity
 import com.dylanc.dontforget.view_model.request.InfoRequestViewModel
 import com.dylanc.utilktx.startActivityForResult
+import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.android.synthetic.main.fragment_home.*
 import java.util.*
+
 
 class HomeFragment : Fragment() {
 
@@ -126,23 +125,41 @@ class HomeFragment : Fragment() {
         }
       }
     }
+    LiveEventBus
+      .get(EVENT_NOTIFY, Boolean::class.java)
+      .observe(this, androidx.lifecycle.Observer<Boolean> {
+        if (it){
+          startNotifyAlarm()
+        }else{
+          stopNotifyAlarm()
+        }
+      })
   }
 
   private fun startNotifyAlarm() {
-    if (AlarmNotifyService.alreadyStarted || DontForgetInfoRepository.infos.isEmpty()) {
+    if (NotifyService.alreadyStarted || DontForgetInfoRepository.infos.isEmpty()) {
       return
     }
 
-    val intent = Intent(activity, AlarmNotifyService::class.java)
+    val intent = Intent(activity, NotifyService::class.java)
     val pendingIntent = PendingIntent.getService(
       activity, REQUEST_CODE_ALARM_NOTIFY, intent, PendingIntent.FLAG_UPDATE_CURRENT
     )
     val alarmManager = activity?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val triggerAtMillis = Date().time
-    val intervalMillis = 60 * 1000 * 5
+    val intervalMillis = 60 * 1000 * 1
     alarmManager.setRepeating(
       AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis.toLong(), pendingIntent
     )
+  }
+
+  private fun stopNotifyAlarm(){
+    val intent = Intent(activity, NotifyService::class.java)
+    val pendingIntent = PendingIntent.getService(
+      activity, REQUEST_CODE_ALARM_NOTIFY, intent, PendingIntent.FLAG_UPDATE_CURRENT
+    )
+    val alarmManager = activity?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    alarmManager.cancel(pendingIntent)
   }
 
 }
