@@ -18,16 +18,22 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.blankj.utilcode.util.BarUtils
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.data.api.VersionApi
-import com.dylanc.dontforget.data.constant.EVENT_NOTIFY
+import com.dylanc.dontforget.data.constant.EVENT_NOTIFICATION
+import com.dylanc.dontforget.data.constant.KEY_SHOW_NOTIFICATION
+import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
 import com.dylanc.dontforget.data.repository.UserRepository
 import com.dylanc.dontforget.databinding.ActivityMainBinding
 import com.dylanc.dontforget.service.NotifyService
 import com.dylanc.dontforget.ui.user.login.LoginActivity
+import com.dylanc.dontforget.utils.observeEvent
+import com.dylanc.dontforget.utils.postEvent
 import com.dylanc.dontforget.utils.setBindingContentView
 import com.dylanc.retrofit.helper.apiServiceOf
 import com.dylanc.retrofit.helper.transformer.io2mainThread
+import com.dylanc.utilktx.putSP
+import com.dylanc.utilktx.spValueOf
 import com.dylanc.utilktx.startActivity
-import com.jeremyliao.liveeventbus.LiveEventBus
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
 import update.UpdateAppUtils
 
@@ -71,19 +77,50 @@ class MainActivity : AppCompatActivity() {
             }, {})
           drawer_layout.closeDrawers()
         }
+        R.id.nav_intervals -> {
+          MaterialAlertDialogBuilder(this)
+            .setTitle("请选择刷新的间隔时间")
+            .setSingleChoiceItems(arrayOf("5 分钟", "10 分钟", "1 小时"), 0) { dialog, which ->
+              when (which) {
+                0 -> {
+                  putSP(KEY_UPDATE_INTERVALS, 5)
+                }
+                1 -> {
+                  putSP(KEY_UPDATE_INTERVALS, 10)
+                }
+                2 -> {
+                  putSP(KEY_UPDATE_INTERVALS, 60)
+                }
+                else ->
+                  return@setSingleChoiceItems
+              }
+              dialog.dismiss()
+              postEvent(EVENT_NOTIFICATION, false)
+              postEvent(EVENT_NOTIFICATION, true)
+              drawer_layout.closeDrawers()
+            }
+            .create()
+            .show()
+        }
         else -> {
         }
       }
       false
     }
-    val switch =
+    val switchNotification =
       nav_view.menu.findItem(R.id.nav_notify).actionView.findViewById<Switch>(R.id.switch1)
-    switch.isChecked = true
-    switch.setOnCheckedChangeListener { _, isChecked ->
-      if (!isChecked) {
-        notifyService.hideNotification()
-      }
-      LiveEventBus.get(EVENT_NOTIFY).post(isChecked)
+    switchNotification.isChecked = spValueOf(KEY_SHOW_NOTIFICATION, true)
+    switchNotification.setOnCheckedChangeListener { _, isChecked ->
+      putSP(KEY_SHOW_NOTIFICATION, isChecked)
+      postEvent(EVENT_NOTIFICATION, isChecked)
+    }
+
+    observeEvent(EVENT_NOTIFICATION, this::onNotificationEvent)
+  }
+
+  private fun onNotificationEvent(isChecked: Boolean) {
+    if (!isChecked && bound) {
+      notifyService.hideNotification()
     }
   }
 
@@ -113,8 +150,8 @@ class MainActivity : AppCompatActivity() {
 
   override fun onStart() {
     super.onStart()
-    Intent(this, NotifyService::class.java).also {
-      bindService(it, connection, BIND_AUTO_CREATE)
+    Intent(this, NotifyService::class.java).also { intent ->
+      bindService(intent, connection, BIND_AUTO_CREATE)
     }
   }
 

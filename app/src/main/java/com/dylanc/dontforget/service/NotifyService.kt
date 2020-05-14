@@ -38,7 +38,7 @@ class NotifyService : Service() {
   }
 
   override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-    if (showNotification()) return super.onStartCommand(intent, flags, startId)
+    showNotification()
     return super.onStartCommand(intent, flags, startId)
   }
 
@@ -47,9 +47,9 @@ class NotifyService : Service() {
     hideNotification()
   }
 
-  fun showNotification(): Boolean {
+  private fun showNotification() {
     val dontForgetInfo = DontForgetInfoRepository.randomDontForgetInfo
-      ?: return true
+      ?: return
 
     val pendingIntent = PendingIntent.getActivity(this, 1, intentOf<MainActivity>(), 0)
     val notification = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -64,7 +64,6 @@ class NotifyService : Service() {
     notification.flags = Notification.FLAG_ONGOING_EVENT
     startForeground(1, notification)
     alreadyStarted = true
-    return false
   }
 
   fun hideNotification() {

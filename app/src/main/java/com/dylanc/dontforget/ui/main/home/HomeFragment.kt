@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.drakeet.multitype.MultiTypeAdapter
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.recycler.DateViewDelegate
@@ -23,9 +24,11 @@ import com.dylanc.dontforget.data.repository.DontForgetInfoRepository
 import com.dylanc.dontforget.databinding.FragmentHomeBinding
 import com.dylanc.dontforget.service.NotifyService
 import com.dylanc.dontforget.ui.main.info.InfoActivity
+import com.dylanc.dontforget.utils.observeEvent
 import com.dylanc.dontforget.view_model.request.InfoRequestViewModel
+import com.dylanc.utilktx.logDebug
+import com.dylanc.utilktx.spValueOf
 import com.dylanc.utilktx.startActivityForResult
-import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.android.synthetic.main.fragment_home.*
 import java.util.*
 
@@ -56,7 +59,7 @@ class HomeFragment : Fragment() {
     super.onActivityCreated(savedInstanceState)
 
     infoRequestViewModel.requestList(requireActivity())
-    infoRequestViewModel.list.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+    infoRequestViewModel.list.observe(viewLifecycleOwner, Observer {
       startNotifyAlarm()
       refresh_layout.isRefreshing = false
 
@@ -125,19 +128,21 @@ class HomeFragment : Fragment() {
         }
       }
     }
-    LiveEventBus
-      .get(EVENT_NOTIFY, Boolean::class.java)
-      .observe(this, androidx.lifecycle.Observer<Boolean> {
-        if (it){
-          startNotifyAlarm()
-        }else{
-          stopNotifyAlarm()
-        }
-      })
+    observeEvent(EVENT_NOTIFICATION, this::onNotificationEvent)
+  }
+
+  private fun onNotificationEvent(isChecked: Boolean) {
+    if (isChecked) {
+      startNotifyAlarm()
+    } else {
+      stopNotifyAlarm()
+    }
   }
 
   private fun startNotifyAlarm() {
-    if (NotifyService.alreadyStarted || DontForgetInfoRepository.infos.isEmpty()) {
+    if (NotifyService.alreadyStarted || DontForgetInfoRepository.infos.isEmpty() ||
+      !spValueOf(KEY_SHOW_NOTIFICATION, true)
+    ) {
       return
     }
 
@@ -147,13 +152,14 @@ class HomeFragment : Fragment() {
     )
     val alarmManager = activity?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val triggerAtMillis = Date().time
-    val intervalMillis = 60 * 1000 * 1
+    val intervalMillis = 60 * 1000 * spValueOf(KEY_UPDATE_INTERVALS, 6)
+    logDebug("intervals -> ${spValueOf(KEY_UPDATE_INTERVALS, 5)}")
     alarmManager.setRepeating(
       AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis.toLong(), pendingIntent
     )
   }
 
-  private fun stopNotifyAlarm(){
+  private fun stopNotifyAlarm() {
     val intent = Intent(activity, NotifyService::class.java)
     val pendingIntent = PendingIntent.getService(
       activity, REQUEST_CODE_ALARM_NOTIFY, intent, PendingIntent.FLAG_UPDATE_CURRENT
