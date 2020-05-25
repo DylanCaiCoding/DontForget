@@ -18,8 +18,8 @@ import com.dylanc.dontforget.data.net.RxLoadingDialog
 import com.dylanc.dontforget.databinding.ActivityInfoBinding
 import com.dylanc.dontforget.utils.setBindingContentView
 import com.dylanc.retrofit.helper.apiServiceOf
-import com.dylanc.retrofit.helper.transformer.io2mainThread
-import com.dylanc.retrofit.helper.transformer.showLoading
+import com.dylanc.retrofit.helper.rxjava.io2mainThread
+import com.dylanc.retrofit.helper.rxjava.showLoading
 import com.dylanc.utilktx.*
 import com.dylanc.utilktx.startActivityForResult
 import kotlinx.android.synthetic.main.layout_toolbar.*
@@ -88,7 +88,7 @@ class InfoActivity : AppCompatActivity() {
         } else {
           apiServiceOf<TodoApi>()
             .updateTodo(
-              "${TodoApi.TODO}/update/${info!!.id}/json",
+              info!!.id,
               viewModel.title.value!!,
               viewModel.content.value,
               info!!.dateStr

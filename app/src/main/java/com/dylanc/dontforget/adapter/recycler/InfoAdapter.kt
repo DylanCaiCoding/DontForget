@@ -17,7 +17,7 @@ import com.dylanc.dontforget.data.constant.REQUEST_CODE_UPDATE_INFO
 import com.dylanc.dontforget.databinding.RecyclerItemInfoBinding
 import com.dylanc.dontforget.ui.main.info.InfoActivity
 import com.dylanc.retrofit.helper.apiServiceOf
-import com.dylanc.retrofit.helper.transformer.io2mainThread
+import com.dylanc.retrofit.helper.rxjava.io2mainThread
 import com.dylanc.utilktx.startActivityForResult
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -76,7 +76,7 @@ class InfoAdapter :
           }
           1 -> {
             apiServiceOf<TodoApi>()
-              .deleteTodo("${TodoApi.TODO}/delete/${info.id}/json")
+              .deleteTodo(info.id)
               .io2mainThread()
               .subscribe({
                 val list = arrayListOf<DontForgetInfo>()

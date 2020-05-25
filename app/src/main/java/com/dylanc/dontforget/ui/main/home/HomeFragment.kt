@@ -24,8 +24,8 @@ import com.dylanc.dontforget.data.repository.DontForgetInfoRepository
 import com.dylanc.dontforget.databinding.FragmentHomeBinding
 import com.dylanc.dontforget.service.NotifyService
 import com.dylanc.dontforget.ui.main.info.InfoActivity
-import com.dylanc.dontforget.utils.observeEvent
 import com.dylanc.dontforget.view_model.request.InfoRequestViewModel
+import com.dylanc.liveeventbus.observeEvent
 import com.dylanc.utilktx.logDebug
 import com.dylanc.utilktx.spValueOf
 import com.dylanc.utilktx.startActivityForResult
@@ -58,7 +58,9 @@ class HomeFragment : Fragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
 
-    infoRequestViewModel.requestList(requireActivity())
+    refresh_layout.post { refresh_layout.isRefreshing = true }
+    refresh_layout.setColorSchemeResources(R.color.colorAccent)
+    infoRequestViewModel.requestList()
     infoRequestViewModel.list.observe(viewLifecycleOwner, Observer {
       startNotifyAlarm()
       refresh_layout.isRefreshing = false
@@ -91,7 +93,7 @@ class HomeFragment : Fragment() {
       viewModel.list.value = items
     })
     refresh_layout.setOnRefreshListener {
-      infoRequestViewModel.requestList(requireActivity())
+      infoRequestViewModel.requestList()
     }
     fab.setOnClickListener {
       activity?.startActivityForResult<InfoActivity>(REQUEST_CODE_ADD_INFO) { resultCode, data ->

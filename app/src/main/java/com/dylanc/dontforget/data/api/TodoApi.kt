@@ -15,20 +15,20 @@ interface TodoApi {
     const val TODO = "/lg/todo"
   }
 
-  @GET
+  @GET("$TODO/v2/list/{page}/json")
   fun getTodoList(
-    @Url url: String
+    @Path(value = "page",encoded = true) page:Int
   ): Single<ApiResponse<ListPage<DontForgetInfo>>>
 
-  @POST
+  @POST("$TODO/delete/{id}/json")
   fun deleteTodo(
-    @Url url: String
+    @Path(value = "id",encoded = true) id:Int
   ): Single<ApiResponse<Any?>>
 
   @FormUrlEncoded
-  @POST
+  @POST("$TODO/update/{id}/json")
   fun updateTodo(
-    @Url url: String,
+    @Path(value = "id",encoded = true) id:Int,
     @Field("title") title: String,
     @Field("content") content: String?,
     @Field("date") date: String

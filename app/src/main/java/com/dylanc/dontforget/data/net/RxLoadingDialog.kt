@@ -1,20 +1,40 @@
 package com.dylanc.dontforget.data.net
 
 import android.app.Dialog
-import android.content.Context
-import com.dylanc.dontforget.widget.LoadingDialog
-import com.dylanc.retrofit.helper.RequestLoading
+import android.os.Bundle
+import android.view.ViewGroup
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentActivity
+import com.dylanc.dontforget.R
+import com.dylanc.retrofit.helper.rxjava.RequestLoading
+import com.dylanc.retrofit.helper.rxjava.showLoading
+import io.reactivex.Single
 
-class RxLoadingDialog(private val context: Context) : RequestLoading {
+private const val TAG_LOADING = "loading"
 
-  private var dialog: Dialog? = null
+fun <T> Single<T>.showLoadingDialog(activity: FragmentActivity): Single<T> =
+  showLoading(RxLoadingDialog(activity))
+
+class RxLoadingDialog(private val activity: FragmentActivity) : RequestLoading {
+
+  private var dialog = LoadingDialog()
 
   override fun show() {
-    dialog = LoadingDialog(context)
-    dialog!!.show()
+    dialog.show(activity.supportFragmentManager, TAG_LOADING)
   }
 
   override fun dismiss() {
-    dialog?.dismiss()
+    dialog.dismiss()
+  }
+}
+
+class LoadingDialog : DialogFragment() {
+  override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    return activity?.let {
+      Dialog(it, R.style.DialogTheme).apply {
+        setContentView(R.layout.dialog_loading)
+        window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+      }
+    } ?: throw IllegalStateException("Activity cannot be null")
   }
 }

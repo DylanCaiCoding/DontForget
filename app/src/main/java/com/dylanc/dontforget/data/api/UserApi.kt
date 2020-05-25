@@ -6,6 +6,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 /**
@@ -23,4 +24,15 @@ interface UserApi {
     @Field("username") username: String,
     @Field("password") password: String
   ): Single<ApiResponse<User>>
+
+  @FormUrlEncoded
+  @POST("$USER/register")
+  fun register(
+    @Field("username") username: String,
+    @Field("password") password: String,
+    @Field("repassword") repassword: String
+  ): Single<ApiResponse<User>>
+
+  @GET("$USER/logout/json")
+  fun logout(): Single<ApiResponse<Any>>
 }

@@ -8,11 +8,12 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.dylanc.dontforget.R
-import com.dylanc.dontforget.data.constant.CHANNEL_ID
-import com.dylanc.dontforget.data.constant.CHANNEL_NAME
 import com.dylanc.dontforget.data.repository.DontForgetInfoRepository
 import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.utilktx.intentOf
+
+private const val CHANNEL_ID = "not_forget"
+private const val CHANNEL_NAME = "勿忘消息"
 
 class NotifyService : Service() {
 

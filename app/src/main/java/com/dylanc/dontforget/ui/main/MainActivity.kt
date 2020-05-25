@@ -25,11 +25,11 @@ import com.dylanc.dontforget.data.repository.UserRepository
 import com.dylanc.dontforget.databinding.ActivityMainBinding
 import com.dylanc.dontforget.service.NotifyService
 import com.dylanc.dontforget.ui.user.login.LoginActivity
-import com.dylanc.dontforget.utils.observeEvent
-import com.dylanc.dontforget.utils.postEvent
 import com.dylanc.dontforget.utils.setBindingContentView
+import com.dylanc.liveeventbus.observeEvent
 import com.dylanc.retrofit.helper.apiServiceOf
-import com.dylanc.retrofit.helper.transformer.io2mainThread
+import com.dylanc.retrofit.helper.rxjava.io2mainThread
+import com.dylanc.liveeventbus.postEvent
 import com.dylanc.utilktx.putSP
 import com.dylanc.utilktx.spValueOf
 import com.dylanc.utilktx.startActivity

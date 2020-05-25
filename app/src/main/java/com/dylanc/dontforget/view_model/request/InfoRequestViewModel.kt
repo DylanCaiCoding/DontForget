@@ -14,7 +14,7 @@ class InfoRequestViewModel : ViewModel() {
   val list: MutableLiveData<MutableList<Any>> = MutableLiveData(arrayListOf())
   private val infoModel  = InfoModel()
 
-  fun requestList(context: Context) {
-    infoModel.requestList(context,list)
+  fun requestList() {
+    infoModel.requestList(list)
   }
 }

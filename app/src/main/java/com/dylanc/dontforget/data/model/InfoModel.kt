@@ -1,17 +1,14 @@
 package com.dylanc.dontforget.data.model
 
 import android.annotation.SuppressLint
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import com.dylanc.dontforget.data.api.TodoApi
 import com.dylanc.dontforget.data.bean.ApiResponse
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.bean.ListPage
-import com.dylanc.dontforget.data.net.RxLoadingDialog
 import com.dylanc.dontforget.data.repository.DontForgetInfoRepository
 import com.dylanc.retrofit.helper.apiServiceOf
-import com.dylanc.retrofit.helper.transformer.io2mainThread
-import com.dylanc.retrofit.helper.transformer.showLoading
+import com.dylanc.retrofit.helper.rxjava.io2mainThread
 import io.reactivex.Single
 
 class InfoModel {
@@ -19,12 +16,11 @@ class InfoModel {
   private val items = arrayListOf<Any>()
 
   @SuppressLint("CheckResult")
-  fun requestList(context: Context, list: MutableLiveData<MutableList<Any>>) {
+  fun requestList(list: MutableLiveData<MutableList<Any>>) {
     items.clear()
     page = 1
     loadList()
       .io2mainThread()
-      .showLoading(RxLoadingDialog(context))
       .subscribe({
         val infoList = arrayListOf<DontForgetInfo>()
         for (item in items) {
@@ -39,7 +35,8 @@ class InfoModel {
 
   private fun loadList(): Single<ApiResponse<ListPage<DontForgetInfo>>> {
     return apiServiceOf<TodoApi>()
-      .getTodoList("${TodoApi.TODO}/v2/list/$page/json").flatMap { response ->
+      .getTodoList(page)
+      .flatMap { response ->
         if (response.data.over) {
           items.addAll(response.data.list)
           Single.just(response)
