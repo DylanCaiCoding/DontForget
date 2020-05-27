@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.dylanc.dontforget.data.api.UserApi
 import com.dylanc.dontforget.data.net.RxLoadingDialog
 import com.dylanc.dontforget.data.net.showLoadingDialog
-import com.dylanc.dontforget.data.repository.UserRepository
+import com.dylanc.dontforget.data.repository.saveUser
 import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.retrofit.helper.apiServiceOf
 import com.dylanc.retrofit.helper.rxjava.io2mainThread
@@ -32,7 +32,7 @@ class LoginViewModel : ViewModel() {
       .showLoadingDialog(activity)
       .subscribe({ response ->
         toast("登录成功")
-        UserRepository.saveUser(response.data)
+        saveUser(response.data)
         startActivity<MainActivity>()
         activity.finish()
       }, {})

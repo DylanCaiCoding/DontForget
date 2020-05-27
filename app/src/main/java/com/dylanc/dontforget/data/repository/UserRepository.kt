@@ -6,36 +6,30 @@ import com.dylanc.utilktx.*
 
 /**
  * @author Dylan Cai
- * @since 2019/10/30
  */
-object UserRepository {
-  private const val KEY_USER = "user"
-  private var userCache: User? = null
+private const val KEY_USER = "user"
+private var user: User? = null
 
-  @JvmStatic
-  fun getUser(): User? {
-    if (userCache == null) {
+val userCache: User?
+  get() {
+    if (user == null) {
       val json = spValueOf(KEY_USER, null)
-      userCache = json?.toInstance()
+      user = json?.toInstance()
     }
-    return userCache
+    return user
   }
 
-  @JvmStatic
-  fun saveUser(user: User) {
-    userCache = user
-    putSP(KEY_USER, user.toJson())
-  }
-
-  @JvmStatic
-  fun logout() {
-    if (isLogin()) {
-      userCache = null
-      removeSp(KEY_USER)
-      persistentCookieJar.clear()
-    }
-  }
-
-  @JvmStatic
-  fun isLogin() = getUser() != null
+fun saveUser(user: User) {
+  com.dylanc.dontforget.data.repository.user = user
+  putSP(KEY_USER, user.toJson())
 }
+
+fun logout() {
+  if (isLogin()) {
+    user = null
+    removeSp(KEY_USER)
+    persistentCookieJar.clear()
+  }
+}
+
+fun isLogin() = userCache != null

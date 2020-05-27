@@ -10,7 +10,7 @@ import androidx.room.PrimaryKey
  * @author Dylan Cai
  * @since 2020/1/23
  */
-@Entity
+@Entity(tableName = "info_table")
 data class DontForgetInfo(
   @PrimaryKey val id: Int,
   val title: String,

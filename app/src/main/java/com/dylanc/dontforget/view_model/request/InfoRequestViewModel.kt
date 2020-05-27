@@ -1,6 +1,5 @@
 package com.dylanc.dontforget.view_model.request
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.dylanc.dontforget.data.model.InfoModel

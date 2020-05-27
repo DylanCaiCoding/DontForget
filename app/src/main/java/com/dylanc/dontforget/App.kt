@@ -22,7 +22,7 @@ class App : Application() {
   override fun onCreate() {
     super.onCreate()
     initRetrofit {
-      setDebug(true)
+      debug(BuildConfig.DEBUG)
       persistentCookies(applicationContext)
       addCallAdapterFactory(RxJava2CallAdapterFactory.create())
       addHttpLoggingInterceptor { msg ->

@@ -21,7 +21,7 @@ import com.dylanc.dontforget.data.api.VersionApi
 import com.dylanc.dontforget.data.constant.EVENT_NOTIFICATION
 import com.dylanc.dontforget.data.constant.KEY_SHOW_NOTIFICATION
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
-import com.dylanc.dontforget.data.repository.UserRepository
+import com.dylanc.dontforget.data.repository.logout
 import com.dylanc.dontforget.databinding.ActivityMainBinding
 import com.dylanc.dontforget.service.NotifyService
 import com.dylanc.dontforget.ui.user.login.LoginActivity
@@ -31,6 +31,7 @@ import com.dylanc.retrofit.helper.apiServiceOf
 import com.dylanc.retrofit.helper.rxjava.io2mainThread
 import com.dylanc.liveeventbus.postEvent
 import com.dylanc.utilktx.putSP
+import com.dylanc.utilktx.setStatusBarLightMode
 import com.dylanc.utilktx.spValueOf
 import com.dylanc.utilktx.startActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -50,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     binding = setBindingContentView(R.layout.activity_main)
     setSupportActionBar(toolbar)
-    BarUtils.setStatusBarLightMode(this, true)
+    setStatusBarLightMode(true)
     binding.viewModel = viewModel
     binding.lifecycleOwner = this
 
@@ -137,7 +138,7 @@ class MainActivity : AppCompatActivity() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       R.id.action_logout -> {
-        UserRepository.logout()
+        logout()
         startActivity<LoginActivity>()
         finish()
         true

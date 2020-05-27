@@ -1,27 +1,27 @@
 package com.dylanc.dontforget.ui.splash
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.blankj.utilcode.util.BarUtils
+import androidx.appcompat.app.AppCompatActivity
 import com.dylanc.dontforget.R
-import com.dylanc.dontforget.data.repository.UserRepository
+import com.dylanc.dontforget.data.repository.isLogin
 import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.dontforget.ui.user.login.LoginActivity
+import com.dylanc.utilktx.setStatusBarLightMode
 import com.dylanc.utilktx.startActivity
-import kotlinx.coroutines.*
-import update.UpdateAppUtils
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SplashActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_splash)
-
-    BarUtils.setStatusBarLightMode(this, true)
+    setStatusBarLightMode(true)
 
     GlobalScope.launch {
       delay(1000)
-      if (UserRepository.isLogin()) {
+      if (isLogin()) {
         startActivity<MainActivity>()
       } else {
         startActivity<LoginActivity>()
