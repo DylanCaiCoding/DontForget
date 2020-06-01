@@ -1,16 +1,22 @@
 package com.dylanc.dontforget.data.bean
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
 /**
  * @author Dylan Cai
  * @since 2020/4/16
  */
+@Entity(tableName = "user_table")
 data class User(
+  @PrimaryKey
+  val id: Int,
   val admin: Boolean,
-  val chapterTops: List<Any>,
-  val collectIds: List<Int>,
+//  val chapterTops: List<Any>,
+//  val collectIds: List<Int>,
   val email: String,
   val icon: String,
-  val id: Int,
   val nickname: String,
   val password: String,
   val publicName: String,

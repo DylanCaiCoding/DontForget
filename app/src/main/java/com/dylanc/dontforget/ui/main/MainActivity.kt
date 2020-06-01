@@ -11,6 +11,7 @@ import android.widget.Switch
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -36,6 +37,7 @@ import com.dylanc.utilktx.spValueOf
 import com.dylanc.utilktx.startActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.launch
 import update.UpdateAppUtils
 
 
@@ -138,9 +140,11 @@ class MainActivity : AppCompatActivity() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       R.id.action_logout -> {
-        logout()
-        startActivity<LoginActivity>()
-        finish()
+        lifecycleScope.launch {
+          logout()
+          startActivity<LoginActivity>()
+          finish()
+        }
         true
       }
       else -> {

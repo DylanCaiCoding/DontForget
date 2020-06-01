@@ -1,20 +1,22 @@
 package com.dylanc.dontforget.ui.user.login
 
 import android.annotation.SuppressLint
-import android.app.Activity
+import android.provider.SyncStateContract.Helpers.insert
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.dylanc.dontforget.data.api.UserApi
-import com.dylanc.dontforget.data.net.RxLoadingDialog
+import com.dylanc.dontforget.data.bean.User
 import com.dylanc.dontforget.data.net.showLoadingDialog
-import com.dylanc.dontforget.data.repository.saveUser
+import com.dylanc.dontforget.data.repository.insert
 import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.retrofit.helper.apiServiceOf
 import com.dylanc.retrofit.helper.rxjava.io2mainThread
-import com.dylanc.retrofit.helper.rxjava.showLoading
 import com.dylanc.utilktx.startActivity
 import com.dylanc.utilktx.toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * @author Dylan Cai
@@ -36,6 +38,10 @@ class LoginViewModel : ViewModel() {
         startActivity<MainActivity>()
         activity.finish()
       }, {})
+  }
+
+  fun saveUser(user: User) = viewModelScope.launch (Dispatchers.IO){
+    insert(user)
   }
 
 }

@@ -12,11 +12,14 @@ import androidx.room.PrimaryKey
  */
 @Entity(tableName = "info_table")
 data class DontForgetInfo(
-  @PrimaryKey val id: Int,
+  @PrimaryKey
+  @ColumnInfo(name = "id")
+  val id: Int,
   val title: String,
   val content: String?,
   val date: Long,
-  @ColumnInfo(name = "data_str")val dateStr: String,
+  @ColumnInfo(name = "data_str")
+  val dateStr: String,
   val priority: Int,
   val status: Int,
   val type: Int

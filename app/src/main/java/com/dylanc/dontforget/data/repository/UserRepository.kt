@@ -2,34 +2,34 @@ package com.dylanc.dontforget.data.repository
 
 import com.dylanc.dontforget.data.bean.User
 import com.dylanc.dontforget.data.net.persistentCookieJar
-import com.dylanc.utilktx.*
+import com.dylanc.dontforget.data.repository.db.userDatabase
 
 /**
  * @author Dylan Cai
  */
-private const val KEY_USER = "user"
-private var user: User? = null
+private var userCache: User? = null
+private val userDao = userDatabase.userDao()
 
-val userCache: User?
+val user: User?
   get() {
-    if (user == null) {
-      val json = spValueOf(KEY_USER, null)
-      user = json?.toInstance()
+    if (userCache == null && userDao.getUser().isNotEmpty()) {
+      userCache = userDao.getUser()[0]
     }
-    return user
+    return userCache
   }
 
-fun saveUser(user: User) {
-  com.dylanc.dontforget.data.repository.user = user
-  putSP(KEY_USER, user.toJson())
+suspend fun insert(user: User) {
+  userCache = user
+  userDao.deleteAll()
+  userDao.insert(user)
 }
 
-fun logout() {
+suspend fun logout() {
   if (isLogin()) {
-    user = null
-    removeSp(KEY_USER)
+    userCache = null
+    userDao.deleteAll()
     persistentCookieJar.clear()
   }
 }
 
-fun isLogin() = userCache != null
+fun isLogin() = user != null

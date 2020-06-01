@@ -7,29 +7,25 @@ import com.dylanc.dontforget.data.bean.ApiResponse
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.bean.ListPage
 import com.dylanc.dontforget.data.repository.DontForgetInfoRepository
+import com.dylanc.dontforget.data.repository.InfoRepository
 import com.dylanc.retrofit.helper.apiServiceOf
 import com.dylanc.retrofit.helper.rxjava.io2mainThread
 import io.reactivex.Single
 
 class InfoModel {
   private var page: Int = 1
-  private val items = arrayListOf<Any>()
+  private val list = mutableListOf<DontForgetInfo>()
 
   @SuppressLint("CheckResult")
-  fun requestList(list: MutableLiveData<MutableList<Any>>) {
-    items.clear()
+  fun requestList(infoList: MutableLiveData<List<DontForgetInfo>>) {
+    list.clear()
     page = 1
     loadList()
       .io2mainThread()
       .subscribe({
-        val infoList = arrayListOf<DontForgetInfo>()
-        for (item in items) {
-          if (item is DontForgetInfo) {
-            infoList.add(item)
-          }
-        }
-        DontForgetInfoRepository.updateInfos(infoList)
-        list.value = items
+        DontForgetInfoRepository.updateInfos(list)
+        InfoRepository().updateAllInfo(list)
+        infoList.value = list
       }, {})
   }
 
@@ -38,11 +34,11 @@ class InfoModel {
       .getTodoList(page)
       .flatMap { response ->
         if (response.data.over) {
-          items.addAll(response.data.list)
+          list.addAll(response.data.list)
           Single.just(response)
         } else {
           page++
-          items.addAll(response.data.list)
+          list.addAll(response.data.list)
           loadList()
         }
       }
