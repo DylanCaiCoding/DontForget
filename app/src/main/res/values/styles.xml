@@ -10,7 +10,7 @@
   </style>
 
   <style name="BackBtnStyle">
-    <item name="android:src">@drawable/common_back_btn_black_icon</item>
+    <item name="android:src">@drawable/ic_baseline_arrow_back_24</item>
     <item name="android:layout_width">36dp</item>
     <item name="android:layout_height">36dp</item>
     <item name="android:padding">5dp</item>

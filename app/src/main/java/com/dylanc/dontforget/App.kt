@@ -4,6 +4,7 @@ package com.dylanc.dontforget
 
 import android.app.Application
 import com.dylanc.dontforget.adapter.loading.LoadingAdapter
+import com.dylanc.dontforget.base.title.TitleAdapter
 import com.dylanc.dontforget.data.net.persistentCookies
 import com.dylanc.loadinghelper.LoadingHelper
 import com.dylanc.loadinghelper.ViewType
@@ -33,6 +34,7 @@ class App : Application() {
     }
 
     LoadingHelper.setDefaultAdapterPool {
+      register(ViewType.TITLE, TitleAdapter())
       register(ViewType.LOADING, LoadingAdapter())
     }
 

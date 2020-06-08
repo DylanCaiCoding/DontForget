@@ -1,6 +1,5 @@
 package com.dylanc.dontforget.data.repository.db
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -10,7 +9,7 @@ import com.dylanc.dontforget.data.bean.User
 interface UserDao {
 
   @Query("SELECT * from user_table")
-  fun getUser(): List<User>
+  suspend fun getUserList(): List<User>
 
   @Insert
   suspend fun insert(user: User)

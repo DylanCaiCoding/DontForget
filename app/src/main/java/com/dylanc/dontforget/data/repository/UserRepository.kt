@@ -1,35 +1,61 @@
 package com.dylanc.dontforget.data.repository
 
+import com.dylanc.dontforget.data.api.UserApi
 import com.dylanc.dontforget.data.bean.User
 import com.dylanc.dontforget.data.net.persistentCookieJar
+import com.dylanc.dontforget.data.repository.db.UserDao
 import com.dylanc.dontforget.data.repository.db.userDatabase
+import com.dylanc.retrofit.helper.apiServiceOf
+import com.dylanc.retrofit.helper.rxjava.io2mainThread
 
 /**
  * @author Dylan Cai
  */
-private var userCache: User? = null
-private val userDao = userDatabase.userDao()
+class UserRepository(
+  private val model: UserModel = UserModel(),
+  private val remoteDataSource: UserRemoteDataSource = UserRemoteDataSource()
+) {
+  fun requestLogin(username: String, password: String) =
+    remoteDataSource.requestLogin(username, password)
 
-val user: User?
-  get() {
-    if (userCache == null && userDao.getUser().isNotEmpty()) {
-      userCache = userDao.getUser()[0]
+  suspend fun updateUser(user: User) =
+    model.updateUser(user)
+
+  suspend fun logout() =
+    model.logout()
+
+  suspend fun isLogin() =
+    model.isLogin()
+}
+
+class UserModel(private val userDao: UserDao = userDatabase.userDao()) {
+
+  suspend fun getUser(): User? =
+    if (isLogin()) {
+      userDao.getUserList()[0]
+    } else {
+      null
     }
-    return userCache
-  }
 
-suspend fun insert(user: User) {
-  userCache = user
-  userDao.deleteAll()
-  userDao.insert(user)
-}
-
-suspend fun logout() {
-  if (isLogin()) {
-    userCache = null
+  suspend fun updateUser(user: User) {
     userDao.deleteAll()
-    persistentCookieJar.clear()
+    userDao.insert(user)
   }
+
+  suspend fun logout() {
+    if (isLogin()) {
+      userDao.deleteAll()
+      persistentCookieJar.clear()
+    }
+  }
+
+  suspend fun isLogin() =
+    userDao.getUserList().isNotEmpty()
 }
 
-fun isLogin() = user != null
+class UserRemoteDataSource {
+  fun requestLogin(username: String, password: String) =
+    apiServiceOf<UserApi>()
+      .login(username, password)
+      .io2mainThread()
+}

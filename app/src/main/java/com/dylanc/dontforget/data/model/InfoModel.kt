@@ -7,7 +7,6 @@ import com.dylanc.dontforget.data.bean.ApiResponse
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.bean.ListPage
 import com.dylanc.dontforget.data.repository.DontForgetInfoRepository
-import com.dylanc.dontforget.data.repository.InfoRepository
 import com.dylanc.retrofit.helper.apiServiceOf
 import com.dylanc.retrofit.helper.rxjava.io2mainThread
 import io.reactivex.Single
@@ -24,7 +23,6 @@ class InfoModel {
       .io2mainThread()
       .subscribe({
         DontForgetInfoRepository.updateInfos(list)
-        InfoRepository().updateAllInfo(list)
         infoList.value = list
       }, {})
   }

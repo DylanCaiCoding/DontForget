@@ -21,6 +21,11 @@ android {
         }
     }
 
+    compileOptions{
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -78,6 +83,7 @@ dependencies {
 
     // LiveEventBus
     implementation "com.dylanc:live-eventbus-ktx:$live_eventbus_ktx_version"
+    implementation 'com.jeremyliao:live-event-bus-x:1.7.2'
 
     // Utils
     implementation "com.dylanc:utilcode-ktx:$utilcode_ktx_version"

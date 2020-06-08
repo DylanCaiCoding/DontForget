@@ -22,7 +22,7 @@ import com.dylanc.dontforget.data.api.VersionApi
 import com.dylanc.dontforget.data.constant.EVENT_NOTIFICATION
 import com.dylanc.dontforget.data.constant.KEY_SHOW_NOTIFICATION
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
-import com.dylanc.dontforget.data.repository.logout
+import com.dylanc.dontforget.data.repository.UserRepository
 import com.dylanc.dontforget.databinding.ActivityMainBinding
 import com.dylanc.dontforget.service.NotifyService
 import com.dylanc.dontforget.ui.user.login.LoginActivity
@@ -31,6 +31,7 @@ import com.dylanc.liveeventbus.observeEvent
 import com.dylanc.retrofit.helper.apiServiceOf
 import com.dylanc.retrofit.helper.rxjava.io2mainThread
 import com.dylanc.liveeventbus.postEvent
+import com.dylanc.retrofit.helper.rxjava.autoDispose
 import com.dylanc.utilktx.putSP
 import com.dylanc.utilktx.setStatusBarLightMode
 import com.dylanc.utilktx.spValueOf
@@ -38,6 +39,7 @@ import com.dylanc.utilktx.startActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import update.UpdateAppUtils
 
 
@@ -48,6 +50,7 @@ class MainActivity : AppCompatActivity() {
   private lateinit var appBarConfiguration: AppBarConfiguration
   private lateinit var notifyService: NotifyService
   private var bound = false
+  private val userRepository = UserRepository()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -71,6 +74,7 @@ class MainActivity : AppCompatActivity() {
           apiServiceOf<VersionApi>()
             .check()
             .io2mainThread()
+            .autoDispose(this)
             .subscribe({ appVersion ->
               UpdateAppUtils
                 .getInstance()
@@ -141,7 +145,7 @@ class MainActivity : AppCompatActivity() {
     return when (item.itemId) {
       R.id.action_logout -> {
         lifecycleScope.launch {
-          logout()
+          userRepository.logout()
           startActivity<LoginActivity>()
           finish()
         }

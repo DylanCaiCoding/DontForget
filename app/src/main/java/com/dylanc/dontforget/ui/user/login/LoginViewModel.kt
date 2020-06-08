@@ -1,18 +1,16 @@
 package com.dylanc.dontforget.ui.user.login
 
 import android.annotation.SuppressLint
-import android.provider.SyncStateContract.Helpers.insert
+import android.text.TextUtils
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dylanc.dontforget.data.api.UserApi
 import com.dylanc.dontforget.data.bean.User
 import com.dylanc.dontforget.data.net.showLoadingDialog
-import com.dylanc.dontforget.data.repository.insert
+import com.dylanc.dontforget.data.repository.UserRepository
 import com.dylanc.dontforget.ui.main.MainActivity
-import com.dylanc.retrofit.helper.apiServiceOf
-import com.dylanc.retrofit.helper.rxjava.io2mainThread
+import com.dylanc.retrofit.helper.rxjava.autoDispose
 import com.dylanc.utilktx.startActivity
 import com.dylanc.utilktx.toast
 import kotlinx.coroutines.Dispatchers
@@ -23,15 +21,25 @@ import kotlinx.coroutines.launch
  * @since 2020/4/25
  */
 class LoginViewModel : ViewModel() {
-  val username: MutableLiveData<String> = MutableLiveData("")
-  val password: MutableLiveData<String> = MutableLiveData("")
+  val username: MutableLiveData<String> = MutableLiveData()
+  val password: MutableLiveData<String> = MutableLiveData()
+  private val userRepository = UserRepository()
 
   @SuppressLint("CheckResult")
   fun requestLogin(activity: FragmentActivity) {
-    apiServiceOf<UserApi>()
-      .login(username.value!!, password.value!!)
-      .io2mainThread()
+    val username = username.value
+    val password = password.value
+    if (TextUtils.isEmpty(username)){
+      toast("请输入账号")
+      return
+    }
+    if (TextUtils.isEmpty(password)){
+      toast("请输入密码")
+      return
+    }
+    userRepository.requestLogin(username!!, password!!)
       .showLoadingDialog(activity)
+      .autoDispose(activity)
       .subscribe({ response ->
         toast("登录成功")
         saveUser(response.data)
@@ -40,8 +48,8 @@ class LoginViewModel : ViewModel() {
       }, {})
   }
 
-  fun saveUser(user: User) = viewModelScope.launch (Dispatchers.IO){
-    insert(user)
+  private fun saveUser(user: User) = viewModelScope.launch (Dispatchers.IO){
+    userRepository.updateUser(user)
   }
 
 }

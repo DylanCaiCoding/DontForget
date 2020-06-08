@@ -47,10 +47,7 @@ class InfoAdapter :
         true
       }
       setOnClickListener {
-        (context as FragmentActivity).startActivityForResult<InfoActivity>(
-          REQUEST_CODE_UPDATE_INFO,
-          KEY_INFO to item
-        ) { resultCode, data ->
+        InfoActivity.start(context as FragmentActivity, item) { resultCode, data ->
           if (resultCode == Activity.RESULT_OK && data != null) {
             val updateInfo: DontForgetInfo = data.getParcelableExtra(KEY_INFO)!!
             val list = arrayListOf<DontForgetInfo>()

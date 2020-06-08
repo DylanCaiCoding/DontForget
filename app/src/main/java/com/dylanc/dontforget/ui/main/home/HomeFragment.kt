@@ -21,16 +21,13 @@ import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.bean.DontForgetInfoGroup
 import com.dylanc.dontforget.data.constant.*
 import com.dylanc.dontforget.data.repository.DontForgetInfoRepository
-import com.dylanc.dontforget.data.repository.infoRepository
 import com.dylanc.dontforget.databinding.FragmentHomeBinding
 import com.dylanc.dontforget.service.NotifyService
 import com.dylanc.dontforget.ui.main.info.InfoActivity
 import com.dylanc.dontforget.view_model.request.InfoRequestViewModel
 import com.dylanc.liveeventbus.observeEvent
 import com.dylanc.utilktx.logDebug
-import com.dylanc.utilktx.logJson
 import com.dylanc.utilktx.spValueOf
-import com.dylanc.utilktx.startActivityForResult
 import kotlinx.android.synthetic.main.fragment_home.*
 import java.util.*
 
@@ -66,9 +63,6 @@ class HomeFragment : Fragment() {
     infoRequestViewModel.list.observe(viewLifecycleOwner, Observer {
       startNotifyAlarm()
       refresh_layout.isRefreshing = false
-      infoRepository.allInfo.value?.let {
-          it1 -> logJson(it1)
-      }
 
       val items = mutableListOf<Any>()
       var infoGroup: DontForgetInfoGroup? = null
@@ -99,37 +93,39 @@ class HomeFragment : Fragment() {
       infoRequestViewModel.requestList()
     }
     fab.setOnClickListener {
-      activity?.startActivityForResult<InfoActivity>(REQUEST_CODE_ADD_INFO) { resultCode, data ->
-        if (resultCode == Activity.RESULT_OK && data != null) {
-          val newInfo = data.getParcelableExtra(KEY_INFO) as DontForgetInfo
-          val editMode = data.getBooleanExtra(KEY_EDIT_MODE, false)
-          val list = infoRequestViewModel.list.value!!.toMutableList()
-          if (editMode) {
-            if (list.isNotEmpty()) {
-              for (i in list.indices) {
-                val info = list[i]
-                if (newInfo.id == info.id) {
-                  list[i] = newInfo
-                  DontForgetInfoRepository.updateInfo(i, newInfo)
-                  break
-                }
-              }
-            }
-          } else {
-            DontForgetInfoRepository.addInfo(newInfo)
-            if (list.isNotEmpty()) {
-              for (i in list.indices) {
-                val info = list[i]
-                if (newInfo.dateStr != info.dateStr || i == list.size - 1) {
-                  list.add(i, newInfo)
-                  break
+      activity?.let { activity ->
+        InfoActivity.start(activity) { resultCode, data ->
+          if (resultCode == Activity.RESULT_OK && data != null) {
+            val newInfo = data.getParcelableExtra(KEY_INFO) as DontForgetInfo
+            val editMode = data.getBooleanExtra(KEY_EDIT_MODE, false)
+            val list = infoRequestViewModel.list.value!!.toMutableList()
+            if (editMode) {
+              if (list.isNotEmpty()) {
+                for (i in list.indices) {
+                  val info = list[i]
+                  if (newInfo.id == info.id) {
+                    list[i] = newInfo
+                    DontForgetInfoRepository.updateInfo(i, newInfo)
+                    break
+                  }
                 }
               }
             } else {
-              list.add(newInfo)
+              DontForgetInfoRepository.addInfo(newInfo)
+              if (list.isNotEmpty()) {
+                for (i in list.indices) {
+                  val info = list[i]
+                  if (newInfo.dateStr != info.dateStr || i == list.size - 1) {
+                    list.add(i, newInfo)
+                    break
+                  }
+                }
+              } else {
+                list.add(newInfo)
+              }
             }
+            infoRequestViewModel.list.value = list
           }
-          infoRequestViewModel.list.value = list
         }
       }
     }

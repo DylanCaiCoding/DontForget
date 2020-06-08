@@ -3,7 +3,7 @@ package com.dylanc.dontforget.ui.splash
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.dylanc.dontforget.R
-import com.dylanc.dontforget.data.repository.isLogin
+import com.dylanc.dontforget.data.repository.UserRepository
 import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.dontforget.ui.user.login.LoginActivity
 import com.dylanc.utilktx.setStatusBarLightMode
@@ -21,13 +21,13 @@ class SplashActivity : AppCompatActivity() {
 
     GlobalScope.launch {
       delay(1000)
-      if (isLogin()) {
+      if (UserRepository().isLogin()) {
         startActivity<MainActivity>()
       } else {
         startActivity<LoginActivity>()
       }
       finish()
     }
-
   }
+
 }

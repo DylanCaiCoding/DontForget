@@ -8,17 +8,17 @@ import com.dylanc.dontforget.data.bean.DontForgetInfo
 interface InfoDao {
 
   @Query("select * from info_table")
-  fun getAllInfo(): LiveData<List<DontForgetInfo>>
+  suspend fun getAllInfo(): List<DontForgetInfo>
 
-  @Insert
-  fun insertInfo(info: DontForgetInfo)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  fun insertAll(infoList:List<DontForgetInfo>)
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertInfo(info: DontForgetInfo)
 
   @Update
-  fun updateInfo(info: DontForgetInfo)
+  suspend fun updateInfo(info: DontForgetInfo)
 
   @Delete
-  fun deleteInfo(info: DontForgetInfo)
-
-  @Query("DELETE FROM info_table")
-  fun deleteAll()
+  suspend fun deleteInfo(info: DontForgetInfo)
 }
