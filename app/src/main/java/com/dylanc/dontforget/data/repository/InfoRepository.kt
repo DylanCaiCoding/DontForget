@@ -1,7 +1,6 @@
 package com.dylanc.dontforget.data.repository
 
-import androidx.lifecycle.LiveData
-import com.dylanc.dontforget.data.api.TodoApi
+import com.dylanc.dontforget.data.api.InfoApi
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.repository.db.InfoDao
 import com.dylanc.dontforget.data.repository.db.infoDatabase
@@ -13,6 +12,10 @@ import java.util.*
 /**
  * @author Dylan Cai
  */
+val infoRepository: InfoRepository by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+  InfoRepository()
+}
+
 class InfoRepository(
   private val model: InfoModel = InfoModel(),
   private val remoteDataSource: InfoRemoteDataSource = InfoRemoteDataSource()
@@ -23,31 +26,39 @@ class InfoRepository(
   suspend fun getInfoList() {
     if (model.allInfo.value != null && model.allInfo.value!!.isEmpty()) {
       val list = remoteDataSource.requestInfoList()
-      withContext(Dispatchers.IO) {
-        model.insertAll(list)
-      }
-    }
-  }
-
-  suspend fun getRandomInfo(): DontForgetInfo? {
-    val list = remoteDataSource.requestInfoList()
-    return if (list.isNotEmpty()) {
-      list[Random().nextInt(list.size)]
-    } else {
-      null
-    }
-  }
-
-  suspend fun requestInfoList() {
-    val list = remoteDataSource.requestInfoList()
-    withContext(Dispatchers.IO) {
-      model.deleteAll()
       model.insertAll(list)
     }
   }
 
-  suspend fun insertInfo(info: DontForgetInfo) =
+  val randomInfo: DontForgetInfo?
+    get() {
+      val list = allInfo.value ?: return null
+      return if (list.isNotEmpty()) {
+        list[Random().nextInt(list.size)]
+      } else {
+        null
+      }
+    }
+
+  suspend fun requestInfoList() {
+    val list = remoteDataSource.requestInfoList()
+    model.deleteAll()
+    model.insertAll(list)
+  }
+
+  suspend fun addInfo(title: String) {
+    val info = remoteDataSource.requestAddInfo(title)
     model.insertInfo(info)
+  }
+
+  suspend fun updateInfo(id: Int, title: String, date: String) {
+    try {
+      val info = remoteDataSource.requestUpdateInfo(id, title, date)
+      model.insertInfo(info)
+    } catch (e: Exception) {
+      e.printStackTrace()
+    }
+  }
 }
 
 class InfoModel(private val infoDao: InfoDao = infoDatabase.infoDao()) {
@@ -56,16 +67,25 @@ class InfoModel(private val infoDao: InfoDao = infoDatabase.infoDao()) {
     infoDao.getAllInfo()
 
   suspend fun insertAll(infoList: List<DontForgetInfo>) =
-    infoDao.insertAll(infoList)
+
+    withContext(Dispatchers.IO) {
+      infoDao.insertAll(infoList)
+    }
 
   suspend fun insertInfo(info: DontForgetInfo) =
-    infoDao.insertInfo(info)
+    withContext(Dispatchers.IO) {
+      infoDao.insertInfo(info)
+    }
 
   suspend fun deleteInfo(info: DontForgetInfo) =
-    infoDao.deleteInfo(info)
+    withContext(Dispatchers.IO) {
+      infoDao.deleteInfo(info)
+    }
 
   suspend fun deleteAll() =
-    infoDao.deleteAll()
+    withContext(Dispatchers.IO) {
+      infoDao.deleteAll()
+    }
 }
 
 class InfoRemoteDataSource {
@@ -80,7 +100,7 @@ class InfoRemoteDataSource {
 
   private suspend fun loadInfoList(): List<DontForgetInfo> {
     val pageList = withContext(Dispatchers.IO) {
-      apiServiceOf<TodoApi>().getInfoList(page).data
+      apiServiceOf<InfoApi>().getInfoList(page).data
     }
     return if (pageList.over) {
       list.addAll(pageList.list)
@@ -91,5 +111,15 @@ class InfoRemoteDataSource {
       loadInfoList()
     }
   }
+
+  suspend fun requestAddInfo(title: String): DontForgetInfo =
+    withContext(Dispatchers.IO) {
+      apiServiceOf<InfoApi>().addInfo(title).data
+    }
+
+  suspend fun requestUpdateInfo(id: Int, title: String, date: String): DontForgetInfo =
+    withContext(Dispatchers.IO) {
+      apiServiceOf<InfoApi>().updateInfo(id, title, date).data
+    }
 }
 

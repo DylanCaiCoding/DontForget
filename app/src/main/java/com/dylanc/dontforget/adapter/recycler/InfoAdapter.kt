@@ -8,7 +8,7 @@ import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.binding.setVisible
 import com.dylanc.dontforget.base.BindingListAdapter
 import com.dylanc.dontforget.base.BindingViewHolder
-import com.dylanc.dontforget.data.api.TodoApi
+import com.dylanc.dontforget.data.api.InfoApi
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.databinding.RecyclerItemInfoBinding
 import com.dylanc.retrofit.helper.apiServiceOf
@@ -54,7 +54,7 @@ class InfoAdapter(
           0 -> {
           }
           1 -> {
-            apiServiceOf<TodoApi>()
+            apiServiceOf<InfoApi>()
               .deleteTodo(info.id)
               .io2mainThread()
               .subscribe({

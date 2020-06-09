@@ -1,6 +1,5 @@
 package com.dylanc.dontforget.ui.main.info_list
 
-import android.app.Activity
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -12,16 +11,21 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.recycler.InfoAdapter
 import com.dylanc.dontforget.data.bean.DontForgetInfo
-import com.dylanc.dontforget.data.constant.*
+import com.dylanc.dontforget.data.constant.EVENT_NOTIFICATION
+import com.dylanc.dontforget.data.constant.KEY_SHOW_NOTIFICATION
+import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
+import com.dylanc.dontforget.data.constant.REQUEST_CODE_ALARM_NOTIFY
 import com.dylanc.dontforget.databinding.FragmentInfoListBinding
 import com.dylanc.dontforget.service.NotifyService
 import com.dylanc.dontforget.ui.main.info.InsertInfoActivity
 import com.dylanc.liveeventbus.observeEvent
 import com.dylanc.utilktx.logDebug
 import com.dylanc.utilktx.spValueOf
+import com.dylanc.utilktx.toast
 import kotlinx.android.synthetic.main.fragment_info_list.*
 import java.util.*
 
@@ -51,22 +55,18 @@ class InfoListFragment : Fragment() {
     fab.setOnClickListener { onItemClick() }
     observeEvent(EVENT_NOTIFICATION, this::onNotificationEvent)
     viewModel.getInfoList()
-    viewModel.isRefreshing.observe(viewLifecycleOwner, androidx.lifecycle.Observer { isRefreshing ->
+    viewModel.isRefreshing.observe(viewLifecycleOwner, Observer { isRefreshing ->
       if (!isRefreshing) {
         startNotifyAlarm()
       }
     })
+    viewModel.list.observe(viewLifecycleOwner, Observer {
+      toast("list 改变了")
+    })
   }
 
   private fun onItemClick(item: DontForgetInfo? = null) {
-    activity?.let { activity ->
-      InsertInfoActivity.start(activity, item) { resultCode, data ->
-        if (resultCode == Activity.RESULT_OK && data != null) {
-          val info = data.getParcelableExtra(KEY_INFO) as DontForgetInfo
-          viewModel.insertInfo(info)
-        }
-      }
-    }
+    InsertInfoActivity.start(item)
   }
 
   private fun onNotificationEvent(isChecked: Boolean) {

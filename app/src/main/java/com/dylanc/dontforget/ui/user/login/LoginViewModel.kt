@@ -29,11 +29,11 @@ class LoginViewModel : ViewModel() {
   fun requestLogin(activity: FragmentActivity) {
     val username = username.value
     val password = password.value
-    if (TextUtils.isEmpty(username)){
+    if (TextUtils.isEmpty(username)) {
       toast("请输入账号")
       return
     }
-    if (TextUtils.isEmpty(password)){
+    if (TextUtils.isEmpty(password)) {
       toast("请输入密码")
       return
     }
@@ -48,7 +48,7 @@ class LoginViewModel : ViewModel() {
       }, {})
   }
 
-  private fun saveUser(user: User) = viewModelScope.launch (Dispatchers.IO){
+  private fun saveUser(user: User) = viewModelScope.launch(Dispatchers.IO) {
     userRepository.updateUser(user)
   }
 
