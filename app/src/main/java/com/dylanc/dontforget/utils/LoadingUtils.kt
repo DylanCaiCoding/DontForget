@@ -23,3 +23,10 @@ fun Activity.setToolbar(config: TitleConfig): LoadingHelper =
     titleAdapter.config = config
     setDecorHeader(ViewType.TITLE)
   }
+
+fun Activity.loadingHelperOf(vararg adapters: Pair<Any, LoadingHelper.Adapter<*>>) =
+  LoadingHelper(this).apply {
+    for (adapter in adapters) {
+      register(adapter.first, adapter.second)
+    }
+  }

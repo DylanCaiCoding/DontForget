@@ -8,20 +8,23 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.dylanc.dontforget.R
-import com.dylanc.dontforget.data.repository.DontForgetInfoRepository
+import com.dylanc.dontforget.data.repository.InfoRepository
 import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.utilktx.intentOf
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 private const val CHANNEL_ID = "not_forget"
 private const val CHANNEL_NAME = "勿忘消息"
 
 class NotifyService : Service() {
 
-  companion object {
-    var alreadyStarted = false
-  }
-
+  private val infoRepository = InfoRepository()
   private val binder = NotifyBinder()
+
+  companion object{
+     var alreadyStarted = false
+  }
 
   override fun onBind(intent: Intent): IBinder? {
     return binder
@@ -49,22 +52,24 @@ class NotifyService : Service() {
   }
 
   private fun showNotification() {
-    val dontForgetInfo = DontForgetInfoRepository.randomDontForgetInfo
-      ?: return
+    GlobalScope.launch {
+      val info = infoRepository.getRandomInfo() ?: throw NullPointerException()
 
-    val pendingIntent = PendingIntent.getActivity(this, 1, intentOf<MainActivity>(), 0)
-    val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-      .setContentText(dontForgetInfo.title)
-      .setStyle(
-        NotificationCompat.BigTextStyle()
-          .bigText(dontForgetInfo.title)
-      )
-      .setSmallIcon(R.mipmap.ic_launcher)
-      .setContentIntent(pendingIntent)
-      .build()
-    notification.flags = Notification.FLAG_ONGOING_EVENT
-    startForeground(1, notification)
-    alreadyStarted = true
+      val pendingIntent =
+        PendingIntent.getActivity(this@NotifyService, 1, intentOf<MainActivity>(), 0)
+      val notification = NotificationCompat.Builder(this@NotifyService, CHANNEL_ID)
+        .setContentText(info.title)
+        .setStyle(
+          NotificationCompat.BigTextStyle()
+            .bigText(info.title)
+        )
+        .setSmallIcon(R.mipmap.ic_launcher)
+        .setContentIntent(pendingIntent)
+        .build()
+      notification.flags = Notification.FLAG_ONGOING_EVENT
+      startForeground(1, notification)
+      alreadyStarted = true
+    }
   }
 
   fun hideNotification() {

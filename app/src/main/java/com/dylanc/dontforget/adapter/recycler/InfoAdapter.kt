@@ -1,10 +1,8 @@
 package com.dylanc.dontforget.adapter.recycler
 
-import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.DiffUtil
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.binding.setVisible
@@ -12,17 +10,14 @@ import com.dylanc.dontforget.base.BindingListAdapter
 import com.dylanc.dontforget.base.BindingViewHolder
 import com.dylanc.dontforget.data.api.TodoApi
 import com.dylanc.dontforget.data.bean.DontForgetInfo
-import com.dylanc.dontforget.data.constant.KEY_INFO
-import com.dylanc.dontforget.data.constant.REQUEST_CODE_UPDATE_INFO
 import com.dylanc.dontforget.databinding.RecyclerItemInfoBinding
-import com.dylanc.dontforget.ui.main.info.InfoActivity
 import com.dylanc.retrofit.helper.apiServiceOf
 import com.dylanc.retrofit.helper.rxjava.io2mainThread
-import com.dylanc.utilktx.startActivityForResult
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class InfoAdapter :
-  BindingListAdapter<DontForgetInfo, RecyclerItemInfoBinding>(InfoDiffCallback()) {
+class InfoAdapter(
+  private val onItemClick: (DontForgetInfo) -> Unit
+) : BindingListAdapter<DontForgetInfo, RecyclerItemInfoBinding>(InfoDiffCallback()) {
 
   override fun getLayout(inflater: LayoutInflater, parent: ViewGroup) =
     R.layout.recycler_item_info
@@ -47,20 +42,7 @@ class InfoAdapter :
         true
       }
       setOnClickListener {
-        InfoActivity.start(context as FragmentActivity, item) { resultCode, data ->
-          if (resultCode == Activity.RESULT_OK && data != null) {
-            val updateInfo: DontForgetInfo = data.getParcelableExtra(KEY_INFO)!!
-            val list = arrayListOf<DontForgetInfo>()
-            for (info in currentList) {
-              if (info.id == updateInfo.id) {
-                list.add(updateInfo)
-              } else {
-                list.add(info)
-              }
-            }
-            submitList(list)
-          }
-        }
+        onItemClick(item)
       }
     }
   }
