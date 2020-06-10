@@ -27,7 +27,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
     dataBinding {
@@ -80,7 +80,7 @@ dependencies {
     // Retrofit
     implementation "com.dylanc:retrofit-helper:$retrofit_helper_version"
     kapt "com.dylanc:retrofit-helper-compiler:$retrofit_helper_version"
-    implementation "com.dylanc:retrofit-helper-rxjava:$retrofit_helper_version"
+//    implementation "com.dylanc:retrofit-helper-rxjava:$retrofit_helper_version"
 
     // LiveEventBus
     implementation "com.dylanc:live-eventbus-ktx:$live_eventbus_ktx_version"

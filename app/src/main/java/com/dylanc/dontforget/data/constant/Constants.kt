@@ -17,7 +17,4 @@ const val KEY_INFO = "info"
 const val KEY_UPDATE_INTERVALS = "update_intervals"
 const val KEY_SHOW_NOTIFICATION = "show_notification"
 
-const val EVENT_NOTIFICATION = "notify"
-
-const val REQUEST_CODE_ALARM_NOTIFY = 0
-const val REQUEST_CODE_INSERT_INFO = 1
+const val EVENT_NOTIFICATION = "notification"

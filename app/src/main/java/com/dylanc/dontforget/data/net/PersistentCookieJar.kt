@@ -10,9 +10,9 @@ import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersisto
  * @author Dylan Cai
  * @since 2020/4/16
  */
-fun Initiator.persistentCookies(context: Context): Initiator {
-  persistentCookieJar = PersistentCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(context))
-  return cookieJar(persistentCookieJar)
-}
-
 lateinit var persistentCookieJar: PersistentCookieJar
+
+fun Initiator.persistentCookies(context: Context): Initiator = apply {
+  persistentCookieJar = PersistentCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(context))
+  cookieJar(persistentCookieJar)
+}

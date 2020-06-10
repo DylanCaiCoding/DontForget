@@ -1,9 +1,8 @@
-package com.dylanc.dontforget.data.api
+package com.dylanc.dontforget.data.repository.api
 
 import com.dylanc.dontforget.data.bean.ApiResponse
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.bean.ListPage
-import io.reactivex.Single
 import retrofit2.http.*
 
 /**
@@ -34,7 +33,4 @@ interface InfoApi {
   suspend fun addInfo(
     @Field("title") title: String
   ): ApiResponse<DontForgetInfo>
-
-  @POST("$TODO/delete/{id}/json")
-  fun deleteTodo(@Path("id") id: Int): Single<ApiResponse<Any?>>
 }

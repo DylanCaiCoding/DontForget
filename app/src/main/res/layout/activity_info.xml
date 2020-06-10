@@ -7,13 +7,13 @@
 
     <variable
       name="viewModel"
-      type="com.dylanc.dontforget.ui.main.info.InsertInfoViewModel" />
+      type="com.dylanc.dontforget.ui.main.insert_info.InsertInfoViewModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.info.InsertInfoActivity">
+    tools:context=".ui.main.insert_info.InsertInfoActivity">
 
 
     <EditText

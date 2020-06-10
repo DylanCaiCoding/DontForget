@@ -4,6 +4,7 @@ package com.dylanc.dontforget.adapter.binding
 
 import android.graphics.drawable.Drawable
 import android.view.View
+import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -59,3 +60,11 @@ fun View.adjustHeight(adjustHeight: Int) {
   params.height = adjustHeight
   layoutParams = params
 }
+
+@BindingAdapter(value = ["onCheckedChange"])
+fun CompoundButton.setOnCheckedChangeListener(onCheckedChange: (Boolean) -> Unit) {
+  setOnCheckedChangeListener { _, isChecked ->
+    onCheckedChange(isChecked)
+  }
+}
+

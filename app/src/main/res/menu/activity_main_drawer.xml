@@ -11,7 +11,7 @@
       android:id="@+id/nav_intervals"
       android:title="设置更新间隔时间" />
     <item
-      android:id="@+id/nav_notify"
+      android:id="@+id/nav_notification"
       android:title="显示通知"
       app:actionLayout="@layout/menu_item_switch"/>
     <item

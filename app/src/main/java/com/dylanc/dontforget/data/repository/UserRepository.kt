@@ -1,28 +1,40 @@
 package com.dylanc.dontforget.data.repository
 
-import com.dylanc.dontforget.data.api.UserApi
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.dylanc.dontforget.data.repository.api.UserApi
 import com.dylanc.dontforget.data.bean.User
 import com.dylanc.dontforget.data.net.persistentCookieJar
 import com.dylanc.dontforget.data.repository.db.UserDao
 import com.dylanc.dontforget.data.repository.db.userDatabase
 import com.dylanc.retrofit.helper.apiServiceOf
-import com.dylanc.retrofit.helper.rxjava.io2mainThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * @author Dylan Cai
  */
+
+val userRepository: UserRepository by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+  UserRepository()
+}
+
 class UserRepository(
   private val model: UserModel = UserModel(),
   private val remoteDataSource: UserRemoteDataSource = UserRemoteDataSource()
 ) {
-  fun requestLogin(username: String, password: String) =
-    remoteDataSource.requestLogin(username, password)
+  val user = model.user
 
-  suspend fun updateUser(user: User) =
+  suspend fun login(username: String, password: String) {
+    val user = remoteDataSource.requestLogin(username, password)
     model.updateUser(user)
+  }
 
-  suspend fun logout() =
+  suspend fun logout() {
+    remoteDataSource.requestLogout()
     model.logout()
+    persistentCookieJar.clear()
+  }
 
   suspend fun isLogin() =
     model.isLogin()
@@ -30,32 +42,41 @@ class UserRepository(
 
 class UserModel(private val userDao: UserDao = userDatabase.userDao()) {
 
-  suspend fun getUser(): User? =
-    if (isLogin()) {
-      userDao.getUserList()[0]
-    } else {
-      null
-    }
+  private val _user: MutableLiveData<User> = MutableLiveData()
+  val user: LiveData<User> = _user
 
   suspend fun updateUser(user: User) {
-    userDao.deleteAll()
-    userDao.insert(user)
+    withContext(Dispatchers.IO) {
+      userDao.deleteAll()
+      userDao.insert(user)
+    }
+    withContext(Dispatchers.Main) {
+      _user.value = user
+    }
   }
 
   suspend fun logout() {
-    if (isLogin()) {
-      userDao.deleteAll()
-      persistentCookieJar.clear()
+    withContext(Dispatchers.IO) {
+      if (isLogin()) {
+        userDao.deleteAll()
+      }
+    }
+    withContext(Dispatchers.Main) {
+      _user.value = null
     }
   }
 
-  suspend fun isLogin() =
+  suspend fun isLogin() = withContext(Dispatchers.IO) {
     userDao.getUserList().isNotEmpty()
+  }
 }
 
 class UserRemoteDataSource {
-  fun requestLogin(username: String, password: String) =
-    apiServiceOf<UserApi>()
-      .login(username, password)
-      .io2mainThread()
+  suspend fun requestLogin(username: String, password: String) = withContext(Dispatchers.IO) {
+    apiServiceOf<UserApi>().login(username, password).data
+  }
+
+  suspend fun requestLogout() = withContext(Dispatchers.IO) {
+    apiServiceOf<UserApi>().logout().data
+  }
 }

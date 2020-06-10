@@ -8,19 +8,50 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.dylanc.dontforget.R
+import com.dylanc.dontforget.data.constant.KEY_SHOW_NOTIFICATION
+import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
 import com.dylanc.dontforget.data.repository.infoRepository
 import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.utilktx.intentOf
+import com.dylanc.utilktx.spValueOf
+import java.util.*
 
-private const val CHANNEL_ID = "not_forget"
-private const val CHANNEL_NAME = "勿忘消息"
 
-class NotifyService : Service() {
+class NotifyInfoService : Service() {
 
   private val binder = NotifyBinder()
 
   companion object {
-    var alreadyStarted = false
+    private var alreadyStarted = false
+    private const val CHANNEL_ID = "dont_forget"
+    private const val CHANNEL_NAME = "勿忘消息"
+    private const val REQUEST_CODE_ALARM_NOTIFY = 0
+
+    fun startRepeatedly(activity: Activity) {
+      if (alreadyStarted || !spValueOf(KEY_SHOW_NOTIFICATION, true)) {
+        return
+      }
+
+      val intent = Intent(activity, NotifyInfoService::class.java)
+      val pendingIntent = PendingIntent.getService(
+        activity, REQUEST_CODE_ALARM_NOTIFY, intent, PendingIntent.FLAG_UPDATE_CURRENT
+      )
+      val alarmManager = activity.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+      val triggerAtMillis = Date().time
+      val intervalMillis = 60 * 1000 * spValueOf(KEY_UPDATE_INTERVALS, 6)
+      alarmManager.setRepeating(
+        AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis.toLong(), pendingIntent
+      )
+    }
+
+    fun stop(activity: Activity) {
+      val intent = Intent(activity, NotifyInfoService::class.java)
+      val pendingIntent = PendingIntent.getService(
+        activity, REQUEST_CODE_ALARM_NOTIFY, intent, PendingIntent.FLAG_UPDATE_CURRENT
+      )
+      val alarmManager = activity.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+      alarmManager.cancel(pendingIntent)
+    }
   }
 
   override fun onBind(intent: Intent): IBinder? {
@@ -71,8 +102,8 @@ class NotifyService : Service() {
   }
 
   inner class NotifyBinder : Binder() {
-    val service: NotifyService
-      get() = this@NotifyService
+    val service: NotifyInfoService
+      get() = this@NotifyInfoService
   }
 
 }

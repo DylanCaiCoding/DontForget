@@ -1,9 +1,7 @@
-package com.dylanc.dontforget.data.api
+package com.dylanc.dontforget.data.repository.api
 
 import com.dylanc.dontforget.data.bean.ApiResponse
 import com.dylanc.dontforget.data.bean.User
-import io.reactivex.Observable
-import io.reactivex.Single
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -20,19 +18,19 @@ interface UserApi {
 
   @FormUrlEncoded
   @POST("$USER/login")
-  fun login(
+  suspend fun login(
     @Field("username") username: String,
     @Field("password") password: String
-  ): Single<ApiResponse<User>>
+  ): ApiResponse<User>
 
   @FormUrlEncoded
   @POST("$USER/register")
-  fun register(
+  suspend fun register(
     @Field("username") username: String,
     @Field("password") password: String,
     @Field("repassword") repassword: String
-  ): Single<ApiResponse<User>>
+  ): ApiResponse<User>
 
   @GET("$USER/logout/json")
-  fun logout(): Single<ApiResponse<Any>>
+  suspend fun logout(): ApiResponse<Any>
 }

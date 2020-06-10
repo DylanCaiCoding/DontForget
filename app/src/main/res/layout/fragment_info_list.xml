@@ -3,9 +3,18 @@
   xmlns:app="http://schemas.android.com/apk/res-auto">
 
   <data>
+
     <variable
       name="viewModel"
-      type="com.dylanc.dontforget.ui.main.info_list.InfoListViewModel" />
+      type="com.dylanc.dontforget.view_model.state.ListStateViewModel" />
+
+    <variable
+      name="requestViewModel"
+      type="com.dylanc.dontforget.view_model.request.InfoRequestViewModel" />
+
+    <variable
+      name="clickProxy"
+      type="com.dylanc.dontforget.ui.main.info_list.InfoListFragment.ClickProxy" />
 
     <variable
       name="adapter"
@@ -18,14 +27,14 @@
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
       android:id="@+id/refresh_layout"
+      isRefreshing="@{viewModel.isRefreshing}"
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      isRefreshing="@{viewModel.isRefreshing}">
+      android:layout_height="match_parent">
 
       <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         adapter="@{adapter}"
-        list="@{viewModel.list}"
+        list="@{requestViewModel.list}"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
@@ -37,6 +46,7 @@
       android:layout_height="wrap_content"
       android:layout_marginEnd="16dp"
       android:layout_marginBottom="16dp"
+      android:onClick="@{()->clickProxy.onFabClick()}"
       app:backgroundTint="@android:color/white"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"

@@ -28,10 +28,10 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
-    <activity android:name="com.dylanc.dontforget.ui.main.info.InsertInfoActivity" />
+    <activity android:name="com.dylanc.dontforget.ui.main.insert_info.InsertInfoActivity" />
     <activity android:name="com.dylanc.dontforget.ui.main.MainActivity"
       android:launchMode="singleInstance"/>
-    <service android:name="com.dylanc.dontforget.service.NotifyService" />
+    <service android:name="com.dylanc.dontforget.service.NotifyInfoService" />
   </application>
 
 </manifest>

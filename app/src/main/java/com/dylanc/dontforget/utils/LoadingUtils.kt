@@ -2,7 +2,7 @@ package com.dylanc.dontforget.utils
 
 import android.app.Activity
 import android.view.MenuItem
-import com.dylanc.dontforget.base.BaseTitleAdapter
+import com.dylanc.dontforget.base.BaseToolbarAdapter
 import com.dylanc.dontforget.base.TitleConfig
 import com.dylanc.loadinghelper.LoadingHelper
 import com.dylanc.loadinghelper.ViewType
@@ -19,8 +19,8 @@ fun Activity.setToolbar(
 
 fun Activity.setToolbar(config: TitleConfig): LoadingHelper =
   LoadingHelper(this).apply {
-    val titleAdapter: BaseTitleAdapter<TitleConfig, *> = getAdapter(ViewType.TITLE)
-    titleAdapter.config = config
+    val toolbarAdapter: BaseToolbarAdapter<TitleConfig, *> = getAdapter(ViewType.TITLE)
+    toolbarAdapter.config = config
     setDecorHeader(ViewType.TITLE)
   }
 

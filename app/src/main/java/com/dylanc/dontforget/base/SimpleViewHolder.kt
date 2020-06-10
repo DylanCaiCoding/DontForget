@@ -8,5 +8,4 @@ import androidx.recyclerview.widget.RecyclerView
  * @author Dylan Cai
  * @since 2020/4/28
  */
-class BindingViewHolder<T : ViewDataBinding>(itemView: View, val binding: T) :
-  RecyclerView.ViewHolder(itemView)
+class SimpleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)

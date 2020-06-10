@@ -1,9 +1,5 @@
 package com.dylanc.dontforget.ui.main.info_list
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,23 +12,25 @@ import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.recycler.InfoAdapter
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.constant.EVENT_NOTIFICATION
-import com.dylanc.dontforget.data.constant.KEY_SHOW_NOTIFICATION
-import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
-import com.dylanc.dontforget.data.constant.REQUEST_CODE_ALARM_NOTIFY
+import com.dylanc.dontforget.data.net.LoadingDialog
 import com.dylanc.dontforget.databinding.FragmentInfoListBinding
-import com.dylanc.dontforget.service.NotifyService
-import com.dylanc.dontforget.ui.main.info.InsertInfoActivity
+import com.dylanc.dontforget.service.NotifyInfoService
+import com.dylanc.dontforget.ui.main.insert_info.InsertInfoActivity
+import com.dylanc.dontforget.utils.alertItems
+import com.dylanc.dontforget.utils.bindView
+import com.dylanc.dontforget.view_model.request.InfoRequestViewModel
+import com.dylanc.dontforget.view_model.state.ListStateViewModel
 import com.dylanc.liveeventbus.observeEvent
-import com.dylanc.utilktx.logDebug
-import com.dylanc.utilktx.spValueOf
-import com.dylanc.utilktx.toast
 import kotlinx.android.synthetic.main.fragment_info_list.*
-import java.util.*
 
 class InfoListFragment : Fragment() {
 
-  private val viewModel: InfoListViewModel by viewModels()
-  private val adapter = InfoAdapter(this::onItemClick)
+  //  private val viewModel: InfoListViewModel by viewModels()
+  private val requestViewModel: InfoRequestViewModel by viewModels()
+  private val listStateViewModel: ListStateViewModel by viewModels()
+  private val clickProxy = ClickProxy()
+  private val adapter = InfoAdapter(clickProxy::onItemClick, clickProxy::onItemLongClick)
+  private val loadingDialog = LoadingDialog()
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
@@ -42,65 +40,63 @@ class InfoListFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    val binding = DataBindingUtil.bind<FragmentInfoListBinding>(view)!!
+    val binding: FragmentInfoListBinding = bindView(view)
     binding.adapter = adapter
-    binding.viewModel = viewModel
+    binding.viewModel = listStateViewModel
+    binding.requestViewModel = requestViewModel
+    binding.clickProxy = clickProxy
     binding.lifecycleOwner = this
   }
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     refresh_layout.setColorSchemeResources(R.color.colorAccent)
-    refresh_layout.setOnRefreshListener { viewModel.requestInfoList() }
-    fab.setOnClickListener { onItemClick() }
+    refresh_layout.setOnRefreshListener { requestViewModel.requestInfoList() }
     observeEvent(EVENT_NOTIFICATION, this::onNotificationEvent)
-    viewModel.getInfoList()
-    viewModel.isRefreshing.observe(viewLifecycleOwner, Observer { isRefreshing ->
+    listStateViewModel.isRefreshing.observe(viewLifecycleOwner, Observer { isRefreshing ->
       if (!isRefreshing) {
-        startNotifyAlarm()
+        activity?.let { NotifyInfoService.startRepeatedly(it) }
       }
     })
-    viewModel.list.observe(viewLifecycleOwner, Observer {
-      toast("list 改变了")
+    requestViewModel.list.observe(viewLifecycleOwner, Observer {
+      loadingDialog.dismiss()
+      listStateViewModel.isRefreshing.value = false
     })
-  }
-
-  private fun onItemClick(item: DontForgetInfo? = null) {
-    InsertInfoActivity.start(item)
+    requestViewModel.getInfoList()
   }
 
   private fun onNotificationEvent(isChecked: Boolean) {
-    if (isChecked) {
-      startNotifyAlarm()
-    } else {
-      stopNotifyAlarm()
+    activity?.let { activity ->
+      if (isChecked) {
+        NotifyInfoService.startRepeatedly(activity)
+      } else {
+        NotifyInfoService.stop(activity)
+      }
     }
   }
 
-  private fun startNotifyAlarm() {
-    if (NotifyService.alreadyStarted || !spValueOf(KEY_SHOW_NOTIFICATION, true)) {
-      return
+  inner class ClickProxy {
+    fun onFabClick() {
+      onItemClick(null)
     }
 
-    val intent = Intent(activity, NotifyService::class.java)
-    val pendingIntent = PendingIntent.getService(
-      activity, REQUEST_CODE_ALARM_NOTIFY, intent, PendingIntent.FLAG_UPDATE_CURRENT
-    )
-    val alarmManager = activity?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    val triggerAtMillis = Date().time
-    val intervalMillis = 60 * 1000 * spValueOf(KEY_UPDATE_INTERVALS, 6)
-    logDebug("intervals -> ${spValueOf(KEY_UPDATE_INTERVALS, 5)}")
-    alarmManager.setRepeating(
-      AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis.toLong(), pendingIntent
-    )
-  }
+    fun onItemClick(item: DontForgetInfo?) {
+      InsertInfoActivity.start(item)
+    }
 
-  private fun stopNotifyAlarm() {
-    val intent = Intent(activity, NotifyService::class.java)
-    val pendingIntent = PendingIntent.getService(
-      activity, REQUEST_CODE_ALARM_NOTIFY, intent, PendingIntent.FLAG_UPDATE_CURRENT
-    )
-    val alarmManager = activity?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    alarmManager.cancel(pendingIntent)
+    fun onItemLongClick(item: DontForgetInfo) {
+      activity?.let { activity ->
+        activity.alertItems("关闭提醒", "删除") { text, _ ->
+          when (text) {
+            "关闭提醒" -> {
+            }
+            "删除" -> {
+              loadingDialog.show(childFragmentManager)
+              requestViewModel.deleteInfo(item)
+            }
+          }
+        }
+      }
+    }
   }
 }
