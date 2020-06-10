@@ -5,7 +5,7 @@
   android:layout_height="match_parent">
 
   <Switch
-    android:id="@+id/switch_menu"
+    android:id="@+id/switch_drawer"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     app:layout_constraintBottom_toBottomOf="parent"

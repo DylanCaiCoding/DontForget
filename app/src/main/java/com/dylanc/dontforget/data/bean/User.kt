@@ -1,6 +1,5 @@
 package com.dylanc.dontforget.data.bean
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 

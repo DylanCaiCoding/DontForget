@@ -24,6 +24,7 @@ class InsertInfoActivity : AppCompatActivity() {
   private val requestViewModel: InfoRequestViewModel by viewModels()
   private lateinit var binding: ActivityInfoBinding
   private val loadingDialog = LoadingDialog()
+  private val clickProxy = ClickProxy()
 
   companion object {
     fun start(info: DontForgetInfo? = null) {
@@ -46,29 +47,36 @@ class InsertInfoActivity : AppCompatActivity() {
     } else {
       "修改信息"
     }
-    setToolbar(title, TitleConfig.Type.BACK, R.menu.text_complete, this::onOptionsItemSelected)
+    setToolbar(
+      title, TitleConfig.Type.BACK,
+      R.menu.text_complete, clickProxy::onOptionsItemSelected
+    )
+
     requestViewModel.insertedInfo.observe(this) {
       loadingDialog.dismiss()
       finish()
     }
   }
 
-  override fun onOptionsItemSelected(item: MenuItem) =
-    when (item.itemId) {
-      R.id.action_complete -> {
-        if (TextUtils.isEmpty(viewModel.title.value)) {
-          toast("请输入标题")
-        } else {
-          loadingDialog.show(supportFragmentManager)
-          if (info == null) {
-            requestViewModel.addInfo(viewModel.title.value!!)
+  inner class ClickProxy {
+
+    fun onOptionsItemSelected(item: MenuItem) =
+      when (item.itemId) {
+        R.id.action_complete -> {
+          if (TextUtils.isEmpty(viewModel.title.value)) {
+            toast("请输入标题")
           } else {
-            requestViewModel.updateInfo(info!!.id, viewModel.title.value!!, info!!.dateStr)
+            loadingDialog.show(supportFragmentManager)
+            if (info == null) {
+              requestViewModel.addInfo(viewModel.title.value!!)
+            } else {
+              requestViewModel.updateInfo(info!!.id, viewModel.title.value!!, info!!.dateStr)
+            }
           }
+          true
         }
-        true
+        else -> false
       }
-      else -> super.onOptionsItemSelected(item)
-    }
+  }
 
 }

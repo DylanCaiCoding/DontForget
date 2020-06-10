@@ -7,14 +7,15 @@ import android.view.View
 import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 
 @BindingAdapter(value = ["imageUrl", "placeHolder"], requireAll = false)
 fun ImageView.loadUrl(
-  url: String?,
-  placeHolder: Drawable?
+  url: String,
+  placeHolder: Drawable? = null
 ) {
   Glide.with(context).load(url).placeholder(placeHolder).into(this)
 }
@@ -38,7 +39,7 @@ fun TextView.bindTextColor(textColorRes: Int) {
 }
 
 @BindingAdapter(value = ["imageRes"], requireAll = false)
-fun ImageView.setImageRes(imageRes: Int) {
+fun ImageView.setImageRes(@DrawableRes imageRes: Int) {
   setImageResource(imageRes)
 }
 
@@ -67,4 +68,3 @@ fun CompoundButton.setOnCheckedChangeListener(onCheckedChange: (Boolean) -> Unit
     onCheckedChange(isChecked)
   }
 }
-

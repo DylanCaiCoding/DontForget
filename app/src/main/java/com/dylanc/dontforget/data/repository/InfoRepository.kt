@@ -36,7 +36,7 @@ class InfoRepository(
     }
 
   suspend fun getInfoList() {
-    if (model.allInfo.value != null && model.allInfo.value!!.isEmpty()) {
+    if (model.allInfo.value == null || model.allInfo.value!!.isEmpty()) {
       val list = remoteDataSource.requestInfoList()
       model.insertAll(list)
     }

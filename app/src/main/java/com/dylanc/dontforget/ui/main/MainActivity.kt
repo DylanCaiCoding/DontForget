@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity() {
   private val loadingDialog = LoadingDialog()
   private var bound = false
   private val clickProxy = ClickProxy()
+  private val eventHandler = EventHandler()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -62,11 +63,11 @@ class MainActivity : AppCompatActivity() {
     nav_view.getHeaderView(0).tv_header.addMarginTopEqualStatusBarHeight()
 //    nav_view.setupWithNavController(navController)
     nav_view.setNavigationItemSelectedListener(clickProxy::onNavItemSelected)
-    val switchNotification = nav_view.menu.findItem(R.id.nav_notification).actionView.switch_menu
+    val switchNotification = nav_view.menu.findItem(R.id.nav_notification).actionView.switch_drawer
     switchNotification.isChecked = spValueOf(KEY_SHOW_NOTIFICATION, true)
-    switchNotification.setOnCheckedChangeListener(clickProxy::onNotifySwitchChecked)
+    switchNotification.setOnCheckedChangeListener(eventHandler::onNotifySwitchChecked)
+    eventHandler.observe()
 
-    observeEvent(EVENT_NOTIFICATION, this::onNotificationEvent)
     userRequestViewModel.user.observe(this, Observer { user ->
       if (user == null) {
         loadingDialog.dismiss()
@@ -83,12 +84,6 @@ class MainActivity : AppCompatActivity() {
     })
   }
 
-  private fun onNotificationEvent(isChecked: Boolean) {
-    if (!isChecked && bound) {
-      notifyInfoService.hideNotification()
-    }
-  }
-
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
     menuInflater.inflate(R.menu.main, menu)
     return true
@@ -103,12 +98,31 @@ class MainActivity : AppCompatActivity() {
     return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
   }
 
-  inner class ClickProxy {
-
-    fun onNotifySwitchChecked(isChecked: Boolean) {
-      putSP(KEY_SHOW_NOTIFICATION, isChecked)
-      postEvent(EVENT_NOTIFICATION, isChecked)
+  override fun onStart() {
+    super.onStart()
+    Intent(this, NotifyInfoService::class.java).also { intent ->
+      bindService(intent, connection, BIND_AUTO_CREATE)
     }
+  }
+
+  override fun onStop() {
+    super.onStop()
+    unbindService(connection)
+  }
+
+  private val connection = object : ServiceConnection {
+    override fun onServiceConnected(name: ComponentName, service: IBinder) {
+      val binder = service as NotifyInfoService.NotifyBinder
+      notifyInfoService = binder.service
+      bound = true
+    }
+
+    override fun onServiceDisconnected(name: ComponentName) {
+      bound = false
+    }
+  }
+
+  inner class ClickProxy {
 
     fun onNavItemSelected(menuItem: MenuItem) = run {
       when (menuItem.itemId) {
@@ -159,27 +173,22 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
-  override fun onStart() {
-    super.onStart()
-    Intent(this, NotifyInfoService::class.java).also { intent ->
-      bindService(intent, connection, BIND_AUTO_CREATE)
+  inner class EventHandler {
+
+    fun observe() {
+      observeEvent(EVENT_NOTIFICATION, this::onNotificationEvent)
+    }
+
+    private fun onNotificationEvent(isChecked: Boolean) {
+      if (!isChecked && bound) {
+        notifyInfoService.hideNotification()
+      }
+    }
+
+    fun onNotifySwitchChecked(isChecked: Boolean) {
+      putSP(KEY_SHOW_NOTIFICATION, isChecked)
+      postEvent(EVENT_NOTIFICATION, isChecked)
     }
   }
 
-  override fun onStop() {
-    super.onStop()
-    unbindService(connection)
-  }
-
-  private val connection = object : ServiceConnection {
-    override fun onServiceConnected(name: ComponentName, service: IBinder) {
-      val binder = service as NotifyInfoService.NotifyBinder
-      notifyInfoService = binder.service
-      bound = true
-    }
-
-    override fun onServiceDisconnected(name: ComponentName) {
-      bound = false
-    }
-  }
 }

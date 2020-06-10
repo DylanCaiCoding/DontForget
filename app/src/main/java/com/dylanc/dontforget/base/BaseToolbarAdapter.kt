@@ -1,7 +1,6 @@
 package com.dylanc.dontforget.base
 
 import android.view.MenuItem
-import android.view.View
 import com.dylanc.loadinghelper.LoadingHelper
 
 /**

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -26,9 +25,11 @@ import kotlinx.android.synthetic.main.fragment_info_list.*
 class InfoListFragment : Fragment() {
 
   //  private val viewModel: InfoListViewModel by viewModels()
+  private lateinit var binding: FragmentInfoListBinding
   private val requestViewModel: InfoRequestViewModel by viewModels()
   private val listStateViewModel: ListStateViewModel by viewModels()
   private val clickProxy = ClickProxy()
+  private val eventHandler = EventHandler()
   private val adapter = InfoAdapter(clickProxy::onItemClick, clickProxy::onItemLongClick)
   private val loadingDialog = LoadingDialog()
 
@@ -40,7 +41,7 @@ class InfoListFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    val binding: FragmentInfoListBinding = bindView(view)
+    binding = bindView(view)
     binding.adapter = adapter
     binding.viewModel = listStateViewModel
     binding.requestViewModel = requestViewModel
@@ -50,9 +51,9 @@ class InfoListFragment : Fragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
+    eventHandler.observe()
     refresh_layout.setColorSchemeResources(R.color.colorAccent)
     refresh_layout.setOnRefreshListener { requestViewModel.requestInfoList() }
-    observeEvent(EVENT_NOTIFICATION, this::onNotificationEvent)
     listStateViewModel.isRefreshing.observe(viewLifecycleOwner, Observer { isRefreshing ->
       if (!isRefreshing) {
         activity?.let { NotifyInfoService.startRepeatedly(it) }
@@ -65,36 +66,42 @@ class InfoListFragment : Fragment() {
     requestViewModel.getInfoList()
   }
 
-  private fun onNotificationEvent(isChecked: Boolean) {
-    activity?.let { activity ->
-      if (isChecked) {
-        NotifyInfoService.startRepeatedly(activity)
-      } else {
-        NotifyInfoService.stop(activity)
-      }
-    }
-  }
-
   inner class ClickProxy {
-    fun onFabClick() {
-      onItemClick(null)
+
+    fun onAddBtnClick() {
+      InsertInfoActivity.start()
     }
 
-    fun onItemClick(item: DontForgetInfo?) {
+    fun onItemClick(item: DontForgetInfo) {
       InsertInfoActivity.start(item)
     }
 
     fun onItemLongClick(item: DontForgetInfo) {
-      activity?.let { activity ->
-        activity.alertItems("关闭提醒", "删除") { text, _ ->
-          when (text) {
-            "关闭提醒" -> {
-            }
-            "删除" -> {
-              loadingDialog.show(childFragmentManager)
-              requestViewModel.deleteInfo(item)
-            }
+      activity?.alertItems("关闭提醒", "删除") { text, _ ->
+        when (text) {
+          "关闭提醒" -> {
           }
+          "删除" -> {
+            loadingDialog.show(childFragmentManager)
+            requestViewModel.deleteInfo(item)
+          }
+        }
+      }
+    }
+  }
+
+  inner class EventHandler {
+
+    fun observe() {
+      observeEvent(EVENT_NOTIFICATION, this::onNotificationEvent)
+    }
+
+    private fun onNotificationEvent(isChecked: Boolean) {
+      activity?.let { activity ->
+        if (isChecked) {
+          NotifyInfoService.startRepeatedly(activity)
+        } else {
+          NotifyInfoService.stop(activity)
         }
       }
     }
