@@ -11,8 +11,10 @@ import com.dylanc.dontforget.base.TitleConfig
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.constant.KEY_INFO
 import com.dylanc.dontforget.data.net.LoadingDialog
+import com.dylanc.dontforget.data.net.Status
 import com.dylanc.dontforget.databinding.ActivityInfoBinding
 import com.dylanc.dontforget.utils.bindContentView
+import com.dylanc.dontforget.utils.lifecycleOwner
 import com.dylanc.dontforget.utils.setToolbar
 import com.dylanc.dontforget.view_model.request.InfoRequestViewModel
 import com.dylanc.utilktx.startActivity
@@ -42,21 +44,18 @@ class InsertInfoActivity : AppCompatActivity() {
 
     info = intent.getParcelableExtra(KEY_INFO)
     viewModel.title.value = info?.title
-    val title = if (info == null) {
+    setToolbar(
+      toolbarTitle, TitleConfig.Type.BACK,
+      R.menu.text_complete, clickProxy::onOptionsItemSelected
+    )
+  }
+
+  private val toolbarTitle: String
+    get() = if (info == null) {
       "添加信息"
     } else {
       "修改信息"
     }
-    setToolbar(
-      title, TitleConfig.Type.BACK,
-      R.menu.text_complete, clickProxy::onOptionsItemSelected
-    )
-
-    requestViewModel.insertedInfo.observe(this) {
-      loadingDialog.dismiss()
-      finish()
-    }
-  }
 
   inner class ClickProxy {
 
@@ -66,11 +65,23 @@ class InsertInfoActivity : AppCompatActivity() {
           if (TextUtils.isEmpty(viewModel.title.value)) {
             toast("请输入标题")
           } else {
-            loadingDialog.show(supportFragmentManager)
-            if (info == null) {
+            val resource = if (info == null) {
               requestViewModel.addInfo(viewModel.title.value!!)
             } else {
               requestViewModel.updateInfo(info!!.id, viewModel.title.value!!, info!!.dateStr)
+            }
+            resource.observe(lifecycleOwner) {
+              when (it.status) {
+                Status.LOADING -> loadingDialog.show(supportFragmentManager)
+                Status.SUCCESS -> {
+                  loadingDialog.dismiss()
+                  finish()
+                }
+                Status.ERROR -> {
+                  loadingDialog.dismiss()
+                  toast(it.message)
+                }
+              }
             }
           }
           true

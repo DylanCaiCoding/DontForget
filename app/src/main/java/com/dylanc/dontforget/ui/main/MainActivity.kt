@@ -20,10 +20,12 @@ import com.dylanc.dontforget.data.constant.EVENT_NOTIFICATION
 import com.dylanc.dontforget.data.constant.KEY_SHOW_NOTIFICATION
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
 import com.dylanc.dontforget.data.net.LoadingDialog
+import com.dylanc.dontforget.data.net.Status
 import com.dylanc.dontforget.databinding.ActivityMainBinding
 import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.ui.user.login.LoginActivity
 import com.dylanc.dontforget.utils.bindContentView
+import com.dylanc.dontforget.utils.lifecycleOwner
 import com.dylanc.dontforget.view_model.request.UserRequestViewModel
 import com.dylanc.dontforget.view_model.request.VersionRequestViewModel
 import com.dylanc.liveeventbus.observeEvent
@@ -54,8 +56,8 @@ class MainActivity : AppCompatActivity() {
     binding = bindContentView(R.layout.activity_main)
     binding.viewModel = viewModel
     binding.lifecycleOwner = this
-    setSupportActionBar(toolbar)
     setStatusBarLightMode(true)
+    setSupportActionBar(toolbar)
     toolbar.title = "搜索"
     val navController = findNavController(R.id.nav_host_fragment)
     appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_home), drawer_layout)
@@ -65,16 +67,16 @@ class MainActivity : AppCompatActivity() {
     nav_view.setNavigationItemSelectedListener(clickProxy::onNavItemSelected)
     val switchNotification = nav_view.menu.findItem(R.id.nav_notification).actionView.switch_drawer
     switchNotification.isChecked = spValueOf(KEY_SHOW_NOTIFICATION, true)
-    switchNotification.setOnCheckedChangeListener(eventHandler::onNotifySwitchChecked)
+    switchNotification.setOnCheckedChangeListener(clickProxy::onNotifySwitchChecked)
     eventHandler.observe()
 
-    userRequestViewModel.user.observe(this, Observer { user ->
-      if (user == null) {
-        loadingDialog.dismiss()
-        startActivity<LoginActivity>()
-        finish()
-      }
-    })
+//    userRequestViewModel.user.observe(this, Observer { user ->
+//      if (user == null) {
+//        loadingDialog.dismiss()
+//        startActivity<LoginActivity>()
+//        finish()
+//      }
+//    })
     versionRequestViewModel.appVersion.observe(this, Observer { appVersion ->
       UpdateAppUtils
         .getInstance()
@@ -162,14 +164,32 @@ class MainActivity : AppCompatActivity() {
     fun onOptionsItemSelected(item: MenuItem): Boolean {
       return when (item.itemId) {
         R.id.action_logout -> {
-          loadingDialog.show(supportFragmentManager)
           userRequestViewModel.logout()
+            .observe(lifecycleOwner, Observer {
+              when (it.status) {
+                Status.LOADING -> loadingDialog.show(supportFragmentManager)
+                Status.SUCCESS -> {
+                  loadingDialog.dismiss()
+                  startActivity<LoginActivity>()
+                  finish()
+                }
+                Status.ERROR -> {
+                  loadingDialog.dismiss()
+                  toast(it.message)
+                }
+              }
+            })
           true
         }
         else -> {
           false
         }
       }
+    }
+
+    fun onNotifySwitchChecked(isChecked: Boolean) {
+      putSP(KEY_SHOW_NOTIFICATION, isChecked)
+      postEvent(EVENT_NOTIFICATION, isChecked)
     }
   }
 
@@ -183,11 +203,6 @@ class MainActivity : AppCompatActivity() {
       if (!isChecked && bound) {
         notifyInfoService.hideNotification()
       }
-    }
-
-    fun onNotifySwitchChecked(isChecked: Boolean) {
-      putSP(KEY_SHOW_NOTIFICATION, isChecked)
-      postEvent(EVENT_NOTIFICATION, isChecked)
     }
   }
 

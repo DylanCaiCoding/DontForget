@@ -1,9 +1,9 @@
 package com.dylanc.dontforget.data.repository
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.dylanc.dontforget.data.repository.api.InfoApi
 import com.dylanc.dontforget.data.bean.DontForgetInfo
+import com.dylanc.dontforget.data.net.Resource
+import com.dylanc.dontforget.data.net.resource
+import com.dylanc.dontforget.data.repository.api.InfoApi
 import com.dylanc.dontforget.data.repository.db.InfoDao
 import com.dylanc.dontforget.data.repository.db.infoDatabase
 import com.dylanc.retrofit.helper.apiServiceOf
@@ -23,7 +23,6 @@ class InfoRepository(
   private val remoteDataSource: InfoRemoteDataSource = InfoRemoteDataSource()
 ) {
   val allInfo = model.allInfo
-  val insertedInfo = model.insertedInfo
 
   val randomInfo: DontForgetInfo?
     get() {
@@ -35,63 +34,62 @@ class InfoRepository(
       }
     }
 
-  suspend fun getInfoList() {
-    if (model.allInfo.value == null || model.allInfo.value!!.isEmpty()) {
-      val list = remoteDataSource.requestInfoList()
-      model.insertAll(list)
+  suspend fun getInfoList() =
+    resource {
+      if (model.allInfo.value == null || model.allInfo.value!!.isEmpty()) {
+        remoteDataSource.requestInfoList().apply {
+          model.insertAll(this)
+        }
+      } else {
+        model.allInfo.value!!
+      }
     }
-  }
 
-  suspend fun requestInfoList() {
-    val list = remoteDataSource.requestInfoList()
-    model.deleteAll()
-    model.insertAll(list)
-  }
-
-  suspend fun addInfo(title: String) {
-    val info = remoteDataSource.requestAddInfo(title)
-    model.insertInfo(info)
-  }
-
-  suspend fun updateInfo(id: Int, title: String, date: String) {
-    try {
-      val info = remoteDataSource.requestUpdateInfo(id, title, date)
-      model.insertInfo(info)
-    } catch (e: Exception) {
-      e.printStackTrace()
+  suspend fun requestInfoList() =
+    resource {
+      remoteDataSource.requestInfoList()
+        .apply {
+          model.deleteAll()
+          model.insertAll(this)
+        }
     }
-  }
 
-  suspend fun deleteInfo(info: DontForgetInfo) {
-    remoteDataSource.requestDeleteInfo(info.id)
-    model.deleteInfo(info)
-  }
+  suspend fun addInfo(title: String) =
+    resource {
+      remoteDataSource.requestAddInfo(title).apply {
+        model.insertInfo(data)
+      }
+    }
 
+  suspend fun updateInfo(id: Int, title: String, date: String) =
+    resource {
+      remoteDataSource.requestUpdateInfo(id, title, date).apply {
+        model.insertInfo(data)
+      }
+    }
+
+  suspend fun deleteInfo(info: DontForgetInfo) =
+    resource {
+      remoteDataSource.requestDeleteInfo(info.id).apply {
+        model.deleteInfo(info)
+      }
+    }
 }
 
 class InfoModel(private val infoDao: InfoDao = infoDatabase.infoDao()) {
 
-  private val _insertedInfo = MutableLiveData<DontForgetInfo>()
   val allInfo = infoDao.getAllInfo()
-  val insertedInfo :LiveData<DontForgetInfo> = _insertedInfo
 
   suspend fun insertAll(infoList: List<DontForgetInfo>) = withContext(Dispatchers.IO) {
     infoDao.insertAll(infoList)
   }
 
-  suspend fun insertInfo(info: DontForgetInfo) {
-    withContext(Dispatchers.IO) {
-      infoDao.insertInfo(info)
-    }
-    withContext(Dispatchers.Main) {
-      _insertedInfo.value = info
-    }
+  suspend fun insertInfo(info: DontForgetInfo) = withContext(Dispatchers.IO) {
+    infoDao.insertInfo(info)
   }
 
-  suspend fun deleteInfo(info: DontForgetInfo) {
-    withContext(Dispatchers.IO) {
-      infoDao.deleteInfo(info)
-    }
+  suspend fun deleteInfo(info: DontForgetInfo) = withContext(Dispatchers.IO) {
+    infoDao.deleteInfo(info)
   }
 
   suspend fun deleteAll() = withContext(Dispatchers.IO) {
@@ -123,17 +121,14 @@ class InfoRemoteDataSource {
     }
   }
 
-  suspend fun requestAddInfo(title: String) = withContext(Dispatchers.IO) {
-    apiServiceOf<InfoApi>().addInfo(title).data
-  }
+  suspend fun requestAddInfo(title: String) =
+    apiServiceOf<InfoApi>().addInfo(title)
 
   suspend fun requestUpdateInfo(id: Int, title: String, date: String) =
-    withContext(Dispatchers.IO) {
-      apiServiceOf<InfoApi>().updateInfo(id, title, date).data
-    }
+    apiServiceOf<InfoApi>().updateInfo(id, title, date)
 
-  suspend fun requestDeleteInfo(id: Int) = withContext(Dispatchers.IO) {
-    apiServiceOf<InfoApi>().deleteInfo(id).data
-  }
+  suspend fun requestDeleteInfo(id: Int) =
+    apiServiceOf<InfoApi>().deleteInfo(id)
+
 }
 
