@@ -2,13 +2,11 @@ package com.dylanc.dontforget.data.repository
 
 import com.dylanc.dontforget.data.bean.User
 import com.dylanc.dontforget.data.net.persistentCookieJar
-import com.dylanc.dontforget.data.net.resource
+import com.dylanc.dontforget.data.net.request
 import com.dylanc.dontforget.data.repository.api.UserApi
 import com.dylanc.dontforget.data.repository.db.UserDao
 import com.dylanc.dontforget.data.repository.db.userDatabase
 import com.dylanc.retrofit.helper.apiServiceOf
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 /**
  * @author Dylan Cai
@@ -24,15 +22,15 @@ class UserRepository(
 ) {
 
   suspend fun login(username: String, password: String) =
-    resource {
+    request {
       remoteDataSource.requestLogin(username, password)
         .apply {
-          model.updateUser(data)
+          model.updateUser(data!!)
         }
     }
 
   suspend fun logout() =
-    resource {
+    request {
       remoteDataSource.requestLogout()
         .apply {
           model.logout()

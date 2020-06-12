@@ -10,6 +10,7 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -20,7 +21,8 @@ import com.dylanc.dontforget.data.constant.EVENT_NOTIFICATION
 import com.dylanc.dontforget.data.constant.KEY_SHOW_NOTIFICATION
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
 import com.dylanc.dontforget.data.net.LoadingDialog
-import com.dylanc.dontforget.data.net.Status
+import com.dylanc.dontforget.data.net.RequestException
+import com.dylanc.dontforget.data.net.observeProcessed
 import com.dylanc.dontforget.databinding.ActivityMainBinding
 import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.ui.user.login.LoginActivity
@@ -69,21 +71,6 @@ class MainActivity : AppCompatActivity() {
     switchNotification.isChecked = spValueOf(KEY_SHOW_NOTIFICATION, true)
     switchNotification.setOnCheckedChangeListener(clickProxy::onNotifySwitchChecked)
     eventHandler.observe()
-
-//    userRequestViewModel.user.observe(this, Observer { user ->
-//      if (user == null) {
-//        loadingDialog.dismiss()
-//        startActivity<LoginActivity>()
-//        finish()
-//      }
-//    })
-    versionRequestViewModel.appVersion.observe(this, Observer { appVersion ->
-      UpdateAppUtils
-        .getInstance()
-        .apkUrl(appVersion.installUrl)
-        .updateTitle("检查到新版本 v${appVersion.versionShort}")
-        .update()
-    })
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -129,7 +116,16 @@ class MainActivity : AppCompatActivity() {
     fun onNavItemSelected(menuItem: MenuItem) = run {
       when (menuItem.itemId) {
         R.id.nav_check_update -> {
+          loadingDialog.show(supportFragmentManager)
           versionRequestViewModel.checkVersion()
+            .observe(lifecycleOwner, Observer { appVersion ->
+              loadingDialog.dismiss()
+              UpdateAppUtils
+                .getInstance()
+                .apkUrl(appVersion.installUrl)
+                .updateTitle("检查到新版本 v${appVersion.versionShort}")
+                .update()
+            })
           drawer_layout.closeDrawers()
         }
         R.id.nav_intervals -> {
@@ -149,10 +145,10 @@ class MainActivity : AppCompatActivity() {
                 else ->
                   return@setSingleChoiceItems
               }
-              dialog.dismiss()
               postEvent(EVENT_NOTIFICATION, false)
               postEvent(EVENT_NOTIFICATION, true)
               drawer_layout.closeDrawers()
+              dialog.dismiss()
             }
             .create()
             .show()
@@ -164,20 +160,12 @@ class MainActivity : AppCompatActivity() {
     fun onOptionsItemSelected(item: MenuItem): Boolean {
       return when (item.itemId) {
         R.id.action_logout -> {
+          loadingDialog.show(supportFragmentManager)
           userRequestViewModel.logout()
             .observe(lifecycleOwner, Observer {
-              when (it.status) {
-                Status.LOADING -> loadingDialog.show(supportFragmentManager)
-                Status.SUCCESS -> {
-                  loadingDialog.dismiss()
-                  startActivity<LoginActivity>()
-                  finish()
-                }
-                Status.ERROR -> {
-                  loadingDialog.dismiss()
-                  toast(it.message)
-                }
-              }
+              loadingDialog.dismiss()
+              startActivity<LoginActivity>()
+              finish()
             })
           true
         }
@@ -197,6 +185,13 @@ class MainActivity : AppCompatActivity() {
 
     fun observe() {
       observeEvent(EVENT_NOTIFICATION, this::onNotificationEvent)
+      userRequestViewModel.requestException.observeProcessed(lifecycleOwner, this::onRequestException)
+      versionRequestViewModel.requestException.observeProcessed(lifecycleOwner, this::onRequestException)
+    }
+
+    private fun onRequestException(e: RequestException) {
+      loadingDialog.dismiss()
+      toast(e.message)
     }
 
     private fun onNotificationEvent(isChecked: Boolean) {

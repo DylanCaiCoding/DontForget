@@ -1,8 +1,7 @@
 package com.dylanc.dontforget.data.repository
 
 import com.dylanc.dontforget.data.bean.DontForgetInfo
-import com.dylanc.dontforget.data.net.Resource
-import com.dylanc.dontforget.data.net.resource
+import com.dylanc.dontforget.data.net.request
 import com.dylanc.dontforget.data.repository.api.InfoApi
 import com.dylanc.dontforget.data.repository.db.InfoDao
 import com.dylanc.dontforget.data.repository.db.infoDatabase
@@ -35,44 +34,38 @@ class InfoRepository(
     }
 
   suspend fun getInfoList() =
-    resource {
-      if (model.allInfo.value == null || model.allInfo.value!!.isEmpty()) {
-        remoteDataSource.requestInfoList().apply {
-          model.insertAll(this)
-        }
-      } else {
-        model.allInfo.value!!
+    if (model.allInfo.value == null || model.allInfo.value!!.isEmpty()) {
+      remoteDataSource.getInfoList().apply {
+        model.insertAll(this)
       }
+    } else {
+      model.allInfo.value!!
     }
+
 
   suspend fun requestInfoList() =
-    resource {
-      remoteDataSource.requestInfoList()
-        .apply {
-          model.deleteAll()
-          model.insertAll(this)
-        }
-    }
+    remoteDataSource.getInfoList()
+      .apply {
+        model.deleteAll()
+        model.insertAll(this)
+      }
+
 
   suspend fun addInfo(title: String) =
-    resource {
-      remoteDataSource.requestAddInfo(title).apply {
-        model.insertInfo(data)
-      }
+    remoteDataSource.requestAddInfo(title).apply {
+      model.insertInfo(data!!)
     }
+
 
   suspend fun updateInfo(id: Int, title: String, date: String) =
-    resource {
-      remoteDataSource.requestUpdateInfo(id, title, date).apply {
-        model.insertInfo(data)
-      }
+    remoteDataSource.requestUpdateInfo(id, title, date).apply {
+      model.insertInfo(data!!)
     }
 
+
   suspend fun deleteInfo(info: DontForgetInfo) =
-    resource {
-      remoteDataSource.requestDeleteInfo(info.id).apply {
-        model.deleteInfo(info)
-      }
+    remoteDataSource.requestDeleteInfo(info.id).apply {
+      model.deleteInfo(info)
     }
 }
 
@@ -101,34 +94,39 @@ class InfoRemoteDataSource {
   private var page: Int = 1
   private val list = mutableListOf<DontForgetInfo>()
 
-  suspend fun requestInfoList(): List<DontForgetInfo> {
+  suspend fun getInfoList(): List<DontForgetInfo> {
     list.clear()
     page = 1
-    return loadInfoList()
+    return loadAllInfo()
   }
 
-  private suspend fun loadInfoList(): List<DontForgetInfo> {
-    val pageList = withContext(Dispatchers.IO) {
-      apiServiceOf<InfoApi>().getInfoList(page).data
-    }
+  private suspend fun loadAllInfo(): List<DontForgetInfo> {
+    val pageList = requestInfoList().data!!
     return if (pageList.over) {
       list.addAll(pageList.list)
       list
     } else {
       page++
       list.addAll(pageList.list)
-      loadInfoList()
+      loadAllInfo()
     }
   }
 
-  suspend fun requestAddInfo(title: String) =
+  private suspend fun requestInfoList() = request {
+    apiServiceOf<InfoApi>().getInfoList(page)
+  }
+
+  suspend fun requestAddInfo(title: String) = request {
     apiServiceOf<InfoApi>().addInfo(title)
+  }
 
-  suspend fun requestUpdateInfo(id: Int, title: String, date: String) =
+  suspend fun requestUpdateInfo(id: Int, title: String, date: String) = request {
     apiServiceOf<InfoApi>().updateInfo(id, title, date)
+  }
 
-  suspend fun requestDeleteInfo(id: Int) =
+  suspend fun requestDeleteInfo(id: Int) = request {
     apiServiceOf<InfoApi>().deleteInfo(id)
+  }
 
 }
 

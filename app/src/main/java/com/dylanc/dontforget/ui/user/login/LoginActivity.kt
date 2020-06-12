@@ -5,9 +5,10 @@ import android.text.TextUtils
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.data.net.LoadingDialog
-import com.dylanc.dontforget.data.net.Status
+import com.dylanc.dontforget.data.net.RequestException
 import com.dylanc.dontforget.databinding.ActivityLoginBinding
 import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.dontforget.utils.bindContentView
@@ -24,6 +25,7 @@ class LoginActivity : AppCompatActivity() {
   private val requestViewModel: UserRequestViewModel by viewModels()
   private val loadingDialog = LoadingDialog()
   private val clickProxy = ClickProxy()
+  private val eventHandler = EventHandler()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -32,6 +34,7 @@ class LoginActivity : AppCompatActivity() {
     binding.clickProxy = clickProxy
     binding.lifecycleOwner = this
     setStatusBarLightMode(true)
+    eventHandler.observe()
   }
 
   inner class ClickProxy {
@@ -46,22 +49,26 @@ class LoginActivity : AppCompatActivity() {
         toast("请输入密码")
         return
       }
+      loadingDialog.show(supportFragmentManager)
       requestViewModel.login(username!!, password!!)
         .observe(lifecycleOwner, Observer {
-          when (it.status) {
-            Status.LOADING -> loadingDialog.show(supportFragmentManager)
-            Status.SUCCESS -> {
-              loadingDialog.dismiss()
-              toast("登录成功")
-              startActivity<MainActivity>()
-              finish()
-            }
-            Status.ERROR -> {
-              loadingDialog.dismiss()
-              toast(it.message)
-            }
-          }
+          loadingDialog.dismiss()
+          toast("登录成功")
+          startActivity<MainActivity>()
+          finish()
         })
+    }
+  }
+
+  inner class EventHandler {
+
+    fun observe() {
+      requestViewModel.requestException.observe(lifecycleOwner, this::onRequestException)
+    }
+
+    private fun onRequestException(e: RequestException) {
+      loadingDialog.dismiss()
+      toast(e.message)
     }
   }
 }

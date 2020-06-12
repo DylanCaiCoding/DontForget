@@ -1,16 +1,14 @@
 package com.dylanc.dontforget.view_model.request
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.liveData
+import com.dylanc.dontforget.base.RequestViewModel
 import com.dylanc.dontforget.data.repository.VersionRepository
-import kotlinx.coroutines.launch
 
-class VersionRequestViewModel: ViewModel() {
+class VersionRequestViewModel : RequestViewModel() {
 
   private val versionRepository = VersionRepository()
-  val appVersion = versionRepository.appVersion
 
-  fun checkVersion() = viewModelScope.launch {
-    versionRepository.checkVersion()
+  fun checkVersion() = liveData(requestExceptionHandler) {
+    emit(versionRepository.checkVersion())
   }
 }

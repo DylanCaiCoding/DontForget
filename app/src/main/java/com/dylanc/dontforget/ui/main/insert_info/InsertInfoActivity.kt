@@ -11,7 +11,8 @@ import com.dylanc.dontforget.base.TitleConfig
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.constant.KEY_INFO
 import com.dylanc.dontforget.data.net.LoadingDialog
-import com.dylanc.dontforget.data.net.Status
+import com.dylanc.dontforget.data.net.RequestException
+import com.dylanc.dontforget.data.net.observeProcessed
 import com.dylanc.dontforget.databinding.ActivityInfoBinding
 import com.dylanc.dontforget.utils.bindContentView
 import com.dylanc.dontforget.utils.lifecycleOwner
@@ -27,6 +28,7 @@ class InsertInfoActivity : AppCompatActivity() {
   private lateinit var binding: ActivityInfoBinding
   private val loadingDialog = LoadingDialog()
   private val clickProxy = ClickProxy()
+  private val eventHandler = EventHandler()
 
   companion object {
     fun start(info: DontForgetInfo? = null) {
@@ -48,6 +50,7 @@ class InsertInfoActivity : AppCompatActivity() {
       toolbarTitle, TitleConfig.Type.BACK,
       R.menu.text_complete, clickProxy::onOptionsItemSelected
     )
+    eventHandler.observe()
   }
 
   private val toolbarTitle: String
@@ -65,29 +68,33 @@ class InsertInfoActivity : AppCompatActivity() {
           if (TextUtils.isEmpty(viewModel.title.value)) {
             toast("请输入标题")
           } else {
-            val resource = if (info == null) {
+            loadingDialog.show(supportFragmentManager)
+            val request = if (info == null) {
               requestViewModel.addInfo(viewModel.title.value!!)
             } else {
               requestViewModel.updateInfo(info!!.id, viewModel.title.value!!, info!!.dateStr)
             }
-            resource.observe(lifecycleOwner) {
-              when (it.status) {
-                Status.LOADING -> loadingDialog.show(supportFragmentManager)
-                Status.SUCCESS -> {
-                  loadingDialog.dismiss()
-                  finish()
-                }
-                Status.ERROR -> {
-                  loadingDialog.dismiss()
-                  toast(it.message)
-                }
-              }
+            request.observe(lifecycleOwner) {
+              loadingDialog.dismiss()
+              finish()
             }
           }
           true
         }
         else -> false
       }
+  }
+
+  inner class EventHandler {
+
+    fun observe() {
+      requestViewModel.requestException.observeProcessed(lifecycleOwner, this::onRequestException)
+    }
+
+    private fun onRequestException(e: RequestException) {
+      loadingDialog.dismiss()
+      toast(e.message)
+    }
   }
 
 }
