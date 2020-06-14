@@ -10,14 +10,13 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.binding.setOnCheckedChangeListener
-import com.dylanc.dontforget.data.constant.EVENT_NOTIFICATION
 import com.dylanc.dontforget.data.constant.KEY_SHOW_NOTIFICATION
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
 import com.dylanc.dontforget.data.net.LoadingDialog
@@ -26,12 +25,12 @@ import com.dylanc.dontforget.data.net.observeProcessed
 import com.dylanc.dontforget.databinding.ActivityMainBinding
 import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.ui.user.login.LoginActivity
+import com.dylanc.dontforget.utils.applicationViewModels
 import com.dylanc.dontforget.utils.bindContentView
 import com.dylanc.dontforget.utils.lifecycleOwner
+import com.dylanc.dontforget.view_model.event.SharedViewModel
 import com.dylanc.dontforget.view_model.request.UserRequestViewModel
 import com.dylanc.dontforget.view_model.request.VersionRequestViewModel
-import com.dylanc.liveeventbus.observeEvent
-import com.dylanc.liveeventbus.postEvent
 import com.dylanc.utilktx.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
@@ -46,6 +45,7 @@ class MainActivity : AppCompatActivity() {
   private val viewModel: MainViewModel by viewModels()
   private val userRequestViewModel: UserRequestViewModel by viewModels()
   private val versionRequestViewModel: VersionRequestViewModel by viewModels()
+  private val sharedViewModel:SharedViewModel by applicationViewModels()
   private lateinit var appBarConfiguration: AppBarConfiguration
   private lateinit var notifyInfoService: NotifyInfoService
   private val loadingDialog = LoadingDialog()
@@ -71,6 +71,7 @@ class MainActivity : AppCompatActivity() {
     switchNotification.isChecked = spValueOf(KEY_SHOW_NOTIFICATION, true)
     switchNotification.setOnCheckedChangeListener(clickProxy::onNotifySwitchChecked)
     eventHandler.observe()
+    ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(application))
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -145,8 +146,8 @@ class MainActivity : AppCompatActivity() {
                 else ->
                   return@setSingleChoiceItems
               }
-              postEvent(EVENT_NOTIFICATION, false)
-              postEvent(EVENT_NOTIFICATION, true)
+              sharedViewModel.showNotification.postValue(false)
+              sharedViewModel.showNotification.postValue(true)
               drawer_layout.closeDrawers()
               dialog.dismiss()
             }
@@ -176,15 +177,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onNotifySwitchChecked(isChecked: Boolean) {
+      sharedViewModel.showNotification.postValue(isChecked)
       putSP(KEY_SHOW_NOTIFICATION, isChecked)
-      postEvent(EVENT_NOTIFICATION, isChecked)
+      if (!isChecked && bound) {
+        notifyInfoService.hideNotification()
+      }
     }
   }
 
   inner class EventHandler {
 
     fun observe() {
-      observeEvent(EVENT_NOTIFICATION, this::onNotificationEvent)
       userRequestViewModel.requestException.observeProcessed(lifecycleOwner, this::onRequestException)
       versionRequestViewModel.requestException.observeProcessed(lifecycleOwner, this::onRequestException)
     }
@@ -192,12 +195,6 @@ class MainActivity : AppCompatActivity() {
     private fun onRequestException(e: RequestException) {
       loadingDialog.dismiss()
       toast(e.message)
-    }
-
-    private fun onNotificationEvent(isChecked: Boolean) {
-      if (!isChecked && bound) {
-        notifyInfoService.hideNotification()
-      }
     }
   }
 

@@ -2,10 +2,12 @@ package com.dylanc.dontforget.utils
 
 import android.app.Activity
 import android.view.View
-import androidx.core.app.ComponentActivity
+import androidx.activity.ComponentActivity
+import androidx.annotation.MainThread
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.*
+import com.dylanc.utilktx.application
 
 /**
  * @author Dylan Cai
@@ -19,4 +21,13 @@ fun <T : ViewDataBinding> bindView(root: View) =
 
 val ComponentActivity.lifecycleOwner: LifecycleOwner
   get() = this
+
+val applicationViewModelStore = ViewModelStore()
+
+@MainThread
+inline fun <reified VM : ViewModel> applicationViewModels(): Lazy<VM> =
+  ViewModelLazy(VM::class, { applicationViewModelStore }, {
+    ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+  })
+
 

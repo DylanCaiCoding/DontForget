@@ -9,8 +9,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.recycler.InfoAdapter
+import com.dylanc.dontforget.base.event.EventObserver
 import com.dylanc.dontforget.data.bean.DontForgetInfo
-import com.dylanc.dontforget.data.constant.EVENT_NOTIFICATION
 import com.dylanc.dontforget.data.net.LoadingDialog
 import com.dylanc.dontforget.data.net.RequestException
 import com.dylanc.dontforget.data.net.observeProcessed
@@ -18,10 +18,11 @@ import com.dylanc.dontforget.databinding.FragmentInfoListBinding
 import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.ui.main.insert_info.InsertInfoActivity
 import com.dylanc.dontforget.utils.alertItems
+import com.dylanc.dontforget.utils.applicationViewModels
 import com.dylanc.dontforget.utils.bindView
+import com.dylanc.dontforget.view_model.event.SharedViewModel
 import com.dylanc.dontforget.view_model.request.InfoRequestViewModel
 import com.dylanc.dontforget.view_model.state.ListStateViewModel
-import com.dylanc.liveeventbus.observeEvent
 import com.dylanc.utilktx.toast
 import kotlinx.android.synthetic.main.fragment_info_list.*
 
@@ -31,6 +32,7 @@ class InfoListFragment : Fragment() {
   private lateinit var binding: FragmentInfoListBinding
   private val requestViewModel: InfoRequestViewModel by viewModels()
   private val listStateViewModel: ListStateViewModel by viewModels()
+  private val sharedViewModel: SharedViewModel by applicationViewModels()
   private val clickProxy = ClickProxy()
   private val eventHandler = EventHandler()
   private val adapter = InfoAdapter(clickProxy::onItemClick, clickProxy::onItemLongClick)
@@ -58,11 +60,19 @@ class InfoListFragment : Fragment() {
     eventHandler.observe()
     refresh_layout.setColorSchemeResources(R.color.colorAccent)
     refresh_layout.setOnRefreshListener(eventHandler::onRefresh)
-        listStateViewModel.isRefreshing.value = true
+    listStateViewModel.isRefreshing.value = true
     requestViewModel.getInfoList()
       .observe(viewLifecycleOwner, Observer {
         NotifyInfoService.startRepeatedly(activity)
         listStateViewModel.isRefreshing.value = false
+      })
+    sharedViewModel.showNotification
+      .observe(viewLifecycleOwner, EventObserver { isChecked ->
+        if (isChecked) {
+          NotifyInfoService.startRepeatedly(activity)
+        } else {
+          NotifyInfoService.stop(activity)
+        }
       })
   }
 
@@ -96,7 +106,6 @@ class InfoListFragment : Fragment() {
   inner class EventHandler {
 
     fun observe() {
-      observeEvent(EVENT_NOTIFICATION, this::onNotificationEvent)
       requestViewModel.requestException
         .observeProcessed(viewLifecycleOwner, this::onRequestException)
     }
@@ -113,14 +122,6 @@ class InfoListFragment : Fragment() {
           NotifyInfoService.startRepeatedly(activity)
           listStateViewModel.isRefreshing.value = false
         })
-    }
-
-    private fun onNotificationEvent(isChecked: Boolean) {
-      if (isChecked) {
-        NotifyInfoService.startRepeatedly(activity)
-      } else {
-        NotifyInfoService.stop(activity)
-      }
     }
   }
 }
