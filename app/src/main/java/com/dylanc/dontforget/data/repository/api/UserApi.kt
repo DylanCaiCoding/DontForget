@@ -21,15 +21,15 @@ interface UserApi {
   suspend fun login(
     @Field("username") username: String,
     @Field("password") password: String
-  ): ApiResponse<User>
+  ): ApiResponse<User?>
 
   @FormUrlEncoded
   @POST("$USER/register")
   suspend fun register(
     @Field("username") username: String,
     @Field("password") password: String,
-    @Field("repassword") repassword: String
-  ): ApiResponse<User>
+    @Field("repassword") confirmPassword: String
+  ): ApiResponse<User?>
 
   @GET("$USER/logout/json")
   suspend fun logout(): ApiResponse<Any>

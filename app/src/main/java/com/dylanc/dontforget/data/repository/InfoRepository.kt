@@ -42,7 +42,6 @@ class InfoRepository(
       model.allInfo.value!!
     }
 
-
   suspend fun requestInfoList() =
     remoteDataSource.getInfoList()
       .apply {
@@ -50,23 +49,23 @@ class InfoRepository(
         model.insertAll(this)
       }
 
-
   suspend fun addInfo(title: String) =
     remoteDataSource.requestAddInfo(title).apply {
       model.insertInfo(data!!)
     }
-
 
   suspend fun updateInfo(id: Int, title: String, date: String) =
     remoteDataSource.requestUpdateInfo(id, title, date).apply {
       model.insertInfo(data!!)
     }
 
-
   suspend fun deleteInfo(info: DontForgetInfo) =
     remoteDataSource.requestDeleteInfo(info.id).apply {
       model.deleteInfo(info)
     }
+
+  suspend fun deleteAllInfo() =
+    model.deleteAll()
 }
 
 class InfoModel(private val infoDao: InfoDao = infoDatabase.infoDao()) {

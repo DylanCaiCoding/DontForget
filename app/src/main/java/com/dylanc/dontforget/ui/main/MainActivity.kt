@@ -71,7 +71,6 @@ class MainActivity : AppCompatActivity() {
     switchNotification.isChecked = spValueOf(KEY_SHOW_NOTIFICATION, true)
     switchNotification.setOnCheckedChangeListener(clickProxy::onNotifySwitchChecked)
     eventHandler.observe()
-    ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(application))
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -113,49 +112,56 @@ class MainActivity : AppCompatActivity() {
   }
 
   inner class ClickProxy {
-
     fun onNavItemSelected(menuItem: MenuItem) = run {
       when (menuItem.itemId) {
         R.id.nav_check_update -> {
-          loadingDialog.show(supportFragmentManager)
-          versionRequestViewModel.checkVersion()
-            .observe(lifecycleOwner, Observer { appVersion ->
-              loadingDialog.dismiss()
-              UpdateAppUtils
-                .getInstance()
-                .apkUrl(appVersion.installUrl)
-                .updateTitle("检查到新版本 v${appVersion.versionShort}")
-                .update()
-            })
+          onCheckBtnClick()
           drawer_layout.closeDrawers()
         }
         R.id.nav_intervals -> {
-          MaterialAlertDialogBuilder(this@MainActivity)
-            .setTitle("请选择刷新的间隔时间")
-            .setSingleChoiceItems(arrayOf("5 分钟", "10 分钟", "1 小时"), 0) { dialog, which ->
-              when (which) {
-                0 -> {
-                  putSP(KEY_UPDATE_INTERVALS, 5)
-                }
-                1 -> {
-                  putSP(KEY_UPDATE_INTERVALS, 10)
-                }
-                2 -> {
-                  putSP(KEY_UPDATE_INTERVALS, 60)
-                }
-                else ->
-                  return@setSingleChoiceItems
-              }
-              sharedViewModel.showNotification.postValue(false)
-              sharedViewModel.showNotification.postValue(true)
-              drawer_layout.closeDrawers()
-              dialog.dismiss()
-            }
-            .create()
-            .show()
+          onIntervalsBtnClick()
         }
       }
       false
+    }
+
+    private fun onCheckBtnClick() {
+      loadingDialog.show(supportFragmentManager)
+      versionRequestViewModel.checkVersion()
+        .observe(lifecycleOwner, Observer { appVersion ->
+          loadingDialog.dismiss()
+          UpdateAppUtils
+            .getInstance()
+            .apkUrl(appVersion.installUrl)
+            .updateTitle("检查到新版本 v${appVersion.versionShort}")
+            .update()
+        })
+    }
+
+    private fun onIntervalsBtnClick() {
+      MaterialAlertDialogBuilder(this@MainActivity)
+        .setTitle("请选择刷新的间隔时间")
+        .setSingleChoiceItems(arrayOf("5 分钟", "10 分钟", "1 小时"), 0) { dialog, which ->
+          when (which) {
+            0 -> {
+              putSP(KEY_UPDATE_INTERVALS, 5)
+            }
+            1 -> {
+              putSP(KEY_UPDATE_INTERVALS, 10)
+            }
+            2 -> {
+              putSP(KEY_UPDATE_INTERVALS, 60)
+            }
+            else ->
+              return@setSingleChoiceItems
+          }
+          sharedViewModel.showNotification.postValue(false)
+          sharedViewModel.showNotification.postValue(true)
+          drawer_layout.closeDrawers()
+          dialog.dismiss()
+        }
+        .create()
+        .show()
     }
 
     fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -186,10 +192,11 @@ class MainActivity : AppCompatActivity() {
   }
 
   inner class EventHandler {
-
     fun observe() {
-      userRequestViewModel.requestException.observeProcessed(lifecycleOwner, this::onRequestException)
-      versionRequestViewModel.requestException.observeProcessed(lifecycleOwner, this::onRequestException)
+      userRequestViewModel.requestException
+        .observeProcessed(lifecycleOwner, this::onRequestException)
+      versionRequestViewModel.requestException
+        .observeProcessed(lifecycleOwner, this::onRequestException)
     }
 
     private fun onRequestException(e: RequestException) {

@@ -22,24 +22,24 @@ class UserRepository(
 ) {
 
   suspend fun login(username: String, password: String) =
-    request {
-      remoteDataSource.requestLogin(username, password)
-        .apply {
-          model.updateUser(data!!)
-        }
-    }
+    remoteDataSource.requestLogin(username, password)
+      .apply {
+        model.updateUser(data!!)
+      }
 
   suspend fun logout() =
-    request {
-      remoteDataSource.requestLogout()
-        .apply {
-          model.logout()
-          persistentCookieJar.clear()
-        }
-    }
+    remoteDataSource.requestLogout()
+      .apply {
+        infoRepository.deleteAllInfo()
+        model.logout()
+        persistentCookieJar.clear()
+      }
 
   suspend fun isLogin() =
     model.isLogin()
+
+  suspend fun register(username: String, password: String, confirmPassword: String) =
+    remoteDataSource.requestRegister(username, password, confirmPassword)
 }
 
 class UserModel(private val userDao: UserDao = userDatabase.userDao()) {
@@ -60,10 +60,16 @@ class UserModel(private val userDao: UserDao = userDatabase.userDao()) {
 }
 
 class UserRemoteDataSource {
-  suspend fun requestLogin(username: String, password: String) =
+  suspend fun requestLogin(username: String, password: String) = request {
     apiServiceOf<UserApi>().login(username, password)
+  }
 
-  suspend fun requestLogout() =
+  suspend fun requestLogout() = request {
     apiServiceOf<UserApi>().logout()
+  }
 
+  suspend fun requestRegister(username: String, password: String, confirmPassword: String) =
+    request {
+      apiServiceOf<UserApi>().register(username, password, confirmPassword)
+    }
 }

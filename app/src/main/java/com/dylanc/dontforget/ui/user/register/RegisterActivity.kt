@@ -1,43 +1,40 @@
-package com.dylanc.dontforget.ui.user.login
+package com.dylanc.dontforget.ui.user.register
 
 import android.os.Bundle
+import android.text.TextUtils
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
 import com.dylanc.dontforget.R
+import com.dylanc.dontforget.base.TitleConfig
 import com.dylanc.dontforget.data.net.LoadingDialog
-import com.dylanc.dontforget.databinding.ActivityLoginBinding
+import com.dylanc.dontforget.databinding.ActivityRegisterBinding
 import com.dylanc.dontforget.ui.main.MainActivity
-import com.dylanc.dontforget.ui.user.register.RegisterActivity
 import com.dylanc.dontforget.utils.bindContentView
 import com.dylanc.dontforget.utils.lifecycleOwner
+import com.dylanc.dontforget.utils.setToolbar
 import com.dylanc.dontforget.view_model.request.UserRequestViewModel
-import com.dylanc.utilktx.setStatusBarLightMode
+import com.dylanc.utilktx.finishAllActivities
 import com.dylanc.utilktx.startActivity
 import com.dylanc.utilktx.toast
 
-class LoginActivity : AppCompatActivity() {
-
-  private lateinit var binding: ActivityLoginBinding
-  private val viewModel: LoginViewModel by viewModels()
+class RegisterActivity : AppCompatActivity() {
+  private lateinit var binding: ActivityRegisterBinding
+  private val viewModel: RegisterViewModel by viewModels()
   private val requestViewModel: UserRequestViewModel by viewModels()
-  private val clickProxy = ClickProxy()
-  private val eventHandler = EventHandler()
   private val loadingDialog = LoadingDialog()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    binding = bindContentView(R.layout.activity_login)
+    binding = bindContentView(R.layout.activity_register)
     binding.viewModel = viewModel
-    binding.clickProxy = clickProxy
+    binding.clickProxy = ClickProxy()
     binding.lifecycleOwner = this
-    setStatusBarLightMode(true)
-    eventHandler.observe()
+    setToolbar("注册", TitleConfig.Type.BACK)
   }
 
   inner class ClickProxy {
-    fun onLoginBtnClick() {
+    fun onRegisterBtnClick() {
       val username = viewModel.username.value
       if (username.isNullOrBlank()) {
         toast("请输入账号")
@@ -48,28 +45,18 @@ class LoginActivity : AppCompatActivity() {
         toast("请输入密码")
         return
       }
+      val confirmPassword = viewModel.confirmPassword.value
+      if (confirmPassword.isNullOrBlank()) {
+        toast("请再次输入密码")
+        return
+      }
       loadingDialog.show(supportFragmentManager)
-      requestViewModel.login(username, password)
+      requestViewModel.register(username, password, confirmPassword)
         .observe(lifecycleOwner, Observer {
           loadingDialog.dismiss()
-          toast("登录成功")
-          startActivity<MainActivity>()
+          toast("注册成功")
           finish()
         })
-    }
-
-    fun onRegisterBtnClick(){
-      startActivity<RegisterActivity>()
-    }
-  }
-
-  inner class EventHandler {
-    fun observe() {
-      requestViewModel.requestException
-        .observe(lifecycleOwner) {
-          loadingDialog.dismiss()
-          toast(it.message)
-        }
     }
   }
 }

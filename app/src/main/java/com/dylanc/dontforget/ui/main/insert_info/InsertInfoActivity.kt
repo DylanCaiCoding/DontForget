@@ -61,7 +61,6 @@ class InsertInfoActivity : AppCompatActivity() {
     }
 
   inner class ClickProxy {
-
     fun onOptionsItemSelected(item: MenuItem) =
       when (item.itemId) {
         R.id.action_complete -> {
@@ -86,14 +85,12 @@ class InsertInfoActivity : AppCompatActivity() {
   }
 
   inner class EventHandler {
-
     fun observe() {
-      requestViewModel.requestException.observeProcessed(lifecycleOwner, this::onRequestException)
-    }
-
-    private fun onRequestException(e: RequestException) {
-      loadingDialog.dismiss()
-      toast(e.message)
+      requestViewModel.requestException
+        .observeProcessed(lifecycleOwner) {
+          loadingDialog.dismiss()
+          toast(it.message)
+        }
     }
   }
 

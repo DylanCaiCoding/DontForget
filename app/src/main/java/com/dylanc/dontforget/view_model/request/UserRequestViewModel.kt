@@ -14,4 +14,9 @@ class UserRequestViewModel : RequestViewModel() {
     emit(userRepository.logout())
   }
 
+  fun register(username: String, password: String, confirmPassword: String) =
+    liveData(requestExceptionHandler) {
+      emit(userRepository.register(username, password, confirmPassword))
+    }
+
 }

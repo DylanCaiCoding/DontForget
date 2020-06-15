@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.recycler.InfoAdapter
 import com.dylanc.dontforget.base.event.EventObserver
@@ -57,27 +58,12 @@ class InfoListFragment : Fragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    eventHandler.observe()
     refresh_layout.setColorSchemeResources(R.color.colorAccent)
-    refresh_layout.setOnRefreshListener(eventHandler::onRefresh)
     listStateViewModel.isRefreshing.value = true
-    requestViewModel.getInfoList()
-      .observe(viewLifecycleOwner, Observer {
-        NotifyInfoService.startRepeatedly(activity)
-        listStateViewModel.isRefreshing.value = false
-      })
-    sharedViewModel.showNotification
-      .observe(viewLifecycleOwner, EventObserver { isChecked ->
-        if (isChecked) {
-          NotifyInfoService.startRepeatedly(activity)
-        } else {
-          NotifyInfoService.stop(activity)
-        }
-      })
+    eventHandler.observe()
   }
 
   inner class ClickProxy {
-
     fun onAddBtnClick() {
       InsertInfoActivity.start()
     }
@@ -105,23 +91,42 @@ class InfoListFragment : Fragment() {
 
   inner class EventHandler {
 
-    fun observe() {
+    fun observe(){
+      requestViewModel.getInfoList()
+        .observe(viewLifecycleOwner, Observer {
+          NotifyInfoService.startRepeatedly(activity)
+          listStateViewModel.isRefreshing.value = false
+        })
       requestViewModel.requestException
-        .observeProcessed(viewLifecycleOwner, this::onRequestException)
+        .observeProcessed(viewLifecycleOwner){
+          loadingDialog.dismiss()
+          listStateViewModel.isRefreshing.value = false
+          toast(it.message)
+        }
+      sharedViewModel.showNotification
+        .observe(viewLifecycleOwner, EventObserver { isChecked ->
+          if (isChecked) {
+            NotifyInfoService.startRepeatedly(activity)
+          } else {
+            NotifyInfoService.stop(activity)
+          }
+        })
     }
 
-    private fun onRequestException(e: RequestException) {
-      loadingDialog.dismiss()
-      listStateViewModel.isRefreshing.value = false
-      toast(e.message)
-    }
-
-    fun onRefresh() {
+    val onRefreshListener = SwipeRefreshLayout.OnRefreshListener {
       requestViewModel.requestInfoList()
         .observe(viewLifecycleOwner, Observer {
           NotifyInfoService.startRepeatedly(activity)
           listStateViewModel.isRefreshing.value = false
         })
+    }
+
+    fun onRefresh() {
+//      requestViewModel.requestInfoList()
+//        .observe(viewLifecycleOwner, Observer {
+//          NotifyInfoService.startRepeatedly(activity)
+//          listStateViewModel.isRefreshing.value = false
+//        })
     }
   }
 }
