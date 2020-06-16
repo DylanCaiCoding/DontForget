@@ -1,15 +1,17 @@
-package com.dylanc.dontforget.data.net
+package com.dylanc.dontforget.utils
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import com.dylanc.dontforget.data.net.AuthenticationException
+import com.dylanc.dontforget.data.net.RequestException
 import com.dylanc.dontforget.ui.user.login.LoginActivity
 import com.dylanc.utilktx.finishAllActivities
 import com.dylanc.utilktx.startActivity
 import com.dylanc.utilktx.toast
 
 
-fun LiveData<RequestException>.observeProcessed(
+fun LiveData<RequestException>.observeException(
   lifecycleOwner: LifecycleOwner,
   onChanged: (RequestException) -> Unit
 ) {

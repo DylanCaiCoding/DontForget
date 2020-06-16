@@ -4,17 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.library.baseAdapters.BR
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.recycler.InfoAdapter
-import com.dylanc.dontforget.base.event.EventObserver
+import com.dylanc.dontforget.base.event.observeEvent
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.net.LoadingDialog
-import com.dylanc.dontforget.data.net.RequestException
-import com.dylanc.dontforget.data.net.observeProcessed
+import com.dylanc.dontforget.utils.observeException
 import com.dylanc.dontforget.databinding.FragmentInfoListBinding
 import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.ui.main.insert_info.InsertInfoActivity
@@ -47,13 +47,13 @@ class InfoListFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    binding = bindView(view)
-    binding.adapter = adapter
-    binding.viewModel = listStateViewModel
-    binding.requestViewModel = requestViewModel
-    binding.clickProxy = clickProxy
-    binding.eventHandler = eventHandler
-    binding.lifecycleOwner = this
+    bindView(
+      view, listStateViewModel,
+      BR.adapter to adapter,
+      BR.clickProxy to clickProxy,
+      BR.eventHandler to eventHandler,
+      BR.requestViewModel to requestViewModel
+    )
   }
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -91,26 +91,26 @@ class InfoListFragment : Fragment() {
 
   inner class EventHandler {
 
-    fun observe(){
+    fun observe() {
       requestViewModel.getInfoList()
         .observe(viewLifecycleOwner, Observer {
           NotifyInfoService.startRepeatedly(activity)
           listStateViewModel.isRefreshing.value = false
         })
       requestViewModel.requestException
-        .observeProcessed(viewLifecycleOwner){
+        .observeException(viewLifecycleOwner) {
           loadingDialog.dismiss()
           listStateViewModel.isRefreshing.value = false
           toast(it.message)
         }
       sharedViewModel.showNotification
-        .observe(viewLifecycleOwner, EventObserver { isChecked ->
+        .observeEvent(viewLifecycleOwner) { isChecked ->
           if (isChecked) {
             NotifyInfoService.startRepeatedly(activity)
           } else {
             NotifyInfoService.stop(activity)
           }
-        })
+        }
     }
 
     val onRefreshListener = SwipeRefreshLayout.OnRefreshListener {
@@ -121,12 +121,12 @@ class InfoListFragment : Fragment() {
         })
     }
 
-    fun onRefresh() {
+//    fun onRefresh() {
 //      requestViewModel.requestInfoList()
 //        .observe(viewLifecycleOwner, Observer {
 //          NotifyInfoService.startRepeatedly(activity)
 //          listStateViewModel.isRefreshing.value = false
 //        })
-    }
+//    }
   }
 }

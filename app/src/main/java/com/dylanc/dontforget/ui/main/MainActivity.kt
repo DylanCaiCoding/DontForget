@@ -10,24 +10,23 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.binding.setOnCheckedChangeListener
+import com.dylanc.dontforget.base.event.postEventValue
 import com.dylanc.dontforget.data.constant.KEY_SHOW_NOTIFICATION
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
 import com.dylanc.dontforget.data.net.LoadingDialog
 import com.dylanc.dontforget.data.net.RequestException
-import com.dylanc.dontforget.data.net.observeProcessed
-import com.dylanc.dontforget.databinding.ActivityMainBinding
 import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.ui.user.login.LoginActivity
 import com.dylanc.dontforget.utils.applicationViewModels
 import com.dylanc.dontforget.utils.bindContentView
 import com.dylanc.dontforget.utils.lifecycleOwner
+import com.dylanc.dontforget.utils.observeException
 import com.dylanc.dontforget.view_model.event.SharedViewModel
 import com.dylanc.dontforget.view_model.request.UserRequestViewModel
 import com.dylanc.dontforget.view_model.request.VersionRequestViewModel
@@ -41,11 +40,10 @@ import update.UpdateAppUtils
 
 class MainActivity : AppCompatActivity() {
 
-  private lateinit var binding: ActivityMainBinding
   private val viewModel: MainViewModel by viewModels()
   private val userRequestViewModel: UserRequestViewModel by viewModels()
   private val versionRequestViewModel: VersionRequestViewModel by viewModels()
-  private val sharedViewModel:SharedViewModel by applicationViewModels()
+  private val sharedViewModel: SharedViewModel by applicationViewModels()
   private lateinit var appBarConfiguration: AppBarConfiguration
   private lateinit var notifyInfoService: NotifyInfoService
   private val loadingDialog = LoadingDialog()
@@ -55,9 +53,7 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    binding = bindContentView(R.layout.activity_main)
-    binding.viewModel = viewModel
-    binding.lifecycleOwner = this
+    bindContentView(R.layout.activity_main, viewModel)
     setStatusBarLightMode(true)
     setSupportActionBar(toolbar)
     toolbar.title = "搜索"
@@ -155,8 +151,8 @@ class MainActivity : AppCompatActivity() {
             else ->
               return@setSingleChoiceItems
           }
-          sharedViewModel.showNotification.postValue(false)
-          sharedViewModel.showNotification.postValue(true)
+          sharedViewModel.showNotification.postEventValue(false)
+          sharedViewModel.showNotification.postEventValue(true)
           drawer_layout.closeDrawers()
           dialog.dismiss()
         }
@@ -183,7 +179,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onNotifySwitchChecked(isChecked: Boolean) {
-      sharedViewModel.showNotification.postValue(isChecked)
+      sharedViewModel.showNotification.postEventValue(isChecked)
       putSP(KEY_SHOW_NOTIFICATION, isChecked)
       if (!isChecked && bound) {
         notifyInfoService.hideNotification()
@@ -194,9 +190,9 @@ class MainActivity : AppCompatActivity() {
   inner class EventHandler {
     fun observe() {
       userRequestViewModel.requestException
-        .observeProcessed(lifecycleOwner, this::onRequestException)
+        .observeException(lifecycleOwner, this::onRequestException)
       versionRequestViewModel.requestException
-        .observeProcessed(lifecycleOwner, this::onRequestException)
+        .observeException(lifecycleOwner, this::onRequestException)
     }
 
     private fun onRequestException(e: RequestException) {

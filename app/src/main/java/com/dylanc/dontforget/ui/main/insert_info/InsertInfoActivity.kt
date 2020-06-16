@@ -11,8 +11,7 @@ import com.dylanc.dontforget.base.TitleConfig
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.constant.KEY_INFO
 import com.dylanc.dontforget.data.net.LoadingDialog
-import com.dylanc.dontforget.data.net.RequestException
-import com.dylanc.dontforget.data.net.observeProcessed
+import com.dylanc.dontforget.utils.observeException
 import com.dylanc.dontforget.databinding.ActivityInfoBinding
 import com.dylanc.dontforget.utils.bindContentView
 import com.dylanc.dontforget.utils.lifecycleOwner
@@ -25,7 +24,6 @@ class InsertInfoActivity : AppCompatActivity() {
 
   private val viewModel: InsertInfoViewModel by viewModels()
   private val requestViewModel: InfoRequestViewModel by viewModels()
-  private lateinit var binding: ActivityInfoBinding
   private val loadingDialog = LoadingDialog()
   private val clickProxy = ClickProxy()
   private val eventHandler = EventHandler()
@@ -40,10 +38,7 @@ class InsertInfoActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    binding = bindContentView(R.layout.activity_info)
-    binding.viewModel = viewModel
-    binding.lifecycleOwner = this
-
+    bindContentView(R.layout.activity_info,viewModel)
     info = intent.getParcelableExtra(KEY_INFO)
     viewModel.title.value = info?.title
     setToolbar(
@@ -64,30 +59,36 @@ class InsertInfoActivity : AppCompatActivity() {
     fun onOptionsItemSelected(item: MenuItem) =
       when (item.itemId) {
         R.id.action_complete -> {
-          if (TextUtils.isEmpty(viewModel.title.value)) {
-            toast("请输入标题")
-          } else {
-            loadingDialog.show(supportFragmentManager)
-            val request = if (info == null) {
-              requestViewModel.addInfo(viewModel.title.value!!)
-            } else {
-              requestViewModel.updateInfo(info!!.id, viewModel.title.value!!, info!!.dateStr)
-            }
-            request.observe(lifecycleOwner) {
-              loadingDialog.dismiss()
-              finish()
-            }
-          }
+          onCompleteBtnClick()
           true
         }
         else -> false
       }
+
+    private fun onCompleteBtnClick() {
+      val value = viewModel.title.value
+      if (value.isNullOrBlank()) {
+        toast("请输入标题")
+      } else {
+        val info = info
+        val request = if (info == null) {
+          requestViewModel.addInfo(value)
+        } else {
+          requestViewModel.updateInfo(info.id, value, info.dateStr)
+        }
+        loadingDialog.show(supportFragmentManager)
+        request.observe(lifecycleOwner) {
+          loadingDialog.dismiss()
+          finish()
+        }
+      }
+    }
   }
 
   inner class EventHandler {
     fun observe() {
       requestViewModel.requestException
-        .observeProcessed(lifecycleOwner) {
+        .observeException(lifecycleOwner) {
           loadingDialog.dismiss()
           toast(it.message)
         }

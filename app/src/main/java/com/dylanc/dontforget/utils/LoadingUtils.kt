@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.dylanc.dontforget.utils
 
 import android.app.Activity
@@ -17,7 +19,7 @@ fun Activity.setToolbar(
 ) =
   setToolbar(TitleConfig(title, type).apply { setMenu(menuId, listener) })
 
-fun Activity.setToolbar(config: TitleConfig): LoadingHelper =
+fun Activity.setToolbar(config: TitleConfig)=
   LoadingHelper(this).apply {
     val toolbarAdapter: BaseToolbarAdapter<TitleConfig, *> = getAdapter(ViewType.TITLE)
     toolbarAdapter.config = config

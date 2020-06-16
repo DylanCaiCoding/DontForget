@@ -4,5 +4,5 @@ import androidx.lifecycle.ViewModel
 import com.dylanc.dontforget.base.event.EventLiveData
 
 class SharedViewModel : ViewModel() {
-  val showNotification: EventLiveData<Boolean> = EventLiveData()
+  val showNotification = EventLiveData<Boolean>()
 }

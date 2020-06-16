@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.library.baseAdapters.BR
 import androidx.lifecycle.Observer
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.base.TitleConfig
@@ -12,6 +13,7 @@ import com.dylanc.dontforget.databinding.ActivityRegisterBinding
 import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.dontforget.utils.bindContentView
 import com.dylanc.dontforget.utils.lifecycleOwner
+import com.dylanc.dontforget.utils.observeException
 import com.dylanc.dontforget.utils.setToolbar
 import com.dylanc.dontforget.view_model.request.UserRequestViewModel
 import com.dylanc.utilktx.finishAllActivities
@@ -19,18 +21,19 @@ import com.dylanc.utilktx.startActivity
 import com.dylanc.utilktx.toast
 
 class RegisterActivity : AppCompatActivity() {
-  private lateinit var binding: ActivityRegisterBinding
   private val viewModel: RegisterViewModel by viewModels()
   private val requestViewModel: UserRequestViewModel by viewModels()
   private val loadingDialog = LoadingDialog()
+  private val eventHandler = EventHandler()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    binding = bindContentView(R.layout.activity_register)
-    binding.viewModel = viewModel
-    binding.clickProxy = ClickProxy()
-    binding.lifecycleOwner = this
+    bindContentView(
+      R.layout.activity_register, viewModel,
+      BR.clickProxy to ClickProxy()
+    )
     setToolbar("注册", TitleConfig.Type.BACK)
+    eventHandler.observe()
   }
 
   inner class ClickProxy {
@@ -57,6 +60,16 @@ class RegisterActivity : AppCompatActivity() {
           toast("注册成功")
           finish()
         })
+    }
+  }
+
+  inner class EventHandler {
+    fun observe() {
+      requestViewModel.requestException
+        .observeException(lifecycleOwner) {
+          loadingDialog.dismiss()
+          toast(it.message)
+        }
     }
   }
 }

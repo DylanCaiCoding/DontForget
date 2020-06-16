@@ -3,15 +3,15 @@ package com.dylanc.dontforget.ui.user.login
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.library.baseAdapters.BR
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.data.net.LoadingDialog
-import com.dylanc.dontforget.databinding.ActivityLoginBinding
 import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.dontforget.ui.user.register.RegisterActivity
 import com.dylanc.dontforget.utils.bindContentView
 import com.dylanc.dontforget.utils.lifecycleOwner
+import com.dylanc.dontforget.utils.observeException
 import com.dylanc.dontforget.view_model.request.UserRequestViewModel
 import com.dylanc.utilktx.setStatusBarLightMode
 import com.dylanc.utilktx.startActivity
@@ -19,7 +19,6 @@ import com.dylanc.utilktx.toast
 
 class LoginActivity : AppCompatActivity() {
 
-  private lateinit var binding: ActivityLoginBinding
   private val viewModel: LoginViewModel by viewModels()
   private val requestViewModel: UserRequestViewModel by viewModels()
   private val clickProxy = ClickProxy()
@@ -28,10 +27,10 @@ class LoginActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    binding = bindContentView(R.layout.activity_login)
-    binding.viewModel = viewModel
-    binding.clickProxy = clickProxy
-    binding.lifecycleOwner = this
+    bindContentView(
+      R.layout.activity_login, viewModel,
+      BR.clickProxy to clickProxy
+    )
     setStatusBarLightMode(true)
     eventHandler.observe()
   }
@@ -58,7 +57,7 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 
-    fun onRegisterBtnClick(){
+    fun onRegisterBtnClick() {
       startActivity<RegisterActivity>()
     }
   }
@@ -66,7 +65,7 @@ class LoginActivity : AppCompatActivity() {
   inner class EventHandler {
     fun observe() {
       requestViewModel.requestException
-        .observe(lifecycleOwner) {
+        .observeException(lifecycleOwner) {
           loadingDialog.dismiss()
           toast(it.message)
         }
