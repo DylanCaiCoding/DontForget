@@ -8,8 +8,8 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.dylanc.dontforget.R
-import com.dylanc.dontforget.data.constant.KEY_SHOW_NOTIFICATION
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
+import com.dylanc.dontforget.data.repository.SettingRepository
 import com.dylanc.dontforget.data.repository.infoRepository
 import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.utilktx.intentOf
@@ -28,7 +28,7 @@ class NotifyInfoService : Service() {
     private const val REQUEST_CODE_ALARM_NOTIFY = 0
 
     fun startRepeatedly(activity: Activity?) {
-      if (activity == null || alreadyStarted || !spValueOf(KEY_SHOW_NOTIFICATION, true)) {
+      if (activity == null || alreadyStarted || !SettingRepository.isShowNotification) {
         return
       }
 

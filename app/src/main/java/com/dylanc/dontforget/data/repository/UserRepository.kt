@@ -30,7 +30,6 @@ class UserRepository(
   suspend fun logout() =
     remoteDataSource.requestLogout()
       .apply {
-        infoRepository.deleteAllInfo()
         model.logout()
         persistentCookieJar.clear()
       }

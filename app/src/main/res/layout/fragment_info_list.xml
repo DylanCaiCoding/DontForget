@@ -39,11 +39,18 @@
       <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         adapter="@{adapter}"
+        emptyView="@{@id/empty_view}"
         list="@{requestViewModel.list}"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+        app:spanCount="2" />
+
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <include
+      android:id="@+id/empty_view"
+      layout="@layout/layout_empty"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
       android:id="@+id/fab"

@@ -17,10 +17,10 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.binding.setOnCheckedChangeListener
 import com.dylanc.dontforget.base.event.postEventValue
-import com.dylanc.dontforget.data.constant.KEY_SHOW_NOTIFICATION
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
 import com.dylanc.dontforget.data.net.LoadingDialog
 import com.dylanc.dontforget.data.net.RequestException
+import com.dylanc.dontforget.data.repository.SettingRepository
 import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.ui.user.login.LoginActivity
 import com.dylanc.dontforget.utils.applicationViewModels
@@ -44,12 +44,12 @@ class MainActivity : AppCompatActivity() {
   private val userRequestViewModel: UserRequestViewModel by viewModels()
   private val versionRequestViewModel: VersionRequestViewModel by viewModels()
   private val sharedViewModel: SharedViewModel by applicationViewModels()
+  private val clickProxy = ClickProxy()
+  private val eventHandler = EventHandler()
   private lateinit var appBarConfiguration: AppBarConfiguration
   private lateinit var notifyInfoService: NotifyInfoService
   private val loadingDialog = LoadingDialog()
   private var bound = false
-  private val clickProxy = ClickProxy()
-  private val eventHandler = EventHandler()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -57,16 +57,23 @@ class MainActivity : AppCompatActivity() {
     setStatusBarLightMode(true)
     setSupportActionBar(toolbar)
     toolbar.title = "搜索"
+    initNavigationView()
+    eventHandler.observe()
+  }
+
+  private fun initNavigationView() {
     val navController = findNavController(R.id.nav_host_fragment)
     appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_home), drawer_layout)
     setupActionBarWithNavController(navController, appBarConfiguration)
     nav_view.getHeaderView(0).tv_header.addMarginTopEqualStatusBarHeight()
-//    nav_view.setupWithNavController(navController)
+    //    nav_view.setupWithNavController(navController)
     nav_view.setNavigationItemSelectedListener(clickProxy::onNavItemSelected)
     val switchNotification = nav_view.menu.findItem(R.id.nav_notification).actionView.switch_drawer
-    switchNotification.isChecked = spValueOf(KEY_SHOW_NOTIFICATION, true)
-    switchNotification.setOnCheckedChangeListener(clickProxy::onNotifySwitchChecked)
-    eventHandler.observe()
+    switchNotification.isChecked = SettingRepository.isShowNotification
+    switchNotification.setOnCheckedChangeListener(eventHandler::onNotificationSwitchChecked)
+    val switchNightMode = nav_view.menu.findItem(R.id.nav_night_mode).actionView.switch_drawer
+    switchNightMode.isChecked = SettingRepository.isNightMode
+    switchNightMode.setOnCheckedChangeListener(eventHandler::onNightModeSwitchChecked)
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -151,8 +158,8 @@ class MainActivity : AppCompatActivity() {
             else ->
               return@setSingleChoiceItems
           }
-          sharedViewModel.showNotification.postEventValue(false)
-          sharedViewModel.showNotification.postEventValue(true)
+          sharedViewModel.isShowNotification.postEventValue(false)
+          sharedViewModel.isShowNotification.postEventValue(true)
           drawer_layout.closeDrawers()
           dialog.dismiss()
         }
@@ -163,27 +170,21 @@ class MainActivity : AppCompatActivity() {
     fun onOptionsItemSelected(item: MenuItem): Boolean {
       return when (item.itemId) {
         R.id.action_logout -> {
-          loadingDialog.show(supportFragmentManager)
-          userRequestViewModel.logout()
-            .observe(lifecycleOwner, Observer {
-              loadingDialog.dismiss()
-              startActivity<LoginActivity>()
-              finish()
-            })
+          onLogoutBtnClick()
           true
         }
-        else -> {
-          false
-        }
+        else -> false
       }
     }
 
-    fun onNotifySwitchChecked(isChecked: Boolean) {
-      sharedViewModel.showNotification.postEventValue(isChecked)
-      putSP(KEY_SHOW_NOTIFICATION, isChecked)
-      if (!isChecked && bound) {
-        notifyInfoService.hideNotification()
-      }
+    private fun onLogoutBtnClick() {
+      loadingDialog.show(supportFragmentManager)
+      userRequestViewModel.logout()
+        .observe(lifecycleOwner, Observer {
+          loadingDialog.dismiss()
+          startActivity<LoginActivity>()
+          finish()
+        })
     }
   }
 
@@ -198,6 +199,18 @@ class MainActivity : AppCompatActivity() {
     private fun onRequestException(e: RequestException) {
       loadingDialog.dismiss()
       toast(e.message)
+    }
+
+    fun onNotificationSwitchChecked(isChecked: Boolean) {
+      sharedViewModel.isShowNotification.postEventValue(isChecked)
+      SettingRepository.isShowNotification = isChecked
+      if (!isChecked && bound) {
+        notifyInfoService.hideNotification()
+      }
+    }
+
+    fun onNightModeSwitchChecked(isChecked: Boolean) {
+      SettingRepository.isNightMode = isChecked
     }
   }
 

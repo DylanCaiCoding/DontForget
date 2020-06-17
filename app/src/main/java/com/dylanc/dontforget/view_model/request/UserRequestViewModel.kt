@@ -2,6 +2,7 @@ package com.dylanc.dontforget.view_model.request
 
 import androidx.lifecycle.liveData
 import com.dylanc.dontforget.base.RequestViewModel
+import com.dylanc.dontforget.data.repository.infoRepository
 import com.dylanc.dontforget.data.repository.userRepository
 
 class UserRequestViewModel : RequestViewModel() {
@@ -12,6 +13,7 @@ class UserRequestViewModel : RequestViewModel() {
 
   fun logout() = liveData(requestExceptionHandler) {
     emit(userRepository.logout())
+    infoRepository.deleteAllInfo()
   }
 
   fun register(username: String, password: String, confirmPassword: String) =
