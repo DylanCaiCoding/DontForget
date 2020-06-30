@@ -9,6 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -19,7 +20,6 @@ import com.dylanc.dontforget.adapter.binding.setOnCheckedChangeListener
 import com.dylanc.dontforget.base.event.postEventValue
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
 import com.dylanc.dontforget.data.net.LoadingDialog
-import com.dylanc.dontforget.data.net.RequestException
 import com.dylanc.dontforget.data.repository.SettingRepository
 import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.ui.user.login.LoginActivity
@@ -30,6 +30,7 @@ import com.dylanc.dontforget.utils.observeException
 import com.dylanc.dontforget.view_model.event.SharedViewModel
 import com.dylanc.dontforget.view_model.request.UserRequestViewModel
 import com.dylanc.dontforget.view_model.request.VersionRequestViewModel
+import com.dylanc.retrofit.helper.coroutines.RequestException
 import com.dylanc.utilktx.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
@@ -48,13 +49,14 @@ class MainActivity : AppCompatActivity() {
   private val eventHandler = EventHandler()
   private lateinit var appBarConfiguration: AppBarConfiguration
   private lateinit var notifyInfoService: NotifyInfoService
-  private val loadingDialog = LoadingDialog()
+  private val loadingDialog = LoadingDialog(this)
   private var bound = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     bindContentView(R.layout.activity_main, viewModel)
     setStatusBarLightMode(true)
+    val toolbar: Toolbar = findViewById(R.id.toolbar)
     setSupportActionBar(toolbar)
     toolbar.title = "搜索"
     initNavigationView()
@@ -129,10 +131,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onCheckBtnClick() {
-      loadingDialog.show(supportFragmentManager)
+      loadingDialog.show(true)
       versionRequestViewModel.checkVersion()
         .observe(lifecycleOwner, Observer { appVersion ->
-          loadingDialog.dismiss()
+          loadingDialog.show(false)
           UpdateAppUtils
             .getInstance()
             .apkUrl(appVersion.installUrl)
@@ -178,10 +180,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onLogoutBtnClick() {
-      loadingDialog.show(supportFragmentManager)
+      loadingDialog.show(true)
       userRequestViewModel.logout()
         .observe(lifecycleOwner, Observer {
-          loadingDialog.dismiss()
+          loadingDialog.show(false)
           startActivity<LoginActivity>()
           finish()
         })
@@ -197,7 +199,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onRequestException(e: RequestException) {
-      loadingDialog.dismiss()
+      loadingDialog.show(false)
       toast(e.message)
     }
 

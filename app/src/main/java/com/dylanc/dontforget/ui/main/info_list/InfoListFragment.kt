@@ -28,14 +28,14 @@ import kotlinx.android.synthetic.main.fragment_info_list.*
 
 class InfoListFragment : Fragment() {
 
-  //  private val viewModel: InfoListViewModel by viewModels()
+  private val viewModel: InfoListViewModel by viewModels()
   private val requestViewModel: InfoRequestViewModel by viewModels()
-  private val viewModel: ListStateViewModel by viewModels()
+  private val stateViewModel: ListStateViewModel by viewModels()
   private val sharedViewModel: SharedViewModel by applicationViewModels()
   private val clickProxy = ClickProxy()
   private val eventHandler = EventHandler()
   private val adapter = InfoAdapter(clickProxy::onItemClick, clickProxy::onItemLongClick)
-  private val loadingDialog = LoadingDialog()
+  private lateinit var loadingDialog: LoadingDialog
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
@@ -50,14 +50,16 @@ class InfoListFragment : Fragment() {
       BR.adapter to adapter,
       BR.clickProxy to clickProxy,
       BR.eventHandler to eventHandler,
-      BR.requestViewModel to requestViewModel
+      BR.requestViewModel to requestViewModel,
+      BR.stateViewModel to stateViewModel
     )
   }
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
+    loadingDialog = LoadingDialog(requireActivity())
     refresh_layout.setColorSchemeResources(R.color.colorAccent)
-    viewModel.isRefreshing.value = true
+    stateViewModel.isRefreshing.value = true
     eventHandler.observe()
   }
 
@@ -76,10 +78,10 @@ class InfoListFragment : Fragment() {
           "关闭提醒" -> {
           }
           "删除" -> {
-            loadingDialog.show(childFragmentManager)
+            loadingDialog.show(true)
             requestViewModel.deleteInfo(item)
               .observe(viewLifecycleOwner, Observer {
-                loadingDialog.dismiss()
+                loadingDialog.show(false)
               })
           }
         }
@@ -93,12 +95,12 @@ class InfoListFragment : Fragment() {
       requestViewModel.getInfoList()
         .observe(viewLifecycleOwner, Observer {
           NotifyInfoService.startRepeatedly(activity)
-          viewModel.isRefreshing.value = false
+          stateViewModel.isRefreshing.value = false
         })
       requestViewModel.requestException
         .observeException(viewLifecycleOwner) {
-          loadingDialog.dismiss()
-          viewModel.isRefreshing.value = false
+          loadingDialog.show(false)
+          stateViewModel.isRefreshing.value = false
           toast(it.message)
         }
       sharedViewModel.isShowNotification
@@ -115,7 +117,7 @@ class InfoListFragment : Fragment() {
       requestViewModel.requestInfoList()
         .observe(viewLifecycleOwner, Observer {
           NotifyInfoService.startRepeatedly(activity)
-          viewModel.isRefreshing.value = false
+          stateViewModel.isRefreshing.value = false
         })
     }
 

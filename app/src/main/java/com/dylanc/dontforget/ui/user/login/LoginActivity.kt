@@ -10,6 +10,7 @@ import com.dylanc.dontforget.data.net.LoadingDialog
 import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.dontforget.ui.user.register.RegisterActivity
 import com.dylanc.dontforget.utils.bindContentView
+import com.dylanc.dontforget.utils.isDarkMode
 import com.dylanc.dontforget.utils.lifecycleOwner
 import com.dylanc.dontforget.utils.observeException
 import com.dylanc.dontforget.view_model.request.UserRequestViewModel
@@ -23,7 +24,7 @@ class LoginActivity : AppCompatActivity() {
   private val requestViewModel: UserRequestViewModel by viewModels()
   private val clickProxy = ClickProxy()
   private val eventHandler = EventHandler()
-  private val loadingDialog = LoadingDialog()
+  private val loadingDialog = LoadingDialog(this)
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -31,7 +32,7 @@ class LoginActivity : AppCompatActivity() {
       R.layout.activity_login, viewModel,
       BR.clickProxy to clickProxy
     )
-    setStatusBarLightMode(true)
+    setStatusBarLightMode(!isDarkMode())
     eventHandler.observe()
   }
 
@@ -47,10 +48,10 @@ class LoginActivity : AppCompatActivity() {
         toast("请输入密码")
         return
       }
-      loadingDialog.show(supportFragmentManager)
+      loadingDialog.show(true)
       requestViewModel.login(username, password)
         .observe(lifecycleOwner, Observer {
-          loadingDialog.dismiss()
+          loadingDialog.show(false)
           toast("登录成功")
           startActivity<MainActivity>()
           finish()
@@ -66,7 +67,7 @@ class LoginActivity : AppCompatActivity() {
     fun observe() {
       requestViewModel.requestException
         .observeException(lifecycleOwner) {
-          loadingDialog.dismiss()
+          loadingDialog.show(false)
           toast(it.message)
         }
     }

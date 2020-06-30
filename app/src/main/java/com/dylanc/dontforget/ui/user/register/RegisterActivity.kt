@@ -1,29 +1,24 @@
 package com.dylanc.dontforget.ui.user.register
 
 import android.os.Bundle
-import android.text.TextUtils
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.library.baseAdapters.BR
 import androidx.lifecycle.Observer
 import com.dylanc.dontforget.R
-import com.dylanc.dontforget.base.TitleConfig
+import com.dylanc.dontforget.adapter.loading.NavIconType
 import com.dylanc.dontforget.data.net.LoadingDialog
-import com.dylanc.dontforget.databinding.ActivityRegisterBinding
-import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.dontforget.utils.bindContentView
 import com.dylanc.dontforget.utils.lifecycleOwner
 import com.dylanc.dontforget.utils.observeException
 import com.dylanc.dontforget.utils.setToolbar
 import com.dylanc.dontforget.view_model.request.UserRequestViewModel
-import com.dylanc.utilktx.finishAllActivities
-import com.dylanc.utilktx.startActivity
 import com.dylanc.utilktx.toast
 
 class RegisterActivity : AppCompatActivity() {
   private val viewModel: RegisterViewModel by viewModels()
   private val requestViewModel: UserRequestViewModel by viewModels()
-  private val loadingDialog = LoadingDialog()
+  private val loadingDialog = LoadingDialog(this)
   private val eventHandler = EventHandler()
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +27,7 @@ class RegisterActivity : AppCompatActivity() {
       R.layout.activity_register, viewModel,
       BR.clickProxy to ClickProxy()
     )
-    setToolbar("注册", TitleConfig.Type.BACK)
+    setToolbar("注册", NavIconType.BACK)
     eventHandler.observe()
   }
 
@@ -53,10 +48,10 @@ class RegisterActivity : AppCompatActivity() {
         toast("请再次输入密码")
         return
       }
-      loadingDialog.show(supportFragmentManager)
+      loadingDialog.show(true)
       requestViewModel.register(username, password, confirmPassword)
         .observe(lifecycleOwner, Observer {
-          loadingDialog.dismiss()
+          loadingDialog.show(false)
           toast("注册成功")
           finish()
         })
@@ -67,7 +62,7 @@ class RegisterActivity : AppCompatActivity() {
     fun observe() {
       requestViewModel.requestException
         .observeException(lifecycleOwner) {
-          loadingDialog.dismiss()
+          loadingDialog.show(false)
           toast(it.message)
         }
     }

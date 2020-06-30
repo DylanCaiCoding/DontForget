@@ -4,10 +4,6 @@ package com.dylanc.dontforget
 
 import android.app.Application
 import com.dylanc.dontforget.adapter.loading.LoadingAdapter
-import com.dylanc.dontforget.adapter.loading.ToolbarAdapter
-import com.dylanc.dontforget.data.bean.ApiResponse
-import com.dylanc.dontforget.data.net.AuthenticationException
-import com.dylanc.dontforget.data.net.RequestSuccessHandler
 import com.dylanc.dontforget.data.net.persistentCookies
 import com.dylanc.loadinghelper.LoadingHelper
 import com.dylanc.loadinghelper.ViewType
@@ -35,19 +31,7 @@ class App : Application() {
     }
 
     LoadingHelper.setDefaultAdapterPool {
-      register(ViewType.TITLE, ToolbarAdapter())
       register(ViewType.LOADING, LoadingAdapter())
-    }
-
-    RequestSuccessHandler.observe { response ->
-      if (response is ApiResponse<*>) {
-        when (response.errorCode) {
-          0 -> {
-          }
-          -1001 -> throw AuthenticationException(response.errorMsg)
-          else -> throw RuntimeException(response.errorMsg)
-        }
-      }
     }
 
     UpdateAppUtils.init(this)

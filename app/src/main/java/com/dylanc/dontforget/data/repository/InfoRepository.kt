@@ -1,11 +1,12 @@
 package com.dylanc.dontforget.data.repository
 
 import com.dylanc.dontforget.data.bean.DontForgetInfo
-import com.dylanc.dontforget.data.net.request
+import com.dylanc.dontforget.data.net.responseHandler
 import com.dylanc.dontforget.data.repository.api.InfoApi
 import com.dylanc.dontforget.data.repository.db.InfoDao
-import com.dylanc.dontforget.data.repository.db.infoDatabase
+import com.dylanc.dontforget.data.repository.db.appDatabase
 import com.dylanc.retrofit.helper.apiServiceOf
+import com.dylanc.retrofit.helper.coroutines.request
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -68,7 +69,7 @@ class InfoRepository(
     model.deleteAll()
 }
 
-class InfoModel(private val infoDao: InfoDao = infoDatabase.infoDao()) {
+class InfoModel(private val infoDao: InfoDao = appDatabase.infoDao()) {
 
   val allInfo = infoDao.getAllInfo()
 
@@ -111,21 +112,20 @@ class InfoRemoteDataSource {
     }
   }
 
-  private suspend fun requestInfoList() = request {
+  private suspend fun requestInfoList() = request(responseHandler) {
     apiServiceOf<InfoApi>().getInfoList(page)
   }
 
-  suspend fun requestAddInfo(title: String) = request {
+  suspend fun requestAddInfo(title: String) = request(responseHandler) {
     apiServiceOf<InfoApi>().addInfo(title)
   }
 
-  suspend fun requestUpdateInfo(id: Int, title: String, date: String) = request {
+  suspend fun requestUpdateInfo(id: Int, title: String, date: String) = request(responseHandler) {
     apiServiceOf<InfoApi>().updateInfo(id, title, date)
   }
 
-  suspend fun requestDeleteInfo(id: Int) = request {
+  suspend fun requestDeleteInfo(id: Int) = request(responseHandler) {
     apiServiceOf<InfoApi>().deleteInfo(id)
   }
-
 }
 

@@ -2,10 +2,11 @@ package com.dylanc.dontforget.data.repository
 
 import com.dylanc.dontforget.data.bean.User
 import com.dylanc.dontforget.data.net.persistentCookieJar
-import com.dylanc.dontforget.data.net.request
+import com.dylanc.dontforget.data.net.responseHandler
+import com.dylanc.retrofit.helper.coroutines.request
 import com.dylanc.dontforget.data.repository.api.UserApi
 import com.dylanc.dontforget.data.repository.db.UserDao
-import com.dylanc.dontforget.data.repository.db.userDatabase
+import com.dylanc.dontforget.data.repository.db.appDatabase
 import com.dylanc.retrofit.helper.apiServiceOf
 
 /**
@@ -41,7 +42,7 @@ class UserRepository(
     remoteDataSource.requestRegister(username, password, confirmPassword)
 }
 
-class UserModel(private val userDao: UserDao = userDatabase.userDao()) {
+class UserModel(private val userDao: UserDao = appDatabase.userDao()) {
 
   suspend fun updateUser(user: User) {
     userDao.deleteAll()
@@ -59,16 +60,19 @@ class UserModel(private val userDao: UserDao = userDatabase.userDao()) {
 }
 
 class UserRemoteDataSource {
-  suspend fun requestLogin(username: String, password: String) = request {
+  suspend fun requestLogin(username: String, password: String) = request(responseHandler) {
     apiServiceOf<UserApi>().login(username, password)
   }
 
-  suspend fun requestLogout() = request {
+  suspend fun requestLogout() = request(responseHandler) {
     apiServiceOf<UserApi>().logout()
   }
 
-  suspend fun requestRegister(username: String, password: String, confirmPassword: String) =
-    request {
-      apiServiceOf<UserApi>().register(username, password, confirmPassword)
-    }
+  suspend fun requestRegister(
+    username: String,
+    password: String,
+    confirmPassword: String
+  ) = request(responseHandler) {
+    apiServiceOf<UserApi>().register(username, password, confirmPassword)
+  }
 }

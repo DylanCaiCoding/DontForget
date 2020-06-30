@@ -26,7 +26,7 @@
       android:layout_marginTop="148dp"
       android:text="@string/app_name"
       android:textSize="42sp"
-      android:textColor="#333"
+      android:textColor="?android:attr/textColorPrimary"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_bias="0.498"
       app:layout_constraintStart_toStartOf="parent"
@@ -89,5 +89,6 @@
       app:layout_constraintEnd_toEndOf="@+id/edt_username"
       app:layout_constraintStart_toStartOf="@+id/edt_username"
       app:layout_constraintTop_toBottomOf="@+id/btn_login" />
+
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

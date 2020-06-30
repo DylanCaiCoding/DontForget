@@ -6,6 +6,10 @@
 
     <variable
       name="viewModel"
+      type="com.dylanc.dontforget.ui.main.info_list.InfoListViewModel" />
+
+    <variable
+      name="stateViewModel"
       type="com.dylanc.dontforget.view_model.state.ListStateViewModel" />
 
     <variable
@@ -31,7 +35,7 @@
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
       android:id="@+id/refresh_layout"
-      isRefreshing="@{viewModel.isRefreshing}"
+      isRefreshing="@{stateViewModel.isRefreshing}"
       onRefresh="@{eventHandler.onRefreshListener}"
       android:layout_width="match_parent"
       android:layout_height="match_parent">
@@ -50,7 +54,7 @@
 
     <include
       android:id="@+id/empty_view"
-      layout="@layout/layout_empty"/>
+      layout="@layout/layout_empty" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
       android:id="@+id/fab"
@@ -59,9 +63,10 @@
       android:layout_marginEnd="16dp"
       android:layout_marginBottom="16dp"
       android:onClick="@{()->clickProxy.onAddBtnClick()}"
-      app:backgroundTint="@android:color/white"
+      app:backgroundTint="@color/white"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
-      app:srcCompat="@drawable/ic_add_blue" />
+      app:srcCompat="@drawable/ic_fab_add"
+      app:tint="@color/colorAccent" />
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

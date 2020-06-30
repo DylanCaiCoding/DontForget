@@ -4,8 +4,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.dylanc.dontforget.data.net.AuthenticationException
-import com.dylanc.dontforget.data.net.RequestException
 import com.dylanc.dontforget.ui.user.login.LoginActivity
+import com.dylanc.retrofit.helper.coroutines.RequestException
 import com.dylanc.utilktx.finishAllActivities
 import com.dylanc.utilktx.startActivity
 import com.dylanc.utilktx.toast

@@ -4,10 +4,11 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.dylanc.dontforget.R
 
-class LoadingDialog : DialogFragment() {
+class LoadingDialog(private val fragmentActivity: FragmentActivity) : DialogFragment() {
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     return activity?.let {
       Dialog(it, R.style.DialogTheme).apply {
@@ -18,11 +19,11 @@ class LoadingDialog : DialogFragment() {
     } ?: throw IllegalStateException("Activity cannot be null")
   }
 
-  fun show(fragmentManager: FragmentManager) = show(fragmentManager, TAG_LOADING)
-
-  override fun dismiss() {
-    if (isAdded) {
-      super.dismiss()
+  fun show(isShow: Boolean) {
+    if (isShow){
+      show(fragmentActivity.supportFragmentManager, TAG_LOADING)
+    }else if (isAdded){
+      dismiss()
     }
   }
 
