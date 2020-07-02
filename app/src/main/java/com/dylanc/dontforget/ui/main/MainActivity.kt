@@ -23,10 +23,7 @@ import com.dylanc.dontforget.data.net.LoadingDialog
 import com.dylanc.dontforget.data.repository.SettingRepository
 import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.ui.user.login.LoginActivity
-import com.dylanc.dontforget.utils.applicationViewModels
-import com.dylanc.dontforget.utils.bindContentView
-import com.dylanc.dontforget.utils.lifecycleOwner
-import com.dylanc.dontforget.utils.observeException
+import com.dylanc.dontforget.utils.*
 import com.dylanc.dontforget.view_model.event.SharedViewModel
 import com.dylanc.dontforget.view_model.request.UserRequestViewModel
 import com.dylanc.dontforget.view_model.request.VersionRequestViewModel
@@ -55,7 +52,7 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     bindContentView(R.layout.activity_main, viewModel)
-    setStatusBarLightMode(true)
+    setStatusBarLightMode(!isDarkMode())
     val toolbar: Toolbar = findViewById(R.id.toolbar)
     setSupportActionBar(toolbar)
     toolbar.title = "搜索"
