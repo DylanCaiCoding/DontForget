@@ -54,7 +54,8 @@
 
     <include
       android:id="@+id/empty_view"
-      layout="@layout/layout_empty" />
+      layout="@layout/layout_empty"
+      android:visibility="gone"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
       android:id="@+id/fab"
