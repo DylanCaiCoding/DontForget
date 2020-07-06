@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.dylanc.dontforget.R
 
-class LoadingDialog(private val fragmentActivity: FragmentActivity) : DialogFragment() {
+class LoadingDialog(var fragmentActivity: FragmentActivity? = null) : DialogFragment() {
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     return activity?.let {
       Dialog(it, R.style.DialogTheme).apply {
@@ -21,7 +21,7 @@ class LoadingDialog(private val fragmentActivity: FragmentActivity) : DialogFrag
 
   fun show(isShow: Boolean) {
     if (isShow){
-      show(fragmentActivity.supportFragmentManager, TAG_LOADING)
+      fragmentActivity?.supportFragmentManager?.let { show(it, TAG_LOADING) }
     }else if (isAdded){
       dismiss()
     }

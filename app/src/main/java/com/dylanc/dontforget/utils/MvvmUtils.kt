@@ -45,6 +45,9 @@ fun Fragment.bindView(
 val ComponentActivity.lifecycleOwner: LifecycleOwner
   get() = this
 
+val Fragment.lifecycleOwner: LifecycleOwner
+  get() = this
+
 val applicationViewModelStore = ViewModelStore()
 val androidViewModelFactory = ViewModelProvider.AndroidViewModelFactory.getInstance(application)
 
