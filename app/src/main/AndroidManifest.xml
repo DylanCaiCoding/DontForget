@@ -21,27 +21,24 @@
     android:theme="@style/AppTheme"
     tools:ignore="AllowBackup,GoogleAppIndexingWarning">
     <activity android:name=".ui.NavigationActivity">
-
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
-
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
     <activity android:name=".ui.user.register.RegisterActivity" />
     <activity android:name=".ui.user.login.LoginActivity" />
     <activity android:name=".ui.splash.SplashActivity">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
+<!--      <intent-filter>-->
+<!--        <action android:name="android.intent.action.MAIN" />-->
 
-        <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
+<!--        <category android:name="android.intent.category.LAUNCHER" />-->
+<!--      </intent-filter>-->
     </activity>
     <activity android:name=".ui.main.insert_info.InsertInfoActivity" />
     <activity
       android:name=".ui.main.MainActivity"
       android:launchMode="singleInstance" />
-
     <service android:name=".service.NotifyInfoService" />
   </application>
 

@@ -1,15 +1,20 @@
 package com.dylanc.dontforget.ui.main
 
 import android.content.ComponentName
+import android.content.Context.BIND_AUTO_CREATE
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.view.LayoutInflater
 import android.view.MenuItem
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.dylanc.dontforget.R
@@ -33,7 +38,7 @@ import kotlinx.android.synthetic.main.nav_header_main.view.*
 import update.UpdateAppUtils
 
 
-class MainActivity : AppCompatActivity() {
+class MainFragment : Fragment() {
 
   private val viewModel: MainViewModel by viewModels()
   private val userRequestViewModel: UserRequestViewModel by viewModels()
@@ -43,26 +48,34 @@ class MainActivity : AppCompatActivity() {
   private val eventHandler = EventHandler()
   private lateinit var appBarConfiguration: AppBarConfiguration
   private lateinit var notifyInfoService: NotifyInfoService
-  private val loadingDialog = LoadingDialog(this)
+  private val loadingDialog: LoadingDialog by lazy { LoadingDialog(requireActivity()) }
   private var bound = false
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    bindContentView(R.layout.activity_main, viewModel)
-    setStatusBarLightMode(!isDarkMode())
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    return inflater.inflate(R.layout.fragment_main, container, false)
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    bindView(view, viewModel)
     initNavigationView()
     eventHandler.observe()
   }
 
   private fun initNavigationView() {
-    val navController = findNavController(R.id.nav_host_fragment)
+    val navController = requireActivity().findNavController(R.id.fragment_main)
     appBarConfiguration = AppBarConfiguration(setOf(R.id.infoListFragment), drawer_layout)
-    toolbar.setupWithNavController(navController,appBarConfiguration)
+    toolbar.setupWithNavController(navController, appBarConfiguration)
     toolbar.title = "搜索"
     toolbar.inflateMenu(R.menu.main)
     toolbar.setOnMenuItemClickListener(clickProxy::onOptionsItemSelected)
-    nav_view.getHeaderView(0).tv_header.addMarginTopEqualStatusBarHeight()
-    //    nav_view.setupWithNavController(navController)
+
+//    nav_view.getHeaderView(0).tv_header.addMarginTopEqualStatusBarHeight()
+//    nav_view.setupWithNavController(navController)
     nav_view.setNavigationItemSelectedListener(clickProxy::onNavItemSelected)
     val switchNotification = nav_view.menu.findItem(R.id.nav_notification).actionView.switch_drawer
     switchNotification.isChecked = SettingRepository.isShowNotification
@@ -74,14 +87,14 @@ class MainActivity : AppCompatActivity() {
 
   override fun onStart() {
     super.onStart()
-    Intent(this, NotifyInfoService::class.java).also { intent ->
-      bindService(intent, connection, BIND_AUTO_CREATE)
+    Intent(requireContext(), NotifyInfoService::class.java).also { intent ->
+      requireActivity().bindService(intent, connection, BIND_AUTO_CREATE)
     }
   }
 
   override fun onStop() {
     super.onStop()
-    unbindService(connection)
+    requireActivity().unbindService(connection)
   }
 
   private val connection = object : ServiceConnection {
@@ -124,7 +137,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onIntervalsBtnClick() {
-      MaterialAlertDialogBuilder(this@MainActivity)
+      MaterialAlertDialogBuilder(requireContext())
         .setTitle("请选择刷新的间隔时间")
         .setSingleChoiceItems(arrayOf("5 分钟", "10 分钟", "1 小时"), 0) { dialog, which ->
           when (which) {
@@ -164,8 +177,7 @@ class MainActivity : AppCompatActivity() {
       userRequestViewModel.logout()
         .observe(lifecycleOwner, Observer {
           loadingDialog.show(false)
-          startActivity<LoginActivity>()
-          finish()
+          findNavController().navigate(R.id.action_mainFragment_to_loginFragment)
         })
     }
   }

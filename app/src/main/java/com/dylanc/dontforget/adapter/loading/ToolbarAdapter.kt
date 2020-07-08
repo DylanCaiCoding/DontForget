@@ -4,6 +4,7 @@ import android.app.Activity
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
+import androidx.navigation.findNavController
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.utils.isDarkMode
 import com.dylanc.loadinghelper.LoadingHelper
@@ -35,7 +36,9 @@ class ToolbarAdapter(
       }
       if (type === NavIconType.BACK) {
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
-        toolbar.setNavigationOnClickListener { activity.finish() }
+        toolbar.setNavigationOnClickListener {
+          activity.findNavController(R.id.nav_host_fragment).popBackStack()
+        }
       } else {
         toolbar.navigationIcon = null
       }

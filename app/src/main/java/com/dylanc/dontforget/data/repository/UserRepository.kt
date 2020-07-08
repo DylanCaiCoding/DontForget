@@ -33,6 +33,7 @@ class UserRepository(
       .apply {
         model.logout()
         persistentCookieJar.clear()
+        infoRepository.deleteAllInfo()
       }
 
   suspend fun isLogin() =

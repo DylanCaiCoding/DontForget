@@ -13,7 +13,6 @@ class UserRequestViewModel : RequestViewModel() {
 
   fun logout() = liveData(requestExceptionHandler) {
     emit(userRepository.logout())
-    infoRepository.deleteAllInfo()
   }
 
   fun register(username: String, password: String, confirmPassword: String) =

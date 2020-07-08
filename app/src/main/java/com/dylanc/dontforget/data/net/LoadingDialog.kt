@@ -5,10 +5,9 @@ import android.os.Bundle
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
 import com.dylanc.dontforget.R
 
-class LoadingDialog(var fragmentActivity: FragmentActivity? = null) : DialogFragment() {
+class LoadingDialog(private val fragmentActivity: FragmentActivity) : DialogFragment() {
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     return activity?.let {
       Dialog(it, R.style.DialogTheme).apply {
@@ -20,9 +19,9 @@ class LoadingDialog(var fragmentActivity: FragmentActivity? = null) : DialogFrag
   }
 
   fun show(isShow: Boolean) {
-    if (isShow){
-      fragmentActivity?.supportFragmentManager?.let { show(it, TAG_LOADING) }
-    }else if (isAdded){
+    if (isShow) {
+      show(fragmentActivity.supportFragmentManager, TAG_LOADING)
+    } else if (isAdded) {
       dismiss()
     }
   }

@@ -6,14 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.data.repository.UserRepository
-import com.dylanc.dontforget.ui.main.MainActivity
-import com.dylanc.dontforget.ui.user.login.LoginActivity
 import com.dylanc.dontforget.utils.isDarkMode
 import com.dylanc.utilktx.setStatusBarLightMode
-import com.dylanc.utilktx.startActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -28,16 +25,12 @@ class SplashFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    requireActivity().apply {
-      setStatusBarLightMode(!isDarkMode())
-    }
-
     lifecycleScope.launch {
       delay(1000)
       if (UserRepository().isLogin()) {
-        startActivity<MainActivity>()
+        findNavController().navigate(R.id.action_splashFragment_to_mainFragment)
       } else {
-        Navigation.createNavigateOnClickListener(R.id.action_login).onClick(view)
+        findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
       }
     }
   }

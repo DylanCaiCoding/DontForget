@@ -19,7 +19,7 @@ class RegisterFragment : Fragment() {
 
   private val viewModel: RegisterViewModel by viewModels()
   private val requestViewModel: UserRequestViewModel by viewModels()
-  private val loadingDialog = LoadingDialog()
+  private val loadingDialog: LoadingDialog by lazy { LoadingDialog(requireActivity()) }
   private val eventHandler = EventHandler()
 
   override fun onCreateView(
@@ -37,7 +37,6 @@ class RegisterFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    loadingDialog.fragmentActivity = requireActivity()
     eventHandler.observe()
   }
 

@@ -8,7 +8,9 @@ import androidx.databinding.library.baseAdapters.BR
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.data.net.LoadingDialog
 import com.dylanc.dontforget.ui.main.MainActivity
@@ -21,6 +23,8 @@ import com.dylanc.dontforget.view_model.request.UserRequestViewModel
 import com.dylanc.utilktx.setStatusBarLightMode
 import com.dylanc.utilktx.startActivity
 import com.dylanc.utilktx.toast
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class LoginFragment : Fragment() {
 
@@ -28,7 +32,7 @@ class LoginFragment : Fragment() {
   private val requestViewModel: UserRequestViewModel by viewModels()
   private val clickProxy = ClickProxy()
   private val eventHandler = EventHandler()
-  private val loadingDialog = LoadingDialog()
+  private val loadingDialog: LoadingDialog by lazy { LoadingDialog(requireActivity()) }
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
@@ -43,10 +47,6 @@ class LoginFragment : Fragment() {
       view, viewModel,
       BR.clickProxy to clickProxy
     )
-    requireActivity().apply {
-      setStatusBarLightMode(!isDarkMode())
-    }
-    loadingDialog.fragmentActivity = requireActivity()
     eventHandler.observe()
   }
 
@@ -65,18 +65,14 @@ class LoginFragment : Fragment() {
       loadingDialog.show(true)
       requestViewModel.login(username, password)
         .observe(lifecycleOwner, Observer {
-          loadingDialog.show(false)
           toast("登录成功")
-          startActivity<MainActivity>()
-          requireActivity().finish()
+          loadingDialog.show(false)
+          findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
         })
     }
 
-    val onRegisterBtnClickListener = Navigation.createNavigateOnClickListener(R.id.action_register)
-
     fun onRegisterBtnClick() {
-//      Navigation.createNavigateOnClickListener(R.id.action_register).onClick()
-      startActivity<RegisterActivity>()
+      findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
     }
   }
 

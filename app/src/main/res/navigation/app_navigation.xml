@@ -12,12 +12,24 @@
     tools:layout="@layout/fragment_splash">
 
     <action
-      android:id="@+id/action_login"
+      android:id="@+id/action_splashFragment_to_loginFragment"
       app:destination="@id/loginFragment"
       app:enterAnim="@anim/slide_in_right"
       app:exitAnim="@anim/slide_out_left"
       app:popEnterAnim="@anim/slide_in_left"
-      app:popExitAnim="@anim/slide_out_right" />
+      app:popExitAnim="@anim/slide_out_right"
+      app:popUpTo="@id/splashFragment"
+      app:popUpToInclusive="true" />
+
+    <action
+      android:id="@+id/action_splashFragment_to_mainFragment"
+      app:destination="@id/mainFragment"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left"
+      app:popEnterAnim="@anim/slide_in_left"
+      app:popExitAnim="@anim/slide_out_right"
+      app:popUpTo="@id/splashFragment"
+      app:popUpToInclusive="true" />
   </fragment>
 
   <fragment
@@ -27,17 +39,68 @@
     tools:layout="@layout/fragment_login">
 
     <action
-      android:id="@+id/action_register"
+      android:id="@+id/action_loginFragment_to_registerFragment"
       app:destination="@id/registerFragment"
       app:enterAnim="@anim/slide_in_right"
       app:exitAnim="@anim/slide_out_left"
       app:popEnterAnim="@anim/slide_in_left"
       app:popExitAnim="@anim/slide_out_right" />
+
+    <action
+      android:id="@+id/action_loginFragment_to_mainFragment"
+      app:destination="@id/mainFragment"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left"
+      app:popEnterAnim="@anim/slide_in_left"
+      app:popExitAnim="@anim/slide_out_right"
+      app:popUpTo="@id/loginFragment"
+      app:popUpToInclusive="true"/>
   </fragment>
 
   <fragment
     android:id="@+id/registerFragment"
     android:name="com.dylanc.dontforget.ui.user.register.RegisterFragment"
     android:label="fragment_register"
-    tools:layout="@layout/fragment_register" />
+    tools:layout="@layout/fragment_register">
+
+  </fragment>
+
+  <fragment
+    android:id="@+id/mainFragment"
+    android:name="com.dylanc.dontforget.ui.main.MainFragment"
+    android:label="MainFragment"
+    tools:layout="@layout/activity_main">
+
+    <action
+      android:id="@+id/action_mainFragment_to_insertInfoFragment"
+      app:destination="@id/insertInfoFragment"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left"
+      app:popEnterAnim="@anim/slide_in_left"
+      app:popExitAnim="@anim/slide_out_right" />
+
+    <action
+      android:id="@+id/action_mainFragment_to_loginFragment"
+      app:destination="@id/loginFragment"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left"
+      app:popEnterAnim="@anim/slide_in_left"
+      app:popExitAnim="@anim/slide_out_right"
+      app:popUpTo="@id/mainFragment"
+      app:popUpToInclusive="true" />
+
+  </fragment>
+
+  <fragment
+    android:id="@+id/insertInfoFragment"
+    android:name="com.dylanc.dontforget.ui.main.insert_info.InsertInfoFragment"
+    android:label="InsertInfoFragment"
+    tools:layout="@layout/fragment_insert_info">
+
+    <argument
+      android:name="info"
+      android:defaultValue="@null"
+      app:argType="com.dylanc.dontforget.data.bean.DontForgetInfo"
+      app:nullable="true" />
+  </fragment>
 </navigation>
