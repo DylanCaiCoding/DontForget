@@ -1,13 +1,12 @@
 package com.dylanc.dontforget.data.repository
 
 import com.dylanc.dontforget.data.bean.User
-import com.dylanc.dontforget.data.net.persistentCookieJar
-import com.dylanc.dontforget.data.net.responseHandler
-import com.dylanc.retrofit.helper.coroutines.request
+import com.dylanc.dontforget.data.net.clearCookieJar
 import com.dylanc.dontforget.data.repository.api.UserApi
 import com.dylanc.dontforget.data.repository.db.UserDao
 import com.dylanc.dontforget.data.repository.db.appDatabase
-import com.dylanc.retrofit.helper.apiServiceOf
+import com.dylanc.retrofit.helper.apiOf
+import kotlinx.coroutines.flow.flow
 
 /**
  * @author Dylan Cai
@@ -22,25 +21,31 @@ class UserRepository(
   private val remoteDataSource: UserRemoteDataSource = UserRemoteDataSource()
 ) {
 
-  suspend fun login(username: String, password: String) =
-    remoteDataSource.requestLogin(username, password)
-      .apply {
-        model.updateUser(data!!)
-      }
+  fun login(username: String, password: String) = flow {
+    emit(
+      remoteDataSource.requestLogin(username, password)
+        .apply {
+          model.updateUser(data!!)
+        })
+  }
 
-  suspend fun logout() =
-    remoteDataSource.requestLogout()
-      .apply {
-        model.logout()
-        persistentCookieJar.clear()
-        infoRepository.deleteAllInfo()
-      }
+  fun logout() = flow {
+    emit(
+      remoteDataSource.requestLogout()
+        .apply {
+          model.logout()
+          infoRepository.deleteAllInfo()
+          clearCookieJar()
+        })
+  }
 
-  suspend fun isLogin() =
-    model.isLogin()
+  suspend fun isLogin() = model.isLogin()
 
-  suspend fun register(username: String, password: String, confirmPassword: String) =
-    remoteDataSource.requestRegister(username, password, confirmPassword)
+  fun register(username: String, password: String, confirmPassword: String) = flow {
+    emit(
+      remoteDataSource.requestRegister(username, password, confirmPassword)
+    )
+  }
 }
 
 class UserModel(private val userDao: UserDao = appDatabase.userDao()) {
@@ -61,19 +66,18 @@ class UserModel(private val userDao: UserDao = appDatabase.userDao()) {
 }
 
 class UserRemoteDataSource {
-  suspend fun requestLogin(username: String, password: String) = request(responseHandler) {
-    apiServiceOf<UserApi>().login(username, password)
-  }
+  suspend fun requestLogin(username: String, password: String) =
+    apiOf<UserApi>().login(username, password)
 
-  suspend fun requestLogout() = request(responseHandler) {
-    apiServiceOf<UserApi>().logout()
-  }
+  suspend fun requestLogout() =
+    apiOf<UserApi>().logout()
+
 
   suspend fun requestRegister(
     username: String,
     password: String,
     confirmPassword: String
-  ) = request(responseHandler) {
-    apiServiceOf<UserApi>().register(username, password, confirmPassword)
-  }
+  ) =
+    apiOf<UserApi>().register(username, password, confirmPassword)
+
 }

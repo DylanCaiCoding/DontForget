@@ -12,7 +12,7 @@ import com.dylanc.dontforget.utils.bindContentView
 import com.dylanc.dontforget.utils.lifecycleOwner
 import com.dylanc.dontforget.utils.observeException
 import com.dylanc.dontforget.utils.setToolbar
-import com.dylanc.dontforget.view_model.request.UserRequestViewModel
+import com.dylanc.dontforget.viewmodel.request.UserRequestViewModel
 import com.dylanc.utilktx.toast
 
 class RegisterActivity : AppCompatActivity() {
@@ -60,7 +60,7 @@ class RegisterActivity : AppCompatActivity() {
 
   inner class EventHandler {
     fun observe() {
-      requestViewModel.requestException
+      requestViewModel.exception
         .observeException(lifecycleOwner) {
           loadingDialog.show(false)
           toast(it.message)

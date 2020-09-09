@@ -10,11 +10,11 @@
 
     <variable
       name="stateViewModel"
-      type="com.dylanc.dontforget.view_model.state.ListStateViewModel" />
+      type="com.dylanc.dontforget.viewmodel.state.ListStateViewModel" />
 
     <variable
       name="requestViewModel"
-      type="com.dylanc.dontforget.view_model.request.InfoRequestViewModel" />
+      type="com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel" />
 
     <variable
       name="clickProxy"

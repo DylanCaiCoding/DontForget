@@ -1,4 +1,4 @@
-package com.dylanc.dontforget.view_model.state
+package com.dylanc.dontforget.viewmodel.state
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

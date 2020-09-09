@@ -24,17 +24,18 @@ import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
 import com.dylanc.dontforget.data.net.LoadingDialog
 import com.dylanc.dontforget.data.repository.SettingRepository
 import com.dylanc.dontforget.service.NotifyInfoService
-import com.dylanc.dontforget.ui.user.login.LoginActivity
-import com.dylanc.dontforget.utils.*
-import com.dylanc.dontforget.view_model.event.SharedViewModel
-import com.dylanc.dontforget.view_model.request.UserRequestViewModel
-import com.dylanc.dontforget.view_model.request.VersionRequestViewModel
-import com.dylanc.retrofit.helper.coroutines.RequestException
-import com.dylanc.utilktx.*
+import com.dylanc.dontforget.utils.applicationViewModels
+import com.dylanc.dontforget.utils.bindView
+import com.dylanc.dontforget.utils.lifecycleOwner
+import com.dylanc.dontforget.utils.observeException
+import com.dylanc.dontforget.viewmodel.event.SharedViewModel
+import com.dylanc.dontforget.viewmodel.request.UserRequestViewModel
+import com.dylanc.dontforget.viewmodel.request.VersionRequestViewModel
+import com.dylanc.utilktx.putSpValue
+import com.dylanc.utilktx.toast
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.menu_item_switch.view.*
-import kotlinx.android.synthetic.main.nav_header_main.view.*
 import update.UpdateAppUtils
 
 
@@ -142,13 +143,13 @@ class MainFragment : Fragment() {
         .setSingleChoiceItems(arrayOf("5 分钟", "10 分钟", "1 小时"), 0) { dialog, which ->
           when (which) {
             0 -> {
-              putSP(KEY_UPDATE_INTERVALS, 5)
+              putSpValue(KEY_UPDATE_INTERVALS, 5)
             }
             1 -> {
-              putSP(KEY_UPDATE_INTERVALS, 10)
+              putSpValue(KEY_UPDATE_INTERVALS, 10)
             }
             2 -> {
-              putSP(KEY_UPDATE_INTERVALS, 60)
+              putSpValue(KEY_UPDATE_INTERVALS, 60)
             }
             else ->
               return@setSingleChoiceItems
@@ -184,13 +185,13 @@ class MainFragment : Fragment() {
 
   inner class EventHandler {
     fun observe() {
-      userRequestViewModel.requestException
+      userRequestViewModel.exception
         .observeException(lifecycleOwner, this::onRequestException)
-      versionRequestViewModel.requestException
+      versionRequestViewModel.exception
         .observeException(lifecycleOwner, this::onRequestException)
     }
 
-    private fun onRequestException(e: RequestException) {
+    private fun onRequestException(e: Throwable) {
       loadingDialog.show(false)
       toast(e.message)
     }

@@ -11,11 +11,12 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.loading.NavIconType
-import com.dylanc.dontforget.data.bean.DontForgetInfo
-import com.dylanc.dontforget.data.constant.KEY_INFO
 import com.dylanc.dontforget.data.net.LoadingDialog
-import com.dylanc.dontforget.utils.*
-import com.dylanc.dontforget.view_model.request.InfoRequestViewModel
+import com.dylanc.dontforget.utils.bindView
+import com.dylanc.dontforget.utils.lifecycleOwner
+import com.dylanc.dontforget.utils.observeException
+import com.dylanc.dontforget.utils.setToolbar
+import com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel
 import com.dylanc.utilktx.toast
 
 class InsertInfoFragment : Fragment() {
@@ -84,7 +85,7 @@ class InsertInfoFragment : Fragment() {
 
   inner class EventHandler {
     fun observe() {
-      requestViewModel.requestException
+      requestViewModel.exception
         .observeException(lifecycleOwner) {
           loadingDialog.show(false)
           toast(it.message)

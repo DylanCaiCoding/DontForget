@@ -1,13 +1,12 @@
 package com.dylanc.dontforget.data.repository
 
 import com.dylanc.dontforget.data.bean.DontForgetInfo
-import com.dylanc.dontforget.data.net.responseHandler
 import com.dylanc.dontforget.data.repository.api.InfoApi
 import com.dylanc.dontforget.data.repository.db.InfoDao
 import com.dylanc.dontforget.data.repository.db.appDatabase
-import com.dylanc.retrofit.helper.apiServiceOf
-import com.dylanc.retrofit.helper.coroutines.request
+import com.dylanc.retrofit.helper.apiOf
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import java.util.*
 
@@ -34,36 +33,44 @@ class InfoRepository(
       }
     }
 
-  suspend fun getInfoList() =
-    if (model.allInfo.value == null || model.allInfo.value!!.isEmpty()) {
+  fun getInfoList() = flow {
+    emit(if (model.allInfo.value == null || model.allInfo.value!!.isEmpty()) {
       remoteDataSource.getInfoList().apply {
         model.insertAll(this)
       }
     } else {
       model.allInfo.value!!
-    }
+    })
+  }
 
-  suspend fun requestInfoList() =
-    remoteDataSource.getInfoList()
-      .apply {
-        model.deleteAll()
-        model.insertAll(this)
-      }
+  fun requestInfoList() = flow {
+    emit(
+      remoteDataSource.getInfoList()
+        .apply {
+          model.deleteAll()
+          model.insertAll(this)
+        })
+  }
 
-  suspend fun addInfo(title: String) =
-    remoteDataSource.requestAddInfo(title).apply {
+  fun addInfo(title: String) = flow {
+    emit(remoteDataSource.requestAddInfo(title).apply {
       model.insertInfo(data!!)
-    }
+    })
+  }
 
-  suspend fun updateInfo(id: Int, title: String, date: String) =
-    remoteDataSource.requestUpdateInfo(id, title, date).apply {
-      model.insertInfo(data!!)
-    }
+  fun updateInfo(id: Int, title: String, date: String) = flow {
+    emit(
+      remoteDataSource.requestUpdateInfo(id, title, date).apply {
+        model.insertInfo(data!!)
+      })
+  }
 
-  suspend fun deleteInfo(info: DontForgetInfo) =
-    remoteDataSource.requestDeleteInfo(info.id).apply {
-      model.deleteInfo(info)
-    }
+  fun deleteInfo(info: DontForgetInfo) = flow {
+    emit(
+      remoteDataSource.requestDeleteInfo(info.id).apply {
+        model.deleteInfo(info)
+      })
+  }
 
   suspend fun deleteAllInfo() =
     model.deleteAll()
@@ -112,20 +119,16 @@ class InfoRemoteDataSource {
     }
   }
 
-  private suspend fun requestInfoList() = request(responseHandler) {
-    apiServiceOf<InfoApi>().getInfoList(page)
-  }
+  private suspend fun requestInfoList() =
+    apiOf<InfoApi>().getInfoList(page)
 
-  suspend fun requestAddInfo(title: String) = request(responseHandler) {
-    apiServiceOf<InfoApi>().addInfo(title)
-  }
+  suspend fun requestAddInfo(title: String) =
+    apiOf<InfoApi>().addInfo(title)
 
-  suspend fun requestUpdateInfo(id: Int, title: String, date: String) = request(responseHandler) {
-    apiServiceOf<InfoApi>().updateInfo(id, title, date)
-  }
+  suspend fun requestUpdateInfo(id: Int, title: String, date: String) =
+    apiOf<InfoApi>().updateInfo(id, title, date)
 
-  suspend fun requestDeleteInfo(id: Int) = request(responseHandler) {
-    apiServiceOf<InfoApi>().deleteInfo(id)
-  }
+  suspend fun requestDeleteInfo(id: Int) =
+    apiOf<InfoApi>().deleteInfo(id)
 }
 

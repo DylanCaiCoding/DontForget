@@ -8,7 +8,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.databinding.library.baseAdapters.BR
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
-import com.dylanc.utilktx.application
+import com.dylanc.utilktx.app
 
 /**
  * @author Dylan Cai
@@ -49,7 +49,7 @@ val Fragment.lifecycleOwner: LifecycleOwner
   get() = this
 
 val applicationViewModelStore = ViewModelStore()
-val androidViewModelFactory = ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+val androidViewModelFactory = ViewModelProvider.AndroidViewModelFactory.getInstance(app)
 
 @MainThread
 inline fun <reified VM : ViewModel> applicationViewModels(): Lazy<VM> =

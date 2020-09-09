@@ -21,10 +21,9 @@ import com.dylanc.dontforget.data.repository.SettingRepository
 import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.ui.user.login.LoginActivity
 import com.dylanc.dontforget.utils.*
-import com.dylanc.dontforget.view_model.event.SharedViewModel
-import com.dylanc.dontforget.view_model.request.UserRequestViewModel
-import com.dylanc.dontforget.view_model.request.VersionRequestViewModel
-import com.dylanc.retrofit.helper.coroutines.RequestException
+import com.dylanc.dontforget.viewmodel.event.SharedViewModel
+import com.dylanc.dontforget.viewmodel.request.UserRequestViewModel
+import com.dylanc.dontforget.viewmodel.request.VersionRequestViewModel
 import com.dylanc.utilktx.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
@@ -49,7 +48,7 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     bindContentView(R.layout.activity_main, viewModel)
-    setStatusBarLightMode(!isDarkMode())
+    isStatusBarLightMode = !isDarkMode
     initNavigationView()
     eventHandler.observe()
   }
@@ -129,13 +128,13 @@ class MainActivity : AppCompatActivity() {
         .setSingleChoiceItems(arrayOf("5 分钟", "10 分钟", "1 小时"), 0) { dialog, which ->
           when (which) {
             0 -> {
-              putSP(KEY_UPDATE_INTERVALS, 5)
+              putSpValue(KEY_UPDATE_INTERVALS, 5)
             }
             1 -> {
-              putSP(KEY_UPDATE_INTERVALS, 10)
+              putSpValue(KEY_UPDATE_INTERVALS, 10)
             }
             2 -> {
-              putSP(KEY_UPDATE_INTERVALS, 60)
+              putSpValue(KEY_UPDATE_INTERVALS, 60)
             }
             else ->
               return@setSingleChoiceItems
@@ -172,13 +171,13 @@ class MainActivity : AppCompatActivity() {
 
   inner class EventHandler {
     fun observe() {
-      userRequestViewModel.requestException
+      userRequestViewModel.exception
         .observeException(lifecycleOwner, this::onRequestException)
-      versionRequestViewModel.requestException
+      versionRequestViewModel.exception
         .observeException(lifecycleOwner, this::onRequestException)
     }
 
-    private fun onRequestException(e: RequestException) {
+    private fun onRequestException(e: Throwable) {
       loadingDialog.show(false)
       toast(e.message)
     }

@@ -8,7 +8,7 @@ import androidx.navigation.findNavController
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.utils.isDarkMode
 import com.dylanc.loadinghelper.LoadingHelper
-import com.dylanc.utilktx.setStatusBarLightMode
+import com.dylanc.utilktx.isStatusBarLightMode
 import kotlinx.android.synthetic.main.layout_toolbar.view.*
 
 /**
@@ -29,7 +29,7 @@ class ToolbarAdapter(
 
   override fun onBindViewHolder(holder: LoadingHelper.ViewHolder) {
     val activity = holder.rootView.context as Activity
-    activity.setStatusBarLightMode(!activity.isDarkMode())
+    activity.isStatusBarLightMode = !activity.isDarkMode
     holder.rootView.apply {
       if (!title.isNullOrBlank()) {
         toolbar.title = title

@@ -1,4 +1,4 @@
-package com.dylanc.dontforget.view_model.event
+package com.dylanc.dontforget.viewmodel.event
 
 import androidx.lifecycle.ViewModel
 import com.dylanc.dontforget.base.event.EventLiveData

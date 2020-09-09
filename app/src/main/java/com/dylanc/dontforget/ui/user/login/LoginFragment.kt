@@ -8,23 +8,14 @@ import androidx.databinding.library.baseAdapters.BR
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.data.net.LoadingDialog
-import com.dylanc.dontforget.ui.main.MainActivity
-import com.dylanc.dontforget.ui.user.register.RegisterActivity
 import com.dylanc.dontforget.utils.bindView
-import com.dylanc.dontforget.utils.isDarkMode
 import com.dylanc.dontforget.utils.lifecycleOwner
 import com.dylanc.dontforget.utils.observeException
-import com.dylanc.dontforget.view_model.request.UserRequestViewModel
-import com.dylanc.utilktx.setStatusBarLightMode
-import com.dylanc.utilktx.startActivity
+import com.dylanc.dontforget.viewmodel.request.UserRequestViewModel
 import com.dylanc.utilktx.toast
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class LoginFragment : Fragment() {
 
@@ -78,7 +69,7 @@ class LoginFragment : Fragment() {
 
   inner class EventHandler {
     fun observe() {
-      requestViewModel.requestException
+      requestViewModel.exception
         .observeException(lifecycleOwner) {
           loadingDialog.show(false)
           toast(it.message)

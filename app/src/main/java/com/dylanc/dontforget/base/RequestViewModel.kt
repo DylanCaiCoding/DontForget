@@ -1,9 +1,10 @@
 package com.dylanc.dontforget.base
 
 import androidx.lifecycle.ViewModel
-import com.dylanc.retrofit.helper.coroutines.RequestExceptionHandler
+import com.dylanc.retrofit.helper.coroutines.ExceptionLiveData
+import com.dylanc.retrofit.helper.coroutines.LoadingLiveData
 
 abstract class RequestViewModel :ViewModel(){
-  protected val requestExceptionHandler = RequestExceptionHandler()
-  val requestException = requestExceptionHandler.requestException
+  val loading = LoadingLiveData()
+  val exception = ExceptionLiveData()
 }

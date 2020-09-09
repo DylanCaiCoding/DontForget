@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.recycler.InfoAdapter
@@ -17,15 +16,14 @@ import com.dylanc.dontforget.base.event.observeEvent
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.constant.KEY_INFO
 import com.dylanc.dontforget.data.net.LoadingDialog
-import com.dylanc.dontforget.utils.observeException
 import com.dylanc.dontforget.service.NotifyInfoService
-import com.dylanc.dontforget.ui.main.insert_info.InsertInfoActivity
 import com.dylanc.dontforget.utils.alertItems
 import com.dylanc.dontforget.utils.applicationViewModels
 import com.dylanc.dontforget.utils.bindView
-import com.dylanc.dontforget.view_model.event.SharedViewModel
-import com.dylanc.dontforget.view_model.request.InfoRequestViewModel
-import com.dylanc.dontforget.view_model.state.ListStateViewModel
+import com.dylanc.dontforget.utils.observeException
+import com.dylanc.dontforget.viewmodel.event.SharedViewModel
+import com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel
+import com.dylanc.dontforget.viewmodel.state.ListStateViewModel
 import com.dylanc.utilktx.bundleOf
 import com.dylanc.utilktx.toast
 import kotlinx.android.synthetic.main.fragment_info_list.*
@@ -105,7 +103,7 @@ class InfoListFragment : Fragment() {
           NotifyInfoService.startRepeatedly(activity)
           stateViewModel.isRefreshing.value = false
         })
-      requestViewModel.requestException
+      requestViewModel.exception
         .observeException(viewLifecycleOwner) {
           loadingDialog.show(false)
           stateViewModel.isRefreshing.value = false

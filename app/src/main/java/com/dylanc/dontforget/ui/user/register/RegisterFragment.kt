@@ -1,18 +1,21 @@
 package com.dylanc.dontforget.ui.user.register
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.library.baseAdapters.BR
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.loading.NavIconType
 import com.dylanc.dontforget.data.net.LoadingDialog
-import com.dylanc.dontforget.utils.*
-import com.dylanc.dontforget.view_model.request.UserRequestViewModel
+import com.dylanc.dontforget.utils.bindView
+import com.dylanc.dontforget.utils.lifecycleOwner
+import com.dylanc.dontforget.utils.observeException
+import com.dylanc.dontforget.utils.setToolbar
+import com.dylanc.dontforget.viewmodel.request.UserRequestViewModel
 import com.dylanc.utilktx.toast
 
 class RegisterFragment : Fragment() {
@@ -69,7 +72,7 @@ class RegisterFragment : Fragment() {
 
   inner class EventHandler {
     fun observe() {
-      requestViewModel.requestException
+      requestViewModel.exception
         .observeException(lifecycleOwner) {
           loadingDialog.show(false)
           toast(it.message)

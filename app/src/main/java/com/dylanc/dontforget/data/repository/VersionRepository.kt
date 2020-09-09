@@ -1,16 +1,18 @@
 package com.dylanc.dontforget.data.repository
 
 import com.dylanc.dontforget.data.repository.api.VersionApi
-import com.dylanc.retrofit.helper.apiServiceOf
+import com.dylanc.retrofit.helper.apiOf
+import kotlinx.coroutines.flow.flow
 
 class VersionRepository(
   private val remoteDataSource: VersionRemoteDataSource = VersionRemoteDataSource()
 ) {
-  suspend fun checkVersion()  =
-    remoteDataSource.checkVersion()
+  fun checkVersion() = flow {
+    emit(remoteDataSource.checkVersion())
+  }
 }
 
 class VersionRemoteDataSource {
   suspend fun checkVersion() =
-    apiServiceOf<VersionApi>().checkVersion()
+    apiOf<VersionApi>().checkVersion()
 }

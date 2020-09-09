@@ -9,8 +9,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.data.repository.UserRepository
-import com.dylanc.dontforget.utils.isDarkMode
-import com.dylanc.utilktx.setStatusBarLightMode
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

@@ -8,7 +8,7 @@ import com.dylanc.dontforget.data.repository.UserRepository
 import com.dylanc.dontforget.ui.main.MainActivity
 import com.dylanc.dontforget.ui.user.login.LoginActivity
 import com.dylanc.dontforget.utils.isDarkMode
-import com.dylanc.utilktx.setStatusBarLightMode
+import com.dylanc.utilktx.isStatusBarLightMode
 import com.dylanc.utilktx.startActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -18,7 +18,7 @@ class SplashActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_splash)
-    setStatusBarLightMode(!isDarkMode())
+    isStatusBarLightMode = !isDarkMode
 
     lifecycleScope.launch {
       delay(1000)
