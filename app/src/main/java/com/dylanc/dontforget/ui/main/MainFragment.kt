@@ -22,22 +22,21 @@ import com.dylanc.dontforget.adapter.binding.setOnCheckedChangeListener
 import com.dylanc.dontforget.base.event.postEventValue
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
 import com.dylanc.dontforget.data.net.LoadingDialog
+import com.dylanc.dontforget.data.net.loadingDialog
+import com.dylanc.dontforget.data.net.observe
 import com.dylanc.dontforget.data.repository.SettingRepository
 import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.utils.applicationViewModels
 import com.dylanc.dontforget.utils.bindView
 import com.dylanc.dontforget.utils.lifecycleOwner
-import com.dylanc.dontforget.utils.observeException
 import com.dylanc.dontforget.viewmodel.event.SharedViewModel
 import com.dylanc.dontforget.viewmodel.request.UserRequestViewModel
 import com.dylanc.dontforget.viewmodel.request.VersionRequestViewModel
 import com.dylanc.utilktx.putSpValue
-import com.dylanc.utilktx.toast
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.menu_item_switch.view.*
 import update.UpdateAppUtils
-
 
 class MainFragment : Fragment() {
 
@@ -45,11 +44,11 @@ class MainFragment : Fragment() {
   private val userRequestViewModel: UserRequestViewModel by viewModels()
   private val versionRequestViewModel: VersionRequestViewModel by viewModels()
   private val sharedViewModel: SharedViewModel by applicationViewModels()
+  private val loadingDialog: LoadingDialog by loadingDialog()
   private val clickProxy = ClickProxy()
   private val eventHandler = EventHandler()
   private lateinit var appBarConfiguration: AppBarConfiguration
   private lateinit var notifyInfoService: NotifyInfoService
-  private val loadingDialog: LoadingDialog by lazy { LoadingDialog(requireActivity()) }
   private var bound = false
 
   override fun onCreateView(
@@ -64,7 +63,10 @@ class MainFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     bindView(view, viewModel)
     initNavigationView()
-    eventHandler.observe()
+    userRequestViewModel.loading.observe(this, loadingDialog)
+    userRequestViewModel.exception.observe(this)
+    versionRequestViewModel.loading.observe(this, loadingDialog)
+    versionRequestViewModel.exception.observe(this)
   }
 
   private fun initNavigationView() {
@@ -125,10 +127,8 @@ class MainFragment : Fragment() {
     }
 
     private fun onCheckBtnClick() {
-      loadingDialog.show(true)
       versionRequestViewModel.checkVersion()
         .observe(lifecycleOwner, Observer { appVersion ->
-          loadingDialog.show(false)
           UpdateAppUtils
             .getInstance()
             .apkUrl(appVersion.installUrl)
@@ -174,27 +174,14 @@ class MainFragment : Fragment() {
     }
 
     private fun onLogoutBtnClick() {
-      loadingDialog.show(true)
       userRequestViewModel.logout()
         .observe(lifecycleOwner, Observer {
-          loadingDialog.show(false)
           findNavController().navigate(R.id.action_mainFragment_to_loginFragment)
         })
     }
   }
 
   inner class EventHandler {
-    fun observe() {
-      userRequestViewModel.exception
-        .observeException(lifecycleOwner, this::onRequestException)
-      versionRequestViewModel.exception
-        .observeException(lifecycleOwner, this::onRequestException)
-    }
-
-    private fun onRequestException(e: Throwable) {
-      loadingDialog.show(false)
-      toast(e.message)
-    }
 
     fun onNotificationSwitchChecked(isChecked: Boolean) {
       sharedViewModel.isShowNotification.postEventValue(isChecked)

@@ -8,7 +8,7 @@ import com.dylanc.retrofit.helper.coroutines.showLoading
 
 class UserRequestViewModel : RequestViewModel() {
 
-  fun login(username: String, password: String) =
+  fun login(username: String?, password: String?) =
     userRepository.login(username, password)
       .showLoading(loading)
       .catch(exception)
@@ -20,7 +20,7 @@ class UserRequestViewModel : RequestViewModel() {
       .catch(exception)
       .asLiveData()
 
-  fun register(username: String, password: String, confirmPassword: String) =
+  fun register(username: String?, password: String?, confirmPassword: String?) =
     userRepository.register(username, password, confirmPassword)
       .showLoading(loading)
       .catch(exception)

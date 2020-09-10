@@ -31,7 +31,6 @@ import com.dylanc.loadinghelper.ViewType
  * 这是耦合度较低的封装方式，没有任何抽象方法，可以很方便地将基类里的代码拷贝到其它项目的基类里使用。
  *
  * 使用该基类时注意以下事项：
- * 将主题设置成 NoActionBar，不然会有报错，后续会将这个问题修复。
  * 显示对应视图之前需要注册适配器，可以设置全局适配器，某个页面想修改样式时再注册个新的适配器。
  * 设置标题栏的方法应该根据项目需要进行编写，下面提供了参考示例。
  *
@@ -50,7 +49,7 @@ abstract class BaseActivity : AppCompatActivity() {
     contentAdapter: LoadingHelper.ContentAdapter<*>? = null
   ) {
     super.setContentView(layoutResID)
-    loadingHelper = LoadingHelper((findViewById<View>(contentViewId) as ViewGroup), contentAdapter)
+    loadingHelper = LoadingHelper((findViewById<View>(contentViewId) as ViewGroup).getChildAt(0), contentAdapter)
     loadingHelper.setOnReloadListener(this::onReload)
   }
 

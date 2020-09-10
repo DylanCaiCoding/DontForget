@@ -9,10 +9,6 @@
       type="com.dylanc.dontforget.ui.main.info_list.InfoListViewModel" />
 
     <variable
-      name="stateViewModel"
-      type="com.dylanc.dontforget.viewmodel.state.ListStateViewModel" />
-
-    <variable
       name="requestViewModel"
       type="com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel" />
 
@@ -35,7 +31,7 @@
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
       android:id="@+id/refresh_layout"
-      isRefreshing="@{stateViewModel.isRefreshing}"
+      isRefreshing="@{requestViewModel.refreshing}"
       onRefresh="@{eventHandler.onRefreshListener}"
       android:layout_width="match_parent"
       android:layout_height="match_parent">

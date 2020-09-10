@@ -11,7 +11,7 @@ import com.dylanc.dontforget.R
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
 import com.dylanc.dontforget.data.repository.SettingRepository
 import com.dylanc.dontforget.data.repository.infoRepository
-import com.dylanc.dontforget.ui.main.MainActivity
+import com.dylanc.dontforget.ui.NavigationActivity
 import com.dylanc.utilktx.intentOf
 import com.dylanc.utilktx.spValueOf
 import java.util.*
@@ -84,7 +84,7 @@ class NotifyInfoService : Service() {
 
   private fun showNotification() {
     val info = infoRepository.randomInfo ?: return
-    val pendingIntent = PendingIntent.getActivity(this, 1, intentOf<MainActivity>(), 0)
+    val pendingIntent = PendingIntent.getActivity(this, 1, intentOf<NavigationActivity>(), 0)
     val notification = NotificationCompat.Builder(this, CHANNEL_ID)
       .setContentText(info.title)
       .setStyle(

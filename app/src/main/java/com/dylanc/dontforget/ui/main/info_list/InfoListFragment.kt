@@ -16,28 +16,26 @@ import com.dylanc.dontforget.base.event.observeEvent
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.constant.KEY_INFO
 import com.dylanc.dontforget.data.net.LoadingDialog
+import com.dylanc.dontforget.data.net.loadingDialog
+import com.dylanc.dontforget.data.net.observe
 import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.utils.alertItems
 import com.dylanc.dontforget.utils.applicationViewModels
 import com.dylanc.dontforget.utils.bindView
-import com.dylanc.dontforget.utils.observeException
 import com.dylanc.dontforget.viewmodel.event.SharedViewModel
 import com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel
-import com.dylanc.dontforget.viewmodel.state.ListStateViewModel
 import com.dylanc.utilktx.bundleOf
-import com.dylanc.utilktx.toast
 import kotlinx.android.synthetic.main.fragment_info_list.*
 
 class InfoListFragment : Fragment() {
 
   private val viewModel: InfoListViewModel by viewModels()
   private val requestViewModel: InfoRequestViewModel by viewModels()
-  private val stateViewModel: ListStateViewModel by viewModels()
   private val sharedViewModel: SharedViewModel by applicationViewModels()
+  private val loadingDialog: LoadingDialog by loadingDialog()
   private val clickProxy = ClickProxy()
   private val eventHandler = EventHandler()
   private val adapter = InfoAdapter(clickProxy::onItemClick, clickProxy::onItemLongClick)
-  private lateinit var loadingDialog: LoadingDialog
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
@@ -52,30 +50,38 @@ class InfoListFragment : Fragment() {
       BR.adapter to adapter,
       BR.clickProxy to clickProxy,
       BR.eventHandler to eventHandler,
-      BR.requestViewModel to requestViewModel,
-      BR.stateViewModel to stateViewModel
+      BR.requestViewModel to requestViewModel
     )
   }
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    loadingDialog = LoadingDialog(requireActivity())
     refresh_layout.setColorSchemeResources(R.color.colorAccent)
-    stateViewModel.isRefreshing.value = true
-    eventHandler.observe()
+    requestViewModel.getInfoList()
+      .observe(viewLifecycleOwner, Observer {
+        NotifyInfoService.startRepeatedly(activity)
+      })
+    sharedViewModel.isShowNotification
+      .observeEvent(viewLifecycleOwner) { isChecked ->
+        if (isChecked) {
+          NotifyInfoService.startRepeatedly(activity)
+        } else {
+          NotifyInfoService.stop(activity)
+        }
+      }
+    requestViewModel.loading.observe(this, loadingDialog)
+    requestViewModel.exception.observe(this)
   }
 
   inner class ClickProxy {
     fun onAddBtnClick() {
       requireActivity().findNavController(R.id.nav_host_fragment)
         .navigate(R.id.action_mainFragment_to_insertInfoFragment)
-//      InsertInfoActivity.start()
     }
 
     fun onItemClick(item: DontForgetInfo) {
       requireActivity().findNavController(R.id.nav_host_fragment)
         .navigate(R.id.action_mainFragment_to_insertInfoFragment, bundleOf(KEY_INFO to item))
-//      InsertInfoActivity.start(item)
     }
 
     fun onItemLongClick(item: DontForgetInfo) {
@@ -84,10 +90,9 @@ class InfoListFragment : Fragment() {
           "关闭提醒" -> {
           }
           "删除" -> {
-            loadingDialog.show(true)
             requestViewModel.deleteInfo(item)
               .observe(viewLifecycleOwner, Observer {
-                loadingDialog.show(false)
+
               })
           }
         }
@@ -97,33 +102,10 @@ class InfoListFragment : Fragment() {
 
   inner class EventHandler {
 
-    fun observe() {
-      requestViewModel.getInfoList()
-        .observe(viewLifecycleOwner, Observer {
-          NotifyInfoService.startRepeatedly(activity)
-          stateViewModel.isRefreshing.value = false
-        })
-      requestViewModel.exception
-        .observeException(viewLifecycleOwner) {
-          loadingDialog.show(false)
-          stateViewModel.isRefreshing.value = false
-          toast(it.message)
-        }
-      sharedViewModel.isShowNotification
-        .observeEvent(viewLifecycleOwner) { isChecked ->
-          if (isChecked) {
-            NotifyInfoService.startRepeatedly(activity)
-          } else {
-            NotifyInfoService.stop(activity)
-          }
-        }
-    }
-
     val onRefreshListener = SwipeRefreshLayout.OnRefreshListener {
       requestViewModel.requestInfoList()
         .observe(viewLifecycleOwner, Observer {
           NotifyInfoService.startRepeatedly(activity)
-          stateViewModel.isRefreshing.value = false
         })
     }
 
@@ -131,7 +113,6 @@ class InfoListFragment : Fragment() {
 //      requestViewModel.requestInfoList()
 //        .observe(viewLifecycleOwner, Observer {
 //          NotifyInfoService.startRepeatedly(activity)
-//          listStateViewModel.isRefreshing.value = false
 //        })
 //    }
   }

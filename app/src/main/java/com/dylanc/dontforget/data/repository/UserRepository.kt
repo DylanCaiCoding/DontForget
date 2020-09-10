@@ -1,6 +1,7 @@
 package com.dylanc.dontforget.data.repository
 
 import com.dylanc.dontforget.data.bean.User
+import com.dylanc.dontforget.data.bean.parseData
 import com.dylanc.dontforget.data.net.clearCookieJar
 import com.dylanc.dontforget.data.repository.api.UserApi
 import com.dylanc.dontforget.data.repository.db.UserDao
@@ -21,30 +22,31 @@ class UserRepository(
   private val remoteDataSource: UserRemoteDataSource = UserRemoteDataSource()
 ) {
 
-  fun login(username: String, password: String) = flow {
-    emit(
-      remoteDataSource.requestLogin(username, password)
-        .apply {
-          model.updateUser(data!!)
-        })
+  fun login(username: String?, password: String?) = flow {
+    checkNotNull(username) { "请输入账号" }
+    checkNotNull(password) { "请输入密码" }
+    emit(remoteDataSource.requestLogin(username, password)
+      .also {
+        model.updateUser(it)
+      })
   }
 
   fun logout() = flow {
-    emit(
-      remoteDataSource.requestLogout()
-        .apply {
-          model.logout()
-          infoRepository.deleteAllInfo()
-          clearCookieJar()
-        })
+    emit(remoteDataSource.requestLogout()
+      .apply {
+        model.logout()
+        infoRepository.deleteAllInfo()
+        clearCookieJar()
+      })
   }
 
   suspend fun isLogin() = model.isLogin()
 
-  fun register(username: String, password: String, confirmPassword: String) = flow {
-    emit(
-      remoteDataSource.requestRegister(username, password, confirmPassword)
-    )
+  fun register(username: String?, password: String?, confirmPassword: String?) = flow {
+    checkNotNull(username){"请输入账号"}
+    checkNotNull(password){"请输入密码"}
+    checkNotNull(confirmPassword){"请再次输入密码"}
+    emit(remoteDataSource.requestRegister(username, password, confirmPassword))
   }
 }
 
@@ -67,17 +69,16 @@ class UserModel(private val userDao: UserDao = appDatabase.userDao()) {
 
 class UserRemoteDataSource {
   suspend fun requestLogin(username: String, password: String) =
-    apiOf<UserApi>().login(username, password)
+    apiOf<UserApi>().login(username, password).parseData()
 
   suspend fun requestLogout() =
-    apiOf<UserApi>().logout()
-
+    apiOf<UserApi>().logout().parseData()
 
   suspend fun requestRegister(
     username: String,
     password: String,
     confirmPassword: String
   ) =
-    apiOf<UserApi>().register(username, password, confirmPassword)
+    apiOf<UserApi>().register(username, password, confirmPassword).parseData()
 
 }

@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 
@@ -20,9 +21,9 @@ fun ImageView.loadUrl(
   Glide.with(context).load(url).placeholder(placeHolder).into(this)
 }
 
-@BindingAdapter(value = ["visible"], requireAll = false)
+@BindingAdapter(value = ["isVisible"], requireAll = false)
 fun View.setVisible(visible: Boolean) {
-  visibility = if (visible) View.VISIBLE else View.GONE
+  isVisible = visible
 }
 
 @BindingAdapter(value = ["showDrawable", "drawableShowed"], requireAll = false)

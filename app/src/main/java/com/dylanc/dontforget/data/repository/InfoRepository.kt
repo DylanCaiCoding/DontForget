@@ -1,6 +1,7 @@
 package com.dylanc.dontforget.data.repository
 
 import com.dylanc.dontforget.data.bean.DontForgetInfo
+import com.dylanc.dontforget.data.bean.parseData
 import com.dylanc.dontforget.data.repository.api.InfoApi
 import com.dylanc.dontforget.data.repository.db.InfoDao
 import com.dylanc.dontforget.data.repository.db.appDatabase
@@ -44,32 +45,30 @@ class InfoRepository(
   }
 
   fun requestInfoList() = flow {
-    emit(
-      remoteDataSource.getInfoList()
-        .apply {
-          model.deleteAll()
-          model.insertAll(this)
-        })
-  }
-
-  fun addInfo(title: String) = flow {
-    emit(remoteDataSource.requestAddInfo(title).apply {
-      model.insertInfo(data!!)
+    emit(remoteDataSource.getInfoList().apply {
+      model.deleteAll()
+      model.insertAll(this)
     })
   }
 
-  fun updateInfo(id: Int, title: String, date: String) = flow {
-    emit(
-      remoteDataSource.requestUpdateInfo(id, title, date).apply {
-        model.insertInfo(data!!)
-      })
+  fun addInfo(title: String?) = flow {
+    checkNotNull(title){"请输入标题"}
+    emit(remoteDataSource.requestAddInfo(title).also {
+      model.insertInfo(it)
+    })
+  }
+
+  fun updateInfo(id: Int, title: String?, date: String) = flow {
+    checkNotNull(title){"请输入标题"}
+    emit(remoteDataSource.requestUpdateInfo(id, title, date).also {
+      model.insertInfo(it)
+    })
   }
 
   fun deleteInfo(info: DontForgetInfo) = flow {
-    emit(
-      remoteDataSource.requestDeleteInfo(info.id).apply {
-        model.deleteInfo(info)
-      })
+    emit(remoteDataSource.requestDeleteInfo(info.id).apply {
+      model.deleteInfo(info)
+    })
   }
 
   suspend fun deleteAllInfo() =
@@ -108,7 +107,7 @@ class InfoRemoteDataSource {
   }
 
   private suspend fun loadAllInfo(): List<DontForgetInfo> {
-    val pageList = requestInfoList().data!!
+    val pageList = requestInfoList()
     return if (pageList.over) {
       list.addAll(pageList.list)
       list
@@ -120,15 +119,15 @@ class InfoRemoteDataSource {
   }
 
   private suspend fun requestInfoList() =
-    apiOf<InfoApi>().getInfoList(page)
+    apiOf<InfoApi>().getInfoList(page).parseData()
 
   suspend fun requestAddInfo(title: String) =
-    apiOf<InfoApi>().addInfo(title)
+    apiOf<InfoApi>().addInfo(title).parseData()
 
   suspend fun requestUpdateInfo(id: Int, title: String, date: String) =
-    apiOf<InfoApi>().updateInfo(id, title, date)
+    apiOf<InfoApi>().updateInfo(id, title, date).parseData()
 
   suspend fun requestDeleteInfo(id: Int) =
-    apiOf<InfoApi>().deleteInfo(id)
+    apiOf<InfoApi>().deleteInfo(id).parseData()
 }
 

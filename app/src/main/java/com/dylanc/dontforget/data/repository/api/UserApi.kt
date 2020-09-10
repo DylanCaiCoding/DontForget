@@ -21,7 +21,7 @@ interface UserApi {
   suspend fun login(
     @Field("username") username: String,
     @Field("password") password: String
-  ): ApiResponse<User?>
+  ): ApiResponse<User>
 
   @FormUrlEncoded
   @POST("$USER/register")
@@ -29,7 +29,7 @@ interface UserApi {
     @Field("username") username: String,
     @Field("password") password: String,
     @Field("repassword") confirmPassword: String
-  ): ApiResponse<User?>
+  ): ApiResponse<User>
 
   @GET("$USER/logout/json")
   suspend fun logout(): ApiResponse<Any>

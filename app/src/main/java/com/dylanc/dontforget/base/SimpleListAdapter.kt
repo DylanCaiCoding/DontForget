@@ -35,10 +35,4 @@ abstract class SimpleListAdapter<T>(callback: DiffUtil.ItemCallback<T>) :
 
   abstract fun onBindViewHolder(holder: SimpleViewHolder, item: T)
 
-  protected fun View.setOnClickListener(holder: RecyclerView.ViewHolder, item: T) {
-    setOnClickListener {
-      onClickListener?.invoke(holder.layoutPosition, item)
-    }
-  }
-
 }
