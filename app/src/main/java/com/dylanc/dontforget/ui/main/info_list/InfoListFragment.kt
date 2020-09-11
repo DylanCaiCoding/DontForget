@@ -6,8 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.library.baseAdapters.BR
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.navigation.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.dylanc.dontforget.R
@@ -20,7 +21,6 @@ import com.dylanc.dontforget.data.net.loadingDialog
 import com.dylanc.dontforget.data.net.observe
 import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.utils.alertItems
-import com.dylanc.dontforget.utils.applicationViewModels
 import com.dylanc.dontforget.utils.bindView
 import com.dylanc.dontforget.viewmodel.event.SharedViewModel
 import com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel
@@ -31,7 +31,7 @@ class InfoListFragment : Fragment() {
 
   private val viewModel: InfoListViewModel by viewModels()
   private val requestViewModel: InfoRequestViewModel by viewModels()
-  private val sharedViewModel: SharedViewModel by applicationViewModels()
+  private val sharedViewModel: SharedViewModel by activityViewModels()
   private val loadingDialog: LoadingDialog by loadingDialog()
   private val clickProxy = ClickProxy()
   private val eventHandler = EventHandler()
@@ -58,9 +58,9 @@ class InfoListFragment : Fragment() {
     super.onActivityCreated(savedInstanceState)
     refresh_layout.setColorSchemeResources(R.color.colorAccent)
     requestViewModel.getInfoList()
-      .observe(viewLifecycleOwner, Observer {
+      .observe(viewLifecycleOwner) {
         NotifyInfoService.startRepeatedly(activity)
-      })
+      }
     sharedViewModel.isShowNotification
       .observeEvent(viewLifecycleOwner) { isChecked ->
         if (isChecked) {
@@ -69,7 +69,7 @@ class InfoListFragment : Fragment() {
           NotifyInfoService.stop(activity)
         }
       }
-    requestViewModel.loading.observe(this, loadingDialog)
+    requestViewModel.isLoading.observe(this, loadingDialog)
     requestViewModel.exception.observe(this)
   }
 
@@ -85,18 +85,17 @@ class InfoListFragment : Fragment() {
     }
 
     fun onItemLongClick(item: DontForgetInfo) {
-      activity?.alertItems("关闭提醒", "删除") { text, _ ->
+      alertItems("关闭提醒", "删除") { text, _ ->
         when (text) {
           "关闭提醒" -> {
           }
           "删除" -> {
             requestViewModel.deleteInfo(item)
-              .observe(viewLifecycleOwner, Observer {
-
-              })
+              .observe(viewLifecycleOwner) {
+              }
           }
         }
-      }
+      }.show()
     }
   }
 
@@ -104,9 +103,9 @@ class InfoListFragment : Fragment() {
 
     val onRefreshListener = SwipeRefreshLayout.OnRefreshListener {
       requestViewModel.requestInfoList()
-        .observe(viewLifecycleOwner, Observer {
+        .observe(viewLifecycleOwner) {
           NotifyInfoService.startRepeatedly(activity)
-        })
+        }
     }
 
 //    fun onRefresh() {

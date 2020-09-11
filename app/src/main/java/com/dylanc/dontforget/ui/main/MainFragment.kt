@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
@@ -26,11 +27,9 @@ import com.dylanc.dontforget.data.net.loadingDialog
 import com.dylanc.dontforget.data.net.observe
 import com.dylanc.dontforget.data.repository.SettingRepository
 import com.dylanc.dontforget.service.NotifyInfoService
-import com.dylanc.dontforget.utils.applicationViewModels
 import com.dylanc.dontforget.utils.bindView
-import com.dylanc.dontforget.utils.lifecycleOwner
 import com.dylanc.dontforget.viewmodel.event.SharedViewModel
-import com.dylanc.dontforget.viewmodel.request.UserRequestViewModel
+import com.dylanc.dontforget.viewmodel.request.LoginRequestViewModel
 import com.dylanc.dontforget.viewmodel.request.VersionRequestViewModel
 import com.dylanc.utilktx.putSpValue
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -41,9 +40,9 @@ import update.UpdateAppUtils
 class MainFragment : Fragment() {
 
   private val viewModel: MainViewModel by viewModels()
-  private val userRequestViewModel: UserRequestViewModel by viewModels()
+  private val loginRequestViewModel: LoginRequestViewModel by viewModels()
   private val versionRequestViewModel: VersionRequestViewModel by viewModels()
-  private val sharedViewModel: SharedViewModel by applicationViewModels()
+  private val sharedViewModel: SharedViewModel by activityViewModels()
   private val loadingDialog: LoadingDialog by loadingDialog()
   private val clickProxy = ClickProxy()
   private val eventHandler = EventHandler()
@@ -63,9 +62,9 @@ class MainFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     bindView(view, viewModel)
     initNavigationView()
-    userRequestViewModel.loading.observe(this, loadingDialog)
-    userRequestViewModel.exception.observe(this)
-    versionRequestViewModel.loading.observe(this, loadingDialog)
+    loginRequestViewModel.isLoading.observe(this, loadingDialog)
+    loginRequestViewModel.exception.observe(this)
+    versionRequestViewModel.isLoading.observe(this, loadingDialog)
     versionRequestViewModel.exception.observe(this)
   }
 
@@ -128,7 +127,7 @@ class MainFragment : Fragment() {
 
     private fun onCheckBtnClick() {
       versionRequestViewModel.checkVersion()
-        .observe(lifecycleOwner, Observer { appVersion ->
+        .observe(viewLifecycleOwner, Observer { appVersion ->
           UpdateAppUtils
             .getInstance()
             .apkUrl(appVersion.installUrl)
@@ -174,8 +173,8 @@ class MainFragment : Fragment() {
     }
 
     private fun onLogoutBtnClick() {
-      userRequestViewModel.logout()
-        .observe(lifecycleOwner, Observer {
+      loginRequestViewModel.logout()
+        .observe(viewLifecycleOwner, Observer {
           findNavController().navigate(R.id.action_mainFragment_to_loginFragment)
         })
     }

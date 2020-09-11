@@ -42,10 +42,6 @@ fun Fragment.bindView(
       }
     }
 
-val ComponentActivity.lifecycleOwner: LifecycleOwner get() = this
-
-val Fragment.lifecycleOwner: LifecycleOwner get() = this
-
 @MainThread
-inline fun <reified VM : ViewModel> applicationViewModels(): Lazy<VM> =
+inline fun <reified VM : ViewModel> appViewModels(): Lazy<VM> =
   ViewModelLazy(VM::class, { ViewModelStore() }, { ViewModelProvider.AndroidViewModelFactory.getInstance(app) })

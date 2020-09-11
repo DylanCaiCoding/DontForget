@@ -13,9 +13,7 @@ import kotlinx.coroutines.flow.flow
  * @author Dylan Cai
  */
 
-val userRepository: UserRepository by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
-  UserRepository()
-}
+val userRepository: UserRepository by lazy { UserRepository() }
 
 class UserRepository(
   private val model: UserModel = UserModel(),
@@ -25,27 +23,25 @@ class UserRepository(
   fun login(username: String?, password: String?) = flow {
     checkNotNull(username) { "请输入账号" }
     checkNotNull(password) { "请输入密码" }
-    emit(remoteDataSource.requestLogin(username, password)
-      .also {
-        model.updateUser(it)
-      })
+    val user = remoteDataSource.requestLogin(username, password)
+    model.updateUser(user)
+    emit(user)
   }
 
   fun logout() = flow {
-    emit(remoteDataSource.requestLogout()
-      .apply {
-        model.logout()
-        infoRepository.deleteAllInfo()
-        clearCookieJar()
-      })
+    val data = remoteDataSource.requestLogout()
+    model.logout()
+    infoRepository.deleteAllInfo()
+    clearCookieJar()
+    emit(data)
   }
 
   suspend fun isLogin() = model.isLogin()
 
   fun register(username: String?, password: String?, confirmPassword: String?) = flow {
-    checkNotNull(username){"请输入账号"}
-    checkNotNull(password){"请输入密码"}
-    checkNotNull(confirmPassword){"请再次输入密码"}
+    checkNotNull(username) { "请输入账号" }
+    checkNotNull(password) { "请输入密码" }
+    checkNotNull(confirmPassword) { "请再次输入密码" }
     emit(remoteDataSource.requestRegister(username, password, confirmPassword))
   }
 }
@@ -71,14 +67,9 @@ class UserRemoteDataSource {
   suspend fun requestLogin(username: String, password: String) =
     apiOf<UserApi>().login(username, password).parseData()
 
-  suspend fun requestLogout() =
-    apiOf<UserApi>().logout().parseData()
+  suspend fun requestLogout() = apiOf<UserApi>().logout().parseData()
 
-  suspend fun requestRegister(
-    username: String,
-    password: String,
-    confirmPassword: String
-  ) =
+  suspend fun requestRegister(username: String, password: String, confirmPassword: String) =
     apiOf<UserApi>().register(username, password, confirmPassword).parseData()
 
 }

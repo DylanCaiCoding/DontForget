@@ -12,7 +12,7 @@ class VersionRequestViewModel : RequestViewModel() {
 
   fun checkVersion() =
     versionRepository.checkVersion()
-      .showLoading(loading)
+      .showLoading(isLoading)
       .catch(exception)
       .asLiveData()
 }

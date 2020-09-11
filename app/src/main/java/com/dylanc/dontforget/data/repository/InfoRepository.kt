@@ -14,9 +14,7 @@ import java.util.*
 /**
  * @author Dylan Cai
  */
-val infoRepository: InfoRepository by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
-  InfoRepository()
-}
+val infoRepository: InfoRepository by lazy { InfoRepository() }
 
 class InfoRepository(
   private val model: InfoModel = InfoModel(),
@@ -35,44 +33,44 @@ class InfoRepository(
     }
 
   fun getInfoList() = flow {
-    emit(if (model.allInfo.value == null || model.allInfo.value!!.isEmpty()) {
-      remoteDataSource.getInfoList().apply {
-        model.insertAll(this)
-      }
+    val infoList = if (model.allInfo.value == null || model.allInfo.value!!.isEmpty()) {
+      val infoList = remoteDataSource.refreshInfoList()
+      model.insertAll(infoList)
+      infoList
     } else {
       model.allInfo.value!!
-    })
+    }
+    emit(infoList)
   }
 
-  fun requestInfoList() = flow {
-    emit(remoteDataSource.getInfoList().apply {
-      model.deleteAll()
-      model.insertAll(this)
-    })
+  fun refreshInfoList() = flow {
+    val infoList = remoteDataSource.refreshInfoList()
+    model.deleteAll()
+    model.insertAll(infoList)
+    emit(infoList)
   }
 
   fun addInfo(title: String?) = flow {
-    checkNotNull(title){"请输入标题"}
-    emit(remoteDataSource.requestAddInfo(title).also {
-      model.insertInfo(it)
-    })
+    checkNotNull(title) { "请输入标题" }
+    val info = remoteDataSource.requestAddInfo(title)
+    model.insertInfo(info)
+    emit(info)
   }
 
   fun updateInfo(id: Int, title: String?, date: String) = flow {
-    checkNotNull(title){"请输入标题"}
-    emit(remoteDataSource.requestUpdateInfo(id, title, date).also {
-      model.insertInfo(it)
-    })
+    checkNotNull(title) { "请输入标题" }
+    val info = remoteDataSource.requestUpdateInfo(id, title, date)
+    model.insertInfo(info)
+    emit(info)
   }
 
   fun deleteInfo(info: DontForgetInfo) = flow {
-    emit(remoteDataSource.requestDeleteInfo(info.id).apply {
-      model.deleteInfo(info)
-    })
+    val deleteInfo = remoteDataSource.requestDeleteInfo(info.id)
+    model.deleteInfo(info)
+    emit(deleteInfo)
   }
 
-  suspend fun deleteAllInfo() =
-    model.deleteAll()
+  suspend fun deleteAllInfo() = model.deleteAll()
 }
 
 class InfoModel(private val infoDao: InfoDao = appDatabase.infoDao()) {
@@ -100,7 +98,7 @@ class InfoRemoteDataSource {
   private var page: Int = 1
   private val list = mutableListOf<DontForgetInfo>()
 
-  suspend fun getInfoList(): List<DontForgetInfo> {
+  suspend fun refreshInfoList(): List<DontForgetInfo> {
     list.clear()
     page = 1
     return loadAllInfo()

@@ -2,7 +2,6 @@ package com.dylanc.dontforget.ui.main.insert_info
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -15,12 +14,10 @@ import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.loading.NavIconType
 import com.dylanc.dontforget.data.net.LoadingDialog
 import com.dylanc.dontforget.data.net.loadingDialog
-import com.dylanc.dontforget.utils.bindView
-import com.dylanc.dontforget.utils.lifecycleOwner
 import com.dylanc.dontforget.data.net.observe
+import com.dylanc.dontforget.utils.bindView
 import com.dylanc.dontforget.utils.setToolbar
 import com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel
-import com.dylanc.utilktx.toast
 
 class InsertInfoFragment : Fragment() {
 
@@ -43,7 +40,7 @@ class InsertInfoFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     viewModel.title.value = args.info?.title
-    requestViewModel.loading.observe(this, loadingDialog)
+    requestViewModel.isLoading.observe(this, loadingDialog)
     requestViewModel.exception.observe(this)
   }
 
@@ -68,7 +65,7 @@ class InsertInfoFragment : Fragment() {
       } else {
         requestViewModel.updateInfo(info.id, value, info.dateStr)
       }
-      request.observe(lifecycleOwner) {
+      request.observe(viewLifecycleOwner) {
         findNavController().popBackStack()
       }
     }

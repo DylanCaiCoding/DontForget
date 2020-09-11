@@ -8,22 +8,22 @@ import androidx.databinding.library.baseAdapters.BR
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.loading.NavIconType
 import com.dylanc.dontforget.data.net.LoadingDialog
 import com.dylanc.dontforget.data.net.loadingDialog
-import com.dylanc.dontforget.utils.bindView
-import com.dylanc.dontforget.utils.lifecycleOwner
 import com.dylanc.dontforget.data.net.observe
+import com.dylanc.dontforget.utils.bindView
 import com.dylanc.dontforget.utils.setToolbar
-import com.dylanc.dontforget.viewmodel.request.UserRequestViewModel
+import com.dylanc.dontforget.viewmodel.request.LoginRequestViewModel
 import com.dylanc.utilktx.toast
 
 class RegisterFragment : Fragment() {
 
   private val viewModel: RegisterViewModel by viewModels()
-  private val requestViewModel: UserRequestViewModel by viewModels()
+  private val requestViewModel: LoginRequestViewModel by viewModels()
   private val loadingDialog: LoadingDialog by loadingDialog()
 
   override fun onCreateView(
@@ -37,7 +37,7 @@ class RegisterFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    requestViewModel.loading.observe(this, loadingDialog)
+    requestViewModel.isLoading.observe(this, loadingDialog)
     requestViewModel.exception.observe(this)
   }
 
@@ -47,10 +47,10 @@ class RegisterFragment : Fragment() {
       val password = viewModel.password.value
       val confirmPassword = viewModel.confirmPassword.value
       requestViewModel.register(username, password, confirmPassword)
-        .observe(lifecycleOwner, Observer {
+        .observe(viewLifecycleOwner) {
           toast("注册成功")
           findNavController().popBackStack()
-        })
+        }
     }
   }
 }

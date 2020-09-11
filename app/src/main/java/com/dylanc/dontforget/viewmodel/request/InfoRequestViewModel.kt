@@ -10,35 +10,35 @@ import com.dylanc.retrofit.helper.coroutines.showLoading
 
 class InfoRequestViewModel : RequestViewModel() {
   val list = infoRepository.allInfo
-  val refreshing  = LoadingLiveData()
+  val isRefreshing  = LoadingLiveData()
 
   fun getInfoList() =
     infoRepository.getInfoList()
-    .showLoading(refreshing)
+    .showLoading(isRefreshing)
     .catch(exception)
     .asLiveData()
 
   fun requestInfoList() =
-    infoRepository.requestInfoList()
-    .showLoading(refreshing)
+    infoRepository.refreshInfoList()
+    .showLoading(isRefreshing)
     .catch(exception)
     .asLiveData()
 
   fun addInfo(title: String?) =
     infoRepository.addInfo(title)
-    .showLoading(loading)
+    .showLoading(isLoading)
     .catch(exception)
     .asLiveData()
 
   fun updateInfo(id: Int, title: String?, date: String) =
     infoRepository.updateInfo(id, title, date)
-      .showLoading(loading)
+      .showLoading(isLoading)
       .catch(exception)
       .asLiveData()
 
   fun deleteInfo(info: DontForgetInfo) =
     infoRepository.deleteInfo(info)
-      .showLoading(loading)
+      .showLoading(isLoading)
       .catch(exception)
       .asLiveData()
 }
