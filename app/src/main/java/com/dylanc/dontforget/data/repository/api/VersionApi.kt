@@ -8,7 +8,7 @@ import retrofit2.http.Query
 @ApiUrl("http://api.bq04.com/")
 interface VersionApi {
 
-  @GET("/apps/latest/5e5f9a3e23389f2ac3d8a12a")
+  @GET("/apps/latest/5f5ee3b123389f4c1b0fb730")
   suspend fun checkVersion(
     @Query("api_token") api_token: String = "52bb77e7a2de204f5177c372541b0f99",
     @Query("type") type: String = "android"

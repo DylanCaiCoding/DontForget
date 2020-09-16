@@ -1,5 +1,6 @@
 package com.dylanc.dontforget.data.bean
 
+import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -7,6 +8,7 @@ import androidx.room.PrimaryKey
  * @author Dylan Cai
  * @since 2020/4/16
  */
+@Keep
 @Entity(tableName = "user_table")
 data class User(
   @PrimaryKey

@@ -1,6 +1,7 @@
 package com.dylanc.dontforget.data.bean
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -10,6 +11,7 @@ import kotlinx.android.parcel.Parcelize
  * @author Dylan Cai
  * @since 2020/1/23
  */
+@Keep
 @Parcelize
 @Entity(tableName = "info_table")
 data class DontForgetInfo(

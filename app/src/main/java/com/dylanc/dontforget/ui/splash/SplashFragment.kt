@@ -31,7 +31,6 @@ class SplashFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     lifecycleScope.launch {
       delay(1000)
-      toast("跳转页面...")
       requestViewModel.authenticationState.observe(viewLifecycleOwner){
         when (it) {
           LoginRequestViewModel.AuthenticationState.AUTHENTICATED -> {

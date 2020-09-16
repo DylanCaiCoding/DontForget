@@ -1,9 +1,10 @@
 package com.dylanc.dontforget.data.bean
 
+
 data class AppVersion(
     val binary: Binary,
     val build: String,
-    val changelog: Any,
+    val changelog: String?,
     val direct_install_url: String,
     val installUrl: String,
     val install_url: String,

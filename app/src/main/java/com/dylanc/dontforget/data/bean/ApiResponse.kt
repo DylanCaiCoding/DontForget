@@ -1,12 +1,13 @@
 package com.dylanc.dontforget.data.bean
 
+import androidx.annotation.Keep
 import com.dylanc.dontforget.data.net.AuthenticationException
 
 /**
  * @author Dylan Cai
  * @since 2020/4/16
  */
-
+@Keep
 @Suppress("UNCHECKED_CAST")
 fun <T> ApiResponse<T>.parseData(): T =
   when (errorCode) {

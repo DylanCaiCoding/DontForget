@@ -2,7 +2,6 @@
 
 package com.dylanc.dontforget.adapter.binding
 
-import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.ImageView
@@ -11,15 +10,14 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
-import com.bumptech.glide.Glide
 
-@BindingAdapter(value = ["imageUrl", "placeHolder"], requireAll = false)
-fun ImageView.loadUrl(
-  url: String,
-  placeHolder: Drawable? = null
-) {
-  Glide.with(context).load(url).placeholder(placeHolder).into(this)
-}
+//@BindingAdapter(value = ["imageUrl", "placeHolder"], requireAll = false)
+//fun ImageView.loadUrl(
+//  url: String,
+//  placeHolder: Drawable? = null
+//) {
+//  Glide.with(context).load(url).placeholder(placeHolder).into(this)
+//}
 
 @BindingAdapter(value = ["isVisible"], requireAll = false)
 fun View.setVisible(visible: Boolean) {
