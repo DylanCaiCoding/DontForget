@@ -10,11 +10,13 @@ import com.dylanc.loadinghelper.ViewType
 import com.dylanc.retrofit.helper.initRetrofit
 import com.dylanc.utilktx.isJson
 import com.dylanc.utilktx.logJson
+import dagger.hilt.android.HiltAndroidApp
 
 /**
  * @author Dylan Cai
  * @since 2020/1/23
  */
+@HiltAndroidApp
 class App : Application() {
 
   override fun onCreate() {

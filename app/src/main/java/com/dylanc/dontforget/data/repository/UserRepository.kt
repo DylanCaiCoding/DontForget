@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.flow
 val userRepository: UserRepository by lazy { UserRepository() }
 
 class UserRepository(
-  private val model: UserModel = UserModel(),
+  private val localDataSource: UserLocalDataSource = UserLocalDataSource(),
   private val remoteDataSource: UserRemoteDataSource = UserRemoteDataSource()
 ) {
 
@@ -24,19 +24,19 @@ class UserRepository(
     checkNotNull(username) { "请输入账号" }
     checkNotNull(password) { "请输入密码" }
     val user = remoteDataSource.requestLogin(username, password)
-    model.updateUser(user)
+    localDataSource.updateUser(user)
     emit(user)
   }
 
   fun logout() = flow {
     val data = remoteDataSource.requestLogout()
-    model.logout()
+    localDataSource.logout()
     infoRepository.deleteAllInfo()
     clearCookieJar()
     emit(data)
   }
 
-  suspend fun isLogin() = model.isLogin()
+  suspend fun isLogin() = localDataSource.isLogin()
 
   fun register(username: String?, password: String?, confirmPassword: String?) = flow {
     checkNotNull(username) { "请输入账号" }
@@ -46,7 +46,7 @@ class UserRepository(
   }
 }
 
-class UserModel(private val userDao: UserDao = appDatabase.userDao()) {
+class UserLocalDataSource(private val userDao: UserDao = appDatabase.userDao()) {
 
   suspend fun updateUser(user: User) {
     userDao.deleteAll()

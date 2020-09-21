@@ -17,10 +17,10 @@ import java.util.*
 val infoRepository: InfoRepository by lazy { InfoRepository() }
 
 class InfoRepository(
-  private val model: InfoModel = InfoModel(),
+  private val localDataSource: InfoLocalDataSource = InfoLocalDataSource(),
   private val remoteDataSource: InfoRemoteDataSource = InfoRemoteDataSource()
 ) {
-  val allInfo = model.allInfo
+  val allInfo = localDataSource.allInfo
 
   val randomInfo: DontForgetInfo?
     get() {
@@ -33,47 +33,47 @@ class InfoRepository(
     }
 
   fun getInfoList() = flow {
-    val infoList = if (model.allInfo.value == null || model.allInfo.value!!.isEmpty()) {
+    val infoList = if (localDataSource.allInfo.value == null || localDataSource.allInfo.value!!.isEmpty()) {
       val infoList = remoteDataSource.refreshInfoList()
-      model.insertAll(infoList)
+      localDataSource.insertAll(infoList)
       infoList
     } else {
-      model.allInfo.value!!
+      localDataSource.allInfo.value!!
     }
     emit(infoList)
   }
 
   fun refreshInfoList() = flow {
     val infoList = remoteDataSource.refreshInfoList()
-    model.deleteAll()
-    model.insertAll(infoList)
+    localDataSource.deleteAll()
+    localDataSource.insertAll(infoList)
     emit(infoList)
   }
 
   fun addInfo(title: String?) = flow {
     checkNotNull(title) { "请输入标题" }
     val info = remoteDataSource.requestAddInfo(title)
-    model.insertInfo(info)
+    localDataSource.insertInfo(info)
     emit(info)
   }
 
   fun updateInfo(id: Int, title: String?, date: String) = flow {
     checkNotNull(title) { "请输入标题" }
     val info = remoteDataSource.requestUpdateInfo(id, title, date)
-    model.insertInfo(info)
+    localDataSource.insertInfo(info)
     emit(info)
   }
 
   fun deleteInfo(info: DontForgetInfo) = flow {
     val deleteInfo = remoteDataSource.requestDeleteInfo(info.id)
-    model.deleteInfo(info)
+    localDataSource.deleteInfo(info)
     emit(deleteInfo)
   }
 
-  suspend fun deleteAllInfo() = model.deleteAll()
+  suspend fun deleteAllInfo() = localDataSource.deleteAll()
 }
 
-class InfoModel(private val infoDao: InfoDao = appDatabase.infoDao()) {
+class InfoLocalDataSource(private val infoDao: InfoDao = appDatabase.infoDao()) {
 
   val allInfo = infoDao.getAllInfo()
 
