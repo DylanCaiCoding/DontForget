@@ -16,3 +16,13 @@ object SettingRepository {
     get() = spValueOf(KEY_NIGHT_MODE, false)
     set(value) = putSpValue(KEY_NIGHT_MODE, value)
 }
+
+class SettingLocalDataSource(){
+  var isShowNotification: Boolean
+    get() = spValueOf(KEY_SHOW_NOTIFICATION, true)
+    set(value) = putSpValue(KEY_SHOW_NOTIFICATION, value)
+
+  var isNightMode: Boolean
+    get() = spValueOf(KEY_NIGHT_MODE, false)
+    set(value) = putSpValue(KEY_NIGHT_MODE, value)
+}

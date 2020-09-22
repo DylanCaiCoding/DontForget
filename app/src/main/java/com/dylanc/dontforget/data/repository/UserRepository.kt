@@ -5,19 +5,16 @@ import com.dylanc.dontforget.data.bean.parseData
 import com.dylanc.dontforget.data.net.clearCookieJar
 import com.dylanc.dontforget.data.repository.api.UserApi
 import com.dylanc.dontforget.data.repository.db.UserDao
-import com.dylanc.dontforget.data.repository.db.appDatabase
-import com.dylanc.retrofit.helper.apiOf
 import kotlinx.coroutines.flow.flow
 
 /**
  * @author Dylan Cai
  */
 
-val userRepository: UserRepository by lazy { UserRepository() }
-
 class UserRepository(
-  private val localDataSource: UserLocalDataSource = UserLocalDataSource(),
-  private val remoteDataSource: UserRemoteDataSource = UserRemoteDataSource()
+  private val localDataSource: UserLocalDataSource,
+  private val remoteDataSource: UserRemoteDataSource,
+  private val infoRepository: InfoRepository
 ) {
 
   fun login(username: String?, password: String?) = flow {
@@ -46,7 +43,7 @@ class UserRepository(
   }
 }
 
-class UserLocalDataSource(private val userDao: UserDao = appDatabase.userDao()) {
+class UserLocalDataSource(private val userDao: UserDao) {
 
   suspend fun updateUser(user: User) {
     userDao.deleteAll()
@@ -63,13 +60,13 @@ class UserLocalDataSource(private val userDao: UserDao = appDatabase.userDao()) 
     userDao.getUserList().isNotEmpty()
 }
 
-class UserRemoteDataSource {
+class UserRemoteDataSource(private val api: UserApi) {
   suspend fun requestLogin(username: String, password: String) =
-    apiOf<UserApi>().login(username, password).parseData()
+    api.login(username, password).parseData()
 
-  suspend fun requestLogout() = apiOf<UserApi>().logout().parseData()
+  suspend fun requestLogout() =
+    api.logout().parseData()
 
   suspend fun requestRegister(username: String, password: String, confirmPassword: String) =
-    apiOf<UserApi>().register(username, password, confirmPassword).parseData()
-
+    api.register(username, password, confirmPassword).parseData()
 }

@@ -1,4 +1,4 @@
-package com.dylanc.dontforget.ui.main.info_list
+package com.dylanc.dontforget.ui.info_list
 
 import androidx.lifecycle.ViewModel
 

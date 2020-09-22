@@ -4,8 +4,6 @@ import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.bean.parseData
 import com.dylanc.dontforget.data.repository.api.InfoApi
 import com.dylanc.dontforget.data.repository.db.InfoDao
-import com.dylanc.dontforget.data.repository.db.appDatabase
-import com.dylanc.retrofit.helper.apiOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -14,11 +12,9 @@ import java.util.*
 /**
  * @author Dylan Cai
  */
-val infoRepository: InfoRepository by lazy { InfoRepository() }
-
 class InfoRepository(
-  private val localDataSource: InfoLocalDataSource = InfoLocalDataSource(),
-  private val remoteDataSource: InfoRemoteDataSource = InfoRemoteDataSource()
+  private val localDataSource: InfoLocalDataSource,
+  private val remoteDataSource: InfoRemoteDataSource
 ) {
   val allInfo = localDataSource.allInfo
 
@@ -73,7 +69,7 @@ class InfoRepository(
   suspend fun deleteAllInfo() = localDataSource.deleteAll()
 }
 
-class InfoLocalDataSource(private val infoDao: InfoDao = appDatabase.infoDao()) {
+class InfoLocalDataSource(private val infoDao: InfoDao) {
 
   val allInfo = infoDao.getAllInfo()
 
@@ -94,7 +90,7 @@ class InfoLocalDataSource(private val infoDao: InfoDao = appDatabase.infoDao()) 
   }
 }
 
-class InfoRemoteDataSource {
+class InfoRemoteDataSource(private val api: InfoApi) {
   private var page: Int = 1
   private val list = mutableListOf<DontForgetInfo>()
 
@@ -117,15 +113,15 @@ class InfoRemoteDataSource {
   }
 
   private suspend fun requestInfoList() =
-    apiOf<InfoApi>().getInfoList(page).parseData()
+    api.getInfoList(page).parseData()
 
   suspend fun requestAddInfo(title: String) =
-    apiOf<InfoApi>().addInfo(title).parseData()
+    api.addInfo(title).parseData()
 
   suspend fun requestUpdateInfo(id: Int, title: String, date: String) =
-    apiOf<InfoApi>().updateInfo(id, title, date).parseData()
+    api.updateInfo(id, title, date).parseData()
 
   suspend fun requestDeleteInfo(id: Int) =
-    apiOf<InfoApi>().deleteInfo(id).parseData()
+    api.deleteInfo(id).parseData()
 }
 

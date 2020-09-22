@@ -8,10 +8,6 @@ import com.dylanc.dontforget.data.bean.User
 import com.dylanc.utilktx.app
 
 
-val appDatabase: AppDatabase by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
-  Room.databaseBuilder(app, AppDatabase::class.java, "app_db").build()
-}
-
 @Database(entities = [User::class, DontForgetInfo::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
   abstract fun userDao(): UserDao

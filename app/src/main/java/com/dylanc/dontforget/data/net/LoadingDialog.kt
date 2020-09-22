@@ -7,16 +7,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.dylanc.dontforget.R
+import com.dylanc.dontforget.base.RequestLoading
 
-fun Fragment.loadingDialog() = lazy {
-  LoadingDialog(requireActivity())
-}
-
-fun FragmentActivity.loadingDialog() = lazy {
-  LoadingDialog(this)
-}
-
-class LoadingDialog(private val fragmentActivity: FragmentActivity) : DialogFragment() {
+class LoadingDialog(private val fragmentActivity: FragmentActivity) : DialogFragment(), RequestLoading {
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     return activity?.let {
       Dialog(it, R.style.DialogTheme).apply {
@@ -27,8 +20,8 @@ class LoadingDialog(private val fragmentActivity: FragmentActivity) : DialogFrag
     } ?: throw IllegalStateException("Activity cannot be null")
   }
 
-  fun show(isShow: Boolean) {
-    if (isShow) {
+  override fun show(isLoading: Boolean) {
+    if (isLoading) {
       show(fragmentActivity.supportFragmentManager, TAG_LOADING)
     } else {
       dismiss()

@@ -1,4 +1,4 @@
-package com.dylanc.dontforget.ui.main.insert_info
+package com.dylanc.dontforget.ui.insert_info
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,18 +12,17 @@ import androidx.navigation.fragment.navArgs
 import com.dylanc.dontforget.BR
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.loading.NavIconType
-import com.dylanc.dontforget.data.net.LoadingDialog
-import com.dylanc.dontforget.data.net.loadingDialog
-import com.dylanc.dontforget.data.net.observe
 import com.dylanc.dontforget.utils.bindView
+import com.dylanc.dontforget.utils.requestViewModels
 import com.dylanc.dontforget.utils.setToolbar
 import com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class InsertInfoFragment : Fragment() {
 
   private val viewModel: InsertInfoViewModel by viewModels()
-  private val requestViewModel: InfoRequestViewModel by viewModels()
-  private val loadingDialog: LoadingDialog by loadingDialog()
+  private val requestViewModel: InfoRequestViewModel by requestViewModels()
   private val args: InsertInfoFragmentArgs by navArgs()
   private val clickProxy = ClickProxy()
 
@@ -40,8 +39,6 @@ class InsertInfoFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     viewModel.title.value = args.info?.title
-    requestViewModel.isLoading.observe(this, loadingDialog)
-    requestViewModel.exception.observe(this)
   }
 
   private val toolbarTitle: String

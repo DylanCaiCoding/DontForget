@@ -5,14 +5,13 @@ import com.dylanc.retrofit.helper.apiOf
 import kotlinx.coroutines.flow.flow
 
 class VersionRepository(
-  private val remoteDataSource: VersionRemoteDataSource = VersionRemoteDataSource()
+  private val remoteDataSource: VersionRemoteDataSource
 ) {
   fun checkVersion() = flow {
     emit(remoteDataSource.checkVersion())
   }
 }
 
-class VersionRemoteDataSource {
-  suspend fun checkVersion() =
-    apiOf<VersionApi>().checkVersion()
+class VersionRemoteDataSource(private val api: VersionApi) {
+  suspend fun checkVersion() = api.checkVersion()
 }

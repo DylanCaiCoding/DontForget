@@ -1,4 +1,4 @@
-package com.dylanc.dontforget.ui.user.login
+package com.dylanc.dontforget.ui.login
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

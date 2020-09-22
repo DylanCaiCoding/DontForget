@@ -6,7 +6,7 @@
 
     <variable
       name="viewModel"
-      type="com.dylanc.dontforget.ui.main.info_list.InfoListViewModel" />
+      type="com.dylanc.dontforget.ui.info_list.InfoListViewModel" />
 
     <variable
       name="requestViewModel"
@@ -14,11 +14,11 @@
 
     <variable
       name="clickProxy"
-      type="com.dylanc.dontforget.ui.main.info_list.InfoListFragment.ClickProxy" />
+      type="com.dylanc.dontforget.ui.info_list.InfoListFragment.ClickProxy" />
 
     <variable
       name="eventHandler"
-      type="com.dylanc.dontforget.ui.main.info_list.InfoListFragment.EventHandler" />
+      type="com.dylanc.dontforget.ui.info_list.InfoListFragment.EventHandler" />
 
     <variable
       name="adapter"

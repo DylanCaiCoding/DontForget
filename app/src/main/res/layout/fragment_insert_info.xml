@@ -7,17 +7,17 @@
 
     <variable
       name="viewModel"
-      type="com.dylanc.dontforget.ui.main.insert_info.InsertInfoViewModel" />
+      type="com.dylanc.dontforget.ui.insert_info.InsertInfoViewModel" />
 
     <variable
       name="clickProxy"
-      type="com.dylanc.dontforget.ui.main.insert_info.InsertInfoFragment.ClickProxy" />
+      type="com.dylanc.dontforget.ui.insert_info.InsertInfoFragment.ClickProxy" />
   </data>
 
   <androidx.coordinatorlayout.widget.CoordinatorLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.insert_info.InsertInfoActivity">
+    tools:context=".ui.insert_info.InsertInfoActivity">
 
     <EditText
       android:id="@+id/edt_title"

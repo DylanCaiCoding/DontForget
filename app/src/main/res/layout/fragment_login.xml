@@ -7,17 +7,17 @@
 
     <variable
       name="viewModel"
-      type="com.dylanc.dontforget.ui.user.login.LoginViewModel" />
+      type="com.dylanc.dontforget.ui.login.LoginViewModel" />
 
     <variable
       name="clickProxy"
-      type="com.dylanc.dontforget.ui.user.login.LoginFragment.ClickProxy" />
+      type="com.dylanc.dontforget.ui.login.LoginFragment.ClickProxy" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.user.login.LoginActivity">
+    tools:context=".ui.login.LoginActivity">
 
     <TextView
       android:id="@+id/imageView"

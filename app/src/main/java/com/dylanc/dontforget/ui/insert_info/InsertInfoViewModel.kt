@@ -1,4 +1,4 @@
-package com.dylanc.dontforget.ui.main.insert_info
+package com.dylanc.dontforget.ui.insert_info
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

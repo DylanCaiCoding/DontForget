@@ -1,4 +1,4 @@
-package com.dylanc.dontforget.ui.user.register
+package com.dylanc.dontforget.ui.register
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

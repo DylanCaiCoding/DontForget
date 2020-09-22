@@ -9,6 +9,7 @@ import com.dylanc.dontforget.R
 import com.dylanc.dontforget.utils.isDarkMode
 import com.dylanc.loadinghelper.LoadingHelper
 import com.dylanc.utilktx.isStatusBarLightMode
+import com.dylanc.utilktx.topActivity
 import kotlinx.android.synthetic.main.layout_toolbar.view.*
 
 /**
@@ -28,8 +29,6 @@ class ToolbarAdapter(
     )
 
   override fun onBindViewHolder(holder: LoadingHelper.ViewHolder) {
-    val activity = holder.rootView.context as Activity
-    activity.isStatusBarLightMode = !activity.isDarkMode
     holder.rootView.apply {
       if (!title.isNullOrBlank()) {
         toolbar.title = title
@@ -37,7 +36,7 @@ class ToolbarAdapter(
       if (type === NavIconType.BACK) {
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
         toolbar.setNavigationOnClickListener {
-          activity.findNavController(R.id.nav_host_fragment).popBackStack()
+          topActivity.findNavController(R.id.nav_host_fragment).popBackStack()
         }
       } else {
         toolbar.navigationIcon = null

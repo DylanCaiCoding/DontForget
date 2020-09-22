@@ -23,28 +23,27 @@ import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.binding.setOnCheckedChangeListener
 import com.dylanc.dontforget.base.event.postEventValue
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
-import com.dylanc.dontforget.data.net.LoadingDialog
-import com.dylanc.dontforget.data.net.loadingDialog
-import com.dylanc.dontforget.data.net.observe
 import com.dylanc.dontforget.data.repository.SettingRepository
 import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.utils.alertNewVersionDialog
 import com.dylanc.dontforget.utils.bindView
+import com.dylanc.dontforget.utils.requestViewModels
 import com.dylanc.dontforget.viewmodel.event.SharedViewModel
 import com.dylanc.dontforget.viewmodel.request.LoginRequestViewModel
 import com.dylanc.dontforget.viewmodel.request.VersionRequestViewModel
 import com.dylanc.utilktx.putSpValue
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.menu_item_switch.view.*
 
+@AndroidEntryPoint
 class MainFragment : Fragment() {
 
   private val viewModel: MainViewModel by viewModels()
-  private val loginRequestViewModel: LoginRequestViewModel by viewModels()
-  private val versionRequestViewModel: VersionRequestViewModel by viewModels()
+  private val loginRequestViewModel: LoginRequestViewModel by requestViewModels()
+  private val versionRequestViewModel: VersionRequestViewModel by requestViewModels()
   private val sharedViewModel: SharedViewModel by activityViewModels()
-  private val loadingDialog: LoadingDialog by loadingDialog()
   private val clickProxy = ClickProxy()
   private val eventHandler = EventHandler()
   private lateinit var appBarConfiguration: AppBarConfiguration
@@ -63,10 +62,6 @@ class MainFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     bindView(view, viewModel)
     initNavigationView()
-    loginRequestViewModel.isLoading.observe(this, loadingDialog)
-    loginRequestViewModel.exception.observe(this)
-    versionRequestViewModel.isLoading.observe(this, loadingDialog)
-    versionRequestViewModel.exception.observe(this)
   }
 
   private fun initNavigationView() {

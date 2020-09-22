@@ -10,12 +10,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.dylanc.dontforget.R
-import com.dylanc.dontforget.data.repository.UserRepository
 import com.dylanc.dontforget.viewmodel.request.LoginRequestViewModel
-import com.dylanc.utilktx.toast
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class SplashFragment : Fragment() {
 
   private val requestViewModel:LoginRequestViewModel by viewModels()

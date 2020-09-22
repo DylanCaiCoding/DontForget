@@ -1,4 +1,4 @@
-package com.dylanc.dontforget.adapter.recycler
+package com.dylanc.dontforget.ui.info_list.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

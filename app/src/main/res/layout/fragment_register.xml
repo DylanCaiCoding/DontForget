@@ -6,11 +6,11 @@
 
     <variable
       name="viewModel"
-      type="com.dylanc.dontforget.ui.user.register.RegisterViewModel" />
+      type="com.dylanc.dontforget.ui.register.RegisterViewModel" />
 
     <variable
       name="clickProxy"
-      type="com.dylanc.dontforget.ui.user.register.RegisterFragment.ClickProxy" />
+      type="com.dylanc.dontforget.ui.register.RegisterFragment.ClickProxy" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout

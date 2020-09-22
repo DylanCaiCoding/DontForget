@@ -9,17 +9,22 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
+import com.dylanc.dontforget.data.repository.InfoRepository
 import com.dylanc.dontforget.data.repository.SettingRepository
-import com.dylanc.dontforget.data.repository.infoRepository
 import com.dylanc.dontforget.ui.NavigationActivity
 import com.dylanc.utilktx.intentOf
 import com.dylanc.utilktx.spValueOf
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class NotifyInfoService : Service() {
 
   private val binder = NotifyBinder()
+
+  @Inject
+  lateinit var infoRepository: InfoRepository
 
   companion object {
     private var alreadyStarted = false
@@ -105,8 +110,7 @@ class NotifyInfoService : Service() {
   }
 
   inner class NotifyBinder : Binder() {
-    val service: NotifyInfoService
-      get() = this@NotifyInfoService
+    val service: NotifyInfoService get() = this@NotifyInfoService
   }
 
 }

@@ -34,7 +34,7 @@
 
   <fragment
     android:id="@+id/loginFragment"
-    android:name="com.dylanc.dontforget.ui.user.login.LoginFragment"
+    android:name="com.dylanc.dontforget.ui.login.LoginFragment"
     android:label="fragment_login"
     tools:layout="@layout/fragment_login">
 
@@ -59,7 +59,7 @@
 
   <fragment
     android:id="@+id/registerFragment"
-    android:name="com.dylanc.dontforget.ui.user.register.RegisterFragment"
+    android:name="com.dylanc.dontforget.ui.register.RegisterFragment"
     android:label="fragment_register"
     tools:layout="@layout/fragment_register">
 
@@ -93,7 +93,7 @@
 
   <fragment
     android:id="@+id/insertInfoFragment"
-    android:name="com.dylanc.dontforget.ui.main.insert_info.InsertInfoFragment"
+    android:name="com.dylanc.dontforget.ui.insert_info.InsertInfoFragment"
     android:label="InsertInfoFragment"
     tools:layout="@layout/fragment_insert_info">
 

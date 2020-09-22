@@ -1,4 +1,4 @@
-package com.dylanc.dontforget.ui.main.info_list
+package com.dylanc.dontforget.ui.info_list
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,27 +12,26 @@ import androidx.lifecycle.observe
 import androidx.navigation.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.dylanc.dontforget.R
-import com.dylanc.dontforget.adapter.recycler.InfoAdapter
+import com.dylanc.dontforget.ui.info_list.adapter.InfoAdapter
 import com.dylanc.dontforget.base.event.observeEvent
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.constant.KEY_INFO
-import com.dylanc.dontforget.data.net.LoadingDialog
-import com.dylanc.dontforget.data.net.loadingDialog
-import com.dylanc.dontforget.data.net.observe
 import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.utils.alertItems
 import com.dylanc.dontforget.utils.bindView
+import com.dylanc.dontforget.utils.requestViewModels
 import com.dylanc.dontforget.viewmodel.event.SharedViewModel
 import com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel
 import com.dylanc.utilktx.bundleOf
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_info_list.*
 
+@AndroidEntryPoint
 class InfoListFragment : Fragment() {
 
   private val viewModel: InfoListViewModel by viewModels()
-  private val requestViewModel: InfoRequestViewModel by viewModels()
+  private val requestViewModel: InfoRequestViewModel by requestViewModels()
   private val sharedViewModel: SharedViewModel by activityViewModels()
-  private val loadingDialog: LoadingDialog by loadingDialog()
   private val clickProxy = ClickProxy()
   private val eventHandler = EventHandler()
   private val adapter = InfoAdapter(clickProxy::onItemClick, clickProxy::onItemLongClick)
@@ -69,8 +68,6 @@ class InfoListFragment : Fragment() {
           NotifyInfoService.stop(activity)
         }
       }
-    requestViewModel.isLoading.observe(this, loadingDialog)
-    requestViewModel.exception.observe(this)
   }
 
   inner class ClickProxy {
@@ -102,17 +99,10 @@ class InfoListFragment : Fragment() {
   inner class EventHandler {
 
     val onRefreshListener = SwipeRefreshLayout.OnRefreshListener {
-      requestViewModel.requestInfoList()
+      requestViewModel.refreshInfoList()
         .observe(viewLifecycleOwner) {
           NotifyInfoService.startRepeatedly(activity)
         }
     }
-
-//    fun onRefresh() {
-//      requestViewModel.requestInfoList()
-//        .observe(viewLifecycleOwner, Observer {
-//          NotifyInfoService.startRepeatedly(activity)
-//        })
-//    }
   }
 }
