@@ -1,11 +1,11 @@
-package com.dylanc.dontforget.module
+package com.dylanc.dontforget.di
 
 import com.dylanc.dontforget.data.repository.*
-import com.dylanc.dontforget.data.repository.api.InfoApi
-import com.dylanc.dontforget.data.repository.api.UserApi
-import com.dylanc.dontforget.data.repository.api.VersionApi
-import com.dylanc.dontforget.data.repository.db.InfoDao
-import com.dylanc.dontforget.data.repository.db.UserDao
+import com.dylanc.dontforget.data.api.InfoApi
+import com.dylanc.dontforget.data.api.UserApi
+import com.dylanc.dontforget.data.api.VersionApi
+import com.dylanc.dontforget.data.db.InfoDao
+import com.dylanc.dontforget.data.db.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,8 +18,8 @@ object RepositoryModule {
 
   @Provides
   @Singleton
-  fun provideUserRepository(userDao: UserDao, userApi: UserApi, infoRepository: InfoRepository): UserRepository =
-    UserRepository(UserLocalDataSource(userDao), UserRemoteDataSource(userApi), infoRepository)
+  fun provideUserRepository(userDao: UserDao, infoDao: InfoDao, userApi: UserApi): UserRepository =
+    UserRepository(UserLocalDataSource(userDao, infoDao), UserRemoteDataSource(userApi))
 
   @Provides
   @Singleton

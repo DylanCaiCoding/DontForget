@@ -24,14 +24,12 @@ class RegisterFragment : Fragment() {
   private val viewModel: RegisterViewModel by viewModels()
   private val requestViewModel: LoginRequestViewModel by requestViewModels()
 
-  override fun onCreateView(
-    inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View? {
-    val view = inflater.inflate(R.layout.fragment_register, container, false)
-    bindView(view, viewModel, BR.clickProxy to ClickProxy())
-    return view.setToolbar("注册", NavIconType.BACK).decorView
-  }
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+    inflater.inflate(R.layout.fragment_register, container, false)
+      .run {
+        bindView(this, viewModel, BR.clickProxy to ClickProxy())
+        setToolbar("注册", NavIconType.BACK).decorView
+      }
 
   inner class ClickProxy {
     fun onRegisterBtnClick() {

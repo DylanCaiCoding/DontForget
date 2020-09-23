@@ -3,8 +3,9 @@ package com.dylanc.dontforget.data.repository
 import com.dylanc.dontforget.data.bean.User
 import com.dylanc.dontforget.data.bean.parseData
 import com.dylanc.dontforget.data.net.clearCookieJar
-import com.dylanc.dontforget.data.repository.api.UserApi
-import com.dylanc.dontforget.data.repository.db.UserDao
+import com.dylanc.dontforget.data.api.UserApi
+import com.dylanc.dontforget.data.db.InfoDao
+import com.dylanc.dontforget.data.db.UserDao
 import kotlinx.coroutines.flow.flow
 
 /**
@@ -13,8 +14,7 @@ import kotlinx.coroutines.flow.flow
 
 class UserRepository(
   private val localDataSource: UserLocalDataSource,
-  private val remoteDataSource: UserRemoteDataSource,
-  private val infoRepository: InfoRepository
+  private val remoteDataSource: UserRemoteDataSource
 ) {
 
   fun login(username: String?, password: String?) = flow {
@@ -28,7 +28,6 @@ class UserRepository(
   fun logout() = flow {
     val data = remoteDataSource.requestLogout()
     localDataSource.logout()
-    infoRepository.deleteAllInfo()
     clearCookieJar()
     emit(data)
   }
@@ -43,7 +42,7 @@ class UserRepository(
   }
 }
 
-class UserLocalDataSource(private val userDao: UserDao) {
+class UserLocalDataSource(private val userDao: UserDao,private val infoDao: InfoDao) {
 
   suspend fun updateUser(user: User) {
     userDao.deleteAll()
@@ -53,6 +52,7 @@ class UserLocalDataSource(private val userDao: UserDao) {
   suspend fun logout() {
     if (isLogin()) {
       userDao.deleteAll()
+      infoDao.deleteAll()
     }
   }
 

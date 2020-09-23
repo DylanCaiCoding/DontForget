@@ -50,21 +50,13 @@ class MainFragment : Fragment() {
   private lateinit var notifyInfoService: NotifyInfoService
   private var bound = false
 
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View? {
-    return inflater.inflate(R.layout.fragment_main, container, false)
-  }
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+    inflater.inflate(R.layout.fragment_main, container, false)
+      .apply { bindView(this, viewModel) }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    bindView(view, viewModel)
-    initNavigationView()
-  }
 
-  private fun initNavigationView() {
     val navController = requireActivity().findNavController(R.id.fragment_main)
     appBarConfiguration = AppBarConfiguration(setOf(R.id.infoListFragment), drawer_layout)
     toolbar.setupWithNavController(navController, appBarConfiguration)

@@ -1,9 +1,10 @@
 package com.dylanc.dontforget.data.repository
 
+import com.dylanc.dontforget.data.api.InfoApi
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.bean.parseData
-import com.dylanc.dontforget.data.repository.api.InfoApi
-import com.dylanc.dontforget.data.repository.db.InfoDao
+import com.dylanc.dontforget.data.db.InfoDao
+import com.dylanc.dontforget.utils.exceptFirstEmpty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -28,22 +29,22 @@ class InfoRepository(
       }
     }
 
-  fun getInfoList() = flow {
-    val infoList = if (localDataSource.allInfo.value == null || localDataSource.allInfo.value!!.isEmpty()) {
-      val infoList = remoteDataSource.refreshInfoList()
-      localDataSource.insertAll(infoList)
-      infoList
+  fun initInfoList() = flow {
+    val list = if (localDataSource.getAll().isEmpty()) {
+      val newList = remoteDataSource.refreshInfoList()
+      localDataSource.insertAll(newList)
+      newList
     } else {
-      localDataSource.allInfo.value!!
+      localDataSource.getAll()
     }
-    emit(infoList)
+    emit(list)
   }
 
   fun refreshInfoList() = flow {
-    val infoList = remoteDataSource.refreshInfoList()
+    val list = remoteDataSource.refreshInfoList()
     localDataSource.deleteAll()
-    localDataSource.insertAll(infoList)
-    emit(infoList)
+    localDataSource.insertAll(list)
+    emit(list)
   }
 
   fun addInfo(title: String?) = flow {
@@ -65,13 +66,15 @@ class InfoRepository(
     localDataSource.deleteInfo(info)
     emit(deleteInfo)
   }
-
-  suspend fun deleteAllInfo() = localDataSource.deleteAll()
 }
 
 class InfoLocalDataSource(private val infoDao: InfoDao) {
 
-  val allInfo = infoDao.getAllInfo()
+  val allInfo = infoDao.getAllInfoLiveData().exceptFirstEmpty()
+
+  suspend fun getAll() = withContext(Dispatchers.IO) {
+    infoDao.getAll()
+  }
 
   suspend fun insertAll(infoList: List<DontForgetInfo>) = withContext(Dispatchers.IO) {
     infoDao.insertAll(infoList)
@@ -82,6 +85,10 @@ class InfoLocalDataSource(private val infoDao: InfoDao) {
   }
 
   suspend fun deleteInfo(info: DontForgetInfo) = withContext(Dispatchers.IO) {
+    infoDao.deleteInfo(info)
+  }
+
+  suspend fun deleteInfoList(info: List<DontForgetInfo>) = withContext(Dispatchers.IO) {
     infoDao.deleteInfo(info)
   }
 

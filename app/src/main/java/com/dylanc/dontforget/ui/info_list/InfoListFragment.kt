@@ -36,27 +36,21 @@ class InfoListFragment : Fragment() {
   private val eventHandler = EventHandler()
   private val adapter = InfoAdapter(clickProxy::onItemClick, clickProxy::onItemLongClick)
 
-  override fun onCreateView(
-    inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View =
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
     inflater.inflate(R.layout.fragment_info_list, container, false)
+      .apply {
+        bindView(
+          this, viewModel,
+          BR.adapter to adapter,
+          BR.requestViewModel to requestViewModel,
+          BR.clickProxy to clickProxy,
+          BR.eventHandler to eventHandler
+        )
+      }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    bindView(
-      view, viewModel,
-      BR.adapter to adapter,
-      BR.clickProxy to clickProxy,
-      BR.eventHandler to eventHandler,
-      BR.requestViewModel to requestViewModel
-    )
-  }
-
-  override fun onActivityCreated(savedInstanceState: Bundle?) {
-    super.onActivityCreated(savedInstanceState)
-    refresh_layout.setColorSchemeResources(R.color.colorAccent)
-    requestViewModel.getInfoList()
+    requestViewModel.initInfoList()
       .observe(viewLifecycleOwner) {
         NotifyInfoService.startRepeatedly(activity)
       }

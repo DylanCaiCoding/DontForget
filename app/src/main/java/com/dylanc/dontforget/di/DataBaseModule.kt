@@ -1,10 +1,10 @@
-package com.dylanc.dontforget.module
+package com.dylanc.dontforget.di
 
 import android.app.Application
 import androidx.room.Room
-import com.dylanc.dontforget.data.repository.db.AppDatabase
-import com.dylanc.dontforget.data.repository.db.InfoDao
-import com.dylanc.dontforget.data.repository.db.UserDao
+import com.dylanc.dontforget.data.db.AppDatabase
+import com.dylanc.dontforget.data.db.InfoDao
+import com.dylanc.dontforget.data.db.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

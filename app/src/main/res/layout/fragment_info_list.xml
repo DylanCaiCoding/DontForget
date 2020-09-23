@@ -33,6 +33,7 @@
       android:id="@+id/refresh_layout"
       isRefreshing="@{requestViewModel.isRefreshing}"
       onRefresh="@{eventHandler.onRefreshListener}"
+      colorScheme="@{@color/colorAccent}"
       android:layout_width="match_parent"
       android:layout_height="match_parent">
 

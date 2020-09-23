@@ -1,8 +1,8 @@
-package com.dylanc.dontforget.module
+package com.dylanc.dontforget.di
 
-import com.dylanc.dontforget.data.repository.api.InfoApi
-import com.dylanc.dontforget.data.repository.api.UserApi
-import com.dylanc.dontforget.data.repository.api.VersionApi
+import com.dylanc.dontforget.data.api.InfoApi
+import com.dylanc.dontforget.data.api.UserApi
+import com.dylanc.dontforget.data.api.VersionApi
 import com.dylanc.retrofit.helper.apiOf
 import dagger.Module
 import dagger.Provides

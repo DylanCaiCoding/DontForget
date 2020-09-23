@@ -26,15 +26,12 @@ class InsertInfoFragment : Fragment() {
   private val args: InsertInfoFragmentArgs by navArgs()
   private val clickProxy = ClickProxy()
 
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View? {
-    val view = inflater.inflate(R.layout.fragment_insert_info, container, false)
-    bindView(view, viewModel, BR.clickProxy to clickProxy)
-    return view.setToolbar(toolbarTitle, NavIconType.BACK).decorView
-  }
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+    inflater.inflate(R.layout.fragment_insert_info, container, false)
+      .run {
+        bindView(this, viewModel, BR.clickProxy to clickProxy)
+        setToolbar(toolbarTitle, NavIconType.BACK).decorView
+      }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)

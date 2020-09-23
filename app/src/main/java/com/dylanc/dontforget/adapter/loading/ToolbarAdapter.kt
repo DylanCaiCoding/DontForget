@@ -1,14 +1,11 @@
 package com.dylanc.dontforget.adapter.loading
 
-import android.app.Activity
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.navigation.findNavController
 import com.dylanc.dontforget.R
-import com.dylanc.dontforget.utils.isDarkMode
 import com.dylanc.loadinghelper.LoadingHelper
-import com.dylanc.utilktx.isStatusBarLightMode
 import com.dylanc.utilktx.topActivity
 import kotlinx.android.synthetic.main.layout_toolbar.view.*
 

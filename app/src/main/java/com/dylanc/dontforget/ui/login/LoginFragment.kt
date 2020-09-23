@@ -23,24 +23,16 @@ class LoginFragment : Fragment() {
   private val requestViewModel: LoginRequestViewModel by requestViewModels()
   private val clickProxy = ClickProxy()
 
-  override fun onCreateView(
-    inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View? {
-    return inflater.inflate(R.layout.fragment_login, container, false)
-  }
-
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-    bindView(view, viewModel, BR.clickProxy to clickProxy)
-  }
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+    inflater.inflate(R.layout.fragment_login, container, false)
+      .apply { bindView(this, viewModel, BR.clickProxy to clickProxy) }
 
   inner class ClickProxy {
     fun onLoginBtnClick() {
       val username = viewModel.username.value
       val password = viewModel.password.value
       requestViewModel.login(username, password)
-        .observe(viewLifecycleOwner){
+        .observe(viewLifecycleOwner) {
           toast("登录成功")
           findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
         }

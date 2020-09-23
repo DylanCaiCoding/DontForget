@@ -1,4 +1,4 @@
-package com.dylanc.dontforget.data.repository.db
+package com.dylanc.dontforget.data.db
 
 import androidx.room.Dao
 import androidx.room.Insert

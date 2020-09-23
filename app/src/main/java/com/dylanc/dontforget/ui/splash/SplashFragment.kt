@@ -18,28 +18,23 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class SplashFragment : Fragment() {
 
-  private val requestViewModel:LoginRequestViewModel by viewModels()
+  private val requestViewModel: LoginRequestViewModel by viewModels()
 
-  override fun onCreateView(
-    inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View {
-    return inflater.inflate(R.layout.fragment_splash, container, false)
-  }
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+    inflater.inflate(R.layout.fragment_splash, container, false)
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     lifecycleScope.launch {
       delay(1000)
-      requestViewModel.authenticationState.observe(viewLifecycleOwner){
+      requestViewModel.authenticationState.observe(viewLifecycleOwner) {
         when (it) {
-          LoginRequestViewModel.AuthenticationState.AUTHENTICATED -> {
+          LoginRequestViewModel.AuthenticationState.AUTHENTICATED ->
             findNavController().navigate(R.id.action_splashFragment_to_mainFragment)
-          }
-          LoginRequestViewModel.AuthenticationState.INVALID_AUTHENTICATION -> {
+          LoginRequestViewModel.AuthenticationState.INVALID_AUTHENTICATION ->
             findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
+          else -> {
           }
-          else -> {}
         }
       }
     }

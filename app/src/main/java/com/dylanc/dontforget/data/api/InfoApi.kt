@@ -1,4 +1,4 @@
-package com.dylanc.dontforget.data.repository.api
+package com.dylanc.dontforget.data.api
 
 import com.dylanc.dontforget.data.bean.ApiResponse
 import com.dylanc.dontforget.data.bean.DontForgetInfo

@@ -7,7 +7,6 @@ import com.dylanc.dontforget.data.net.AuthenticationException
  * @author Dylan Cai
  * @since 2020/4/16
  */
-@Keep
 @Suppress("UNCHECKED_CAST")
 fun <T> ApiResponse<T>.parseData(): T =
   when (errorCode) {
@@ -16,6 +15,7 @@ fun <T> ApiResponse<T>.parseData(): T =
     else -> throw RuntimeException(errorMsg)
   }
 
+@Keep
 data class ApiResponse<T>(
   val data: T?,
   val errorCode: Int,

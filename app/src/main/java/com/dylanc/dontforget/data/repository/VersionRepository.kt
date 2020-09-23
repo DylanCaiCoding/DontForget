@@ -1,7 +1,6 @@
 package com.dylanc.dontforget.data.repository
 
-import com.dylanc.dontforget.data.repository.api.VersionApi
-import com.dylanc.retrofit.helper.apiOf
+import com.dylanc.dontforget.data.api.VersionApi
 import kotlinx.coroutines.flow.flow
 
 class VersionRepository(

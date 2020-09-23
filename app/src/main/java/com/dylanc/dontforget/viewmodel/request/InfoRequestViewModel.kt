@@ -15,8 +15,8 @@ class InfoRequestViewModel @ViewModelInject constructor(
   val list = infoRepository.allInfo
   val isRefreshing = LoadingLiveData()
 
-  fun getInfoList() =
-    infoRepository.getInfoList()
+  fun initInfoList() =
+    infoRepository.initInfoList()
       .showLoading(isRefreshing)
       .catch(exception)
       .asLiveData()

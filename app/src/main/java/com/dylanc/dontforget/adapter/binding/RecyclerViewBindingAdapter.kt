@@ -6,6 +6,8 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.drakeet.multitype.MultiTypeAdapter
+import com.dylanc.dontforget.utils.AdapterDataEmptyObserver
+import com.dylanc.dontforget.utils.observeDataEmpty
 
 @Suppress("UNCHECKED_CAST")
 @BindingAdapter(value = ["adapter", "list", "emptyView"])
@@ -16,8 +18,7 @@ fun <T : Any> RecyclerView.setRecyclerAdapter(
 ) {
   if (adapter != null) {
     this.adapter = adapter
-    val emptyView: View? = findViewInLayout(EmptyViewId)
-    emptyView?.let { adapter.registerAdapterDataObserver(AdapterDataEmptyObserver(adapter, it)) }
+    findViewInLayout(EmptyViewId)?.let { adapter.observeDataEmpty(it) }
   }
 
   if (list != null) {
@@ -44,32 +45,3 @@ private fun ViewGroup.findViewInLayout(viewId: Int): View? {
   }
 }
 
-private class AdapterDataEmptyObserver(
-  private val adapter: RecyclerView.Adapter<*>,
-  private val emptyView: View
-) : RecyclerView.AdapterDataObserver() {
-
-  override fun onChanged() {
-    super.onChanged()
-    checkEmpty()
-  }
-
-  override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-    super.onItemRangeInserted(positionStart, itemCount)
-    checkEmpty()
-  }
-
-  override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-    super.onItemRangeRemoved(positionStart, itemCount)
-    checkEmpty()
-  }
-
-  private fun checkEmpty() {
-    if (adapter.itemCount == 0) {
-      emptyView.visibility = View.VISIBLE
-    } else {
-      emptyView.visibility = View.GONE
-    }
-  }
-
-}
