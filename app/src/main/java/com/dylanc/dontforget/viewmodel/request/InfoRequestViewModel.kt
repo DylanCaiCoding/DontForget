@@ -12,7 +12,7 @@ import com.dylanc.retrofit.helper.coroutines.showLoading
 class InfoRequestViewModel @ViewModelInject constructor(
   private val infoRepository: InfoRepository
 ) : RequestViewModel() {
-  val list = infoRepository.allInfo
+
   val isRefreshing = LoadingLiveData()
 
   fun initInfoList() =

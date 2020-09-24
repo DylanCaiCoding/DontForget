@@ -41,7 +41,7 @@
         android:id="@+id/recycler_view"
         adapter="@{adapter}"
         emptyView="@{@id/empty_view}"
-        list="@{requestViewModel.list}"
+        list="@{viewModel.list}"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"

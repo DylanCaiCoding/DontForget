@@ -72,29 +72,23 @@ class InfoLocalDataSource(private val infoDao: InfoDao) {
 
   val allInfo = infoDao.getAllInfoLiveData().exceptFirstEmpty()
 
-  suspend fun getAll() = withContext(Dispatchers.IO) {
+  suspend fun getAll() =
     infoDao.getAll()
-  }
 
-  suspend fun insertAll(infoList: List<DontForgetInfo>) = withContext(Dispatchers.IO) {
+  suspend fun insertAll(infoList: List<DontForgetInfo>) =
     infoDao.insertAll(infoList)
-  }
 
-  suspend fun insertInfo(info: DontForgetInfo) = withContext(Dispatchers.IO) {
+  suspend fun insertInfo(info: DontForgetInfo) =
     infoDao.insertInfo(info)
-  }
 
-  suspend fun deleteInfo(info: DontForgetInfo) = withContext(Dispatchers.IO) {
+  suspend fun deleteInfo(info: DontForgetInfo) =
     infoDao.deleteInfo(info)
-  }
 
-  suspend fun deleteInfoList(info: List<DontForgetInfo>) = withContext(Dispatchers.IO) {
+  suspend fun deleteInfoList(info: List<DontForgetInfo>) =
     infoDao.deleteInfo(info)
-  }
 
-  suspend fun deleteAll() = withContext(Dispatchers.IO) {
+  suspend fun deleteAll() =
     infoDao.deleteAll()
-  }
 }
 
 class InfoRemoteDataSource(private val api: InfoApi) {

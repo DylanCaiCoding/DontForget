@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.dylanc.dontforget.R
+import com.dylanc.dontforget.data.constant.AuthenticationState
 import com.dylanc.dontforget.viewmodel.request.LoginRequestViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -18,7 +19,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class SplashFragment : Fragment() {
 
-  private val requestViewModel: LoginRequestViewModel by viewModels()
+  private val viewModel: SplashViewModel by viewModels()
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
     inflater.inflate(R.layout.fragment_splash, container, false)
@@ -27,11 +28,11 @@ class SplashFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     lifecycleScope.launch {
       delay(1000)
-      requestViewModel.authenticationState.observe(viewLifecycleOwner) {
+      viewModel.authenticationState.observe(viewLifecycleOwner) {
         when (it) {
-          LoginRequestViewModel.AuthenticationState.AUTHENTICATED ->
+          AuthenticationState.AUTHENTICATED ->
             findNavController().navigate(R.id.action_splashFragment_to_mainFragment)
-          LoginRequestViewModel.AuthenticationState.INVALID_AUTHENTICATION ->
+          AuthenticationState.INVALID_AUTHENTICATION ->
             findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
           else -> {
           }
