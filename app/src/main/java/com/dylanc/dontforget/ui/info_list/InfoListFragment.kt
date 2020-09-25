@@ -12,19 +12,17 @@ import androidx.lifecycle.observe
 import androidx.navigation.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.dylanc.dontforget.R
-import com.dylanc.dontforget.ui.info_list.adapter.InfoAdapter
-import com.dylanc.dontforget.base.event.observeEvent
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.constant.KEY_INFO
 import com.dylanc.dontforget.service.NotifyInfoService
+import com.dylanc.dontforget.ui.info_list.adapter.InfoAdapter
 import com.dylanc.dontforget.utils.alertItems
 import com.dylanc.dontforget.utils.bindView
 import com.dylanc.dontforget.utils.requestViewModels
-import com.dylanc.dontforget.viewmodel.event.SharedViewModel
+import com.dylanc.dontforget.viewmodel.shared.SharedViewModel
 import com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel
 import com.dylanc.utilktx.bundleOf
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_info_list.*
 
 @AndroidEntryPoint
 class InfoListFragment : Fragment() {
@@ -52,16 +50,22 @@ class InfoListFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     requestViewModel.initInfoList()
       .observe(viewLifecycleOwner) {
-        NotifyInfoService.startRepeatedly(activity)
+        startNotifyInfoService()
       }
     sharedViewModel.isShowNotification
-      .observeEvent(viewLifecycleOwner) { isChecked ->
+      .observe(viewLifecycleOwner) { isChecked ->
         if (isChecked) {
-          NotifyInfoService.startRepeatedly(activity)
+          startNotifyInfoService()
         } else {
           NotifyInfoService.stop(activity)
         }
       }
+  }
+
+  private fun startNotifyInfoService() {
+    if (sharedViewModel.isShowNotification.value!!) {
+      NotifyInfoService.startRepeatedly(activity)
+    }
   }
 
   inner class ClickProxy {
@@ -95,8 +99,9 @@ class InfoListFragment : Fragment() {
     val onRefreshListener = SwipeRefreshLayout.OnRefreshListener {
       requestViewModel.refreshInfoList()
         .observe(viewLifecycleOwner) {
-          NotifyInfoService.startRepeatedly(activity)
+          startNotifyInfoService()
         }
     }
   }
+
 }

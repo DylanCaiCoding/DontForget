@@ -30,7 +30,5 @@ interface InfoApi {
 
   @FormUrlEncoded
   @POST("$TODO/add/json")
-  suspend fun addInfo(
-    @Field("title") title: String
-  ): ApiResponse<DontForgetInfo>
+  suspend fun addInfo(@Field("title") title: String): ApiResponse<DontForgetInfo>
 }

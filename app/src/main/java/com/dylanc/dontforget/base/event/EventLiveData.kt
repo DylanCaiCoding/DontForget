@@ -18,3 +18,5 @@ fun <T> EventLiveData<T>.observeEvent(owner: LifecycleOwner, onChanged: (T) -> U
 
 fun <T> EventLiveData<T>.postEventValue(value: T) =
   postValue(Event(value))
+
+val <T> EventLiveData<T>.content get() = value?.content

@@ -30,4 +30,9 @@ object RepositoryModule {
   @Singleton
   fun provideVersionRepository(versionApi: VersionApi): VersionRepository =
     VersionRepository(VersionRemoteDataSource(versionApi))
+
+  @Provides
+  @Singleton
+  fun provideSettingRepository(): SettingRepository =
+    SettingRepository(SettingLocalDataSource())
 }
