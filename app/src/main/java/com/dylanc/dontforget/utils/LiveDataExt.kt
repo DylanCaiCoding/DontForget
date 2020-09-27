@@ -5,6 +5,7 @@ package com.dylanc.dontforget.utils
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
+import com.kunminx.architecture.ui.callback.UnPeekLiveData
 
 @MainThread
 inline fun <T :List<*>> LiveData<T>.exceptFirstEmpty(): LiveData<T?> {
@@ -17,4 +18,8 @@ inline fun <T :List<*>> LiveData<T>.exceptFirstEmpty(): LiveData<T?> {
       it
     }
   }
+}
+
+inline fun UnPeekLiveData<Any>.post(){
+  value = Any()
 }

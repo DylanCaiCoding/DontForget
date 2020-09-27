@@ -1,19 +1,11 @@
 package com.dylanc.dontforget.data.repository
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataScope
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
+import com.dylanc.dontforget.data.api.UserApi
 import com.dylanc.dontforget.data.bean.User
 import com.dylanc.dontforget.data.bean.parseData
-import com.dylanc.dontforget.data.net.clearCookieJar
-import com.dylanc.dontforget.data.api.UserApi
-import com.dylanc.dontforget.data.constant.AuthenticationState
 import com.dylanc.dontforget.data.db.InfoDao
 import com.dylanc.dontforget.data.db.UserDao
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.runBlocking
+import com.dylanc.dontforget.data.net.clearCookieJar
 
 /**
  * @author Dylan Cai
@@ -24,41 +16,23 @@ class UserRepository(
   private val remoteDataSource: UserRemoteDataSource
 ) {
 
-  private val _authenticationState = MutableLiveData<AuthenticationState>()
-  val authenticationState: LiveData<AuthenticationState> = _authenticationState
+  suspend fun isLogin() = localDataSource.isLogin()
 
-  init {
-    runBlocking {
-      if (localDataSource.isLogin()) {
-        _authenticationState.value = AuthenticationState.AUTHENTICATED
-      } else {
-        _authenticationState.value = AuthenticationState.INVALID_AUTHENTICATION
-      }
-    }
-  }
-
-  fun login(username: String?, password: String?) = flow {
-    checkNotNull(username) { "请输入账号" }
-    checkNotNull(password) { "请输入密码" }
+  suspend fun login(username: String, password: String): User {
     val user = remoteDataSource.requestLogin(username, password)
     localDataSource.updateUser(user)
-    _authenticationState.value = AuthenticationState.AUTHENTICATED
-    emit(user)
+    return user
   }
 
-  fun logout() = flow {
+  suspend fun logout(): Any {
     val data = remoteDataSource.requestLogout()
     localDataSource.logout()
     clearCookieJar()
-    _authenticationState.value = AuthenticationState.INVALID_AUTHENTICATION
-    emit(data)
+    return data
   }
 
-  fun register(username: String?, password: String?, confirmPassword: String?) = flow {
-    checkNotNull(username) { "请输入账号" }
-    checkNotNull(password) { "请输入密码" }
-    checkNotNull(confirmPassword) { "请再次输入密码" }
-    emit(remoteDataSource.requestRegister(username, password, confirmPassword))
+  suspend fun register(username: String, password: String, confirmPassword: String): User {
+    return remoteDataSource.requestRegister(username, password, confirmPassword)
   }
 }
 

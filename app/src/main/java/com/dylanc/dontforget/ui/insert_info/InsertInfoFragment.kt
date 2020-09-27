@@ -6,13 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.dylanc.dontforget.BR
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.loading.NavIconType
-import com.dylanc.dontforget.utils.bindView
+import com.dylanc.dontforget.utils.bind
 import com.dylanc.dontforget.utils.requestViewModels
 import com.dylanc.dontforget.utils.setToolbar
 import com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel
@@ -24,14 +23,11 @@ class InsertInfoFragment : Fragment() {
   private val viewModel: InsertInfoViewModel by viewModels()
   private val requestViewModel: InfoRequestViewModel by requestViewModels()
   private val args: InsertInfoFragmentArgs by navArgs()
-  private val clickProxy = ClickProxy()
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
     inflater.inflate(R.layout.fragment_insert_info, container, false)
-      .run {
-        bindView(this, viewModel, BR.clickProxy to clickProxy)
-        setToolbar(toolbarTitle, NavIconType.BACK).decorView
-      }
+      .bind(viewLifecycleOwner, viewModel, BR.clickProxy to  ClickProxy())
+      .setToolbar(toolbarTitle, NavIconType.BACK).decorView
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)

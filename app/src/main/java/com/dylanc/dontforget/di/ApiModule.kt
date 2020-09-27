@@ -3,7 +3,7 @@ package com.dylanc.dontforget.di
 import com.dylanc.dontforget.data.api.InfoApi
 import com.dylanc.dontforget.data.api.UserApi
 import com.dylanc.dontforget.data.api.VersionApi
-import com.dylanc.retrofit.helper.apiOf
+import com.dylanc.retrofit.helper.apiServiceOf
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,13 +16,13 @@ object ApiModule {
 
   @Provides
   @Singleton
-  fun provideUserApi(): UserApi = apiOf()
+  fun provideUserApi(): UserApi = apiServiceOf()
 
   @Provides
   @Singleton
-  fun provideInfoApi(): InfoApi = apiOf()
+  fun provideInfoApi(): InfoApi = apiServiceOf()
 
   @Provides
   @Singleton
-  fun provideVersionApi(): VersionApi = apiOf()
+  fun provideVersionApi(): VersionApi = apiServiceOf()
 }

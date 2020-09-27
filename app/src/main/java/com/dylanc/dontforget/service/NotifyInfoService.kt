@@ -31,8 +31,9 @@ class NotifyInfoService : Service() {
     private const val CHANNEL_NAME = "勿忘消息"
     private const val REQUEST_CODE_ALARM_NOTIFY = 0
 
-    fun startRepeatedly(activity: Activity?) {
-      if (activity == null || alreadyStarted) {
+//    fun startRepeatedly(activity: Activity?,intervalMillis:Long) {
+    fun startRepeatedly(activity: Activity) {
+      if (alreadyStarted) {
         return
       }
 
@@ -48,10 +49,7 @@ class NotifyInfoService : Service() {
       )
     }
 
-    fun stop(activity: Activity?) {
-      if (activity == null) {
-        return
-      }
+    fun stop(activity: Activity) {
       val intent = Intent(activity, NotifyInfoService::class.java)
       val pendingIntent = PendingIntent.getService(
         activity, REQUEST_CODE_ALARM_NOTIFY, intent, PendingIntent.FLAG_UPDATE_CURRENT

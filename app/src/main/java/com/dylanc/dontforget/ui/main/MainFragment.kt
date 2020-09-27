@@ -13,8 +13,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -23,14 +21,15 @@ import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.binding.setOnCheckedChangeListener
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
 import com.dylanc.dontforget.service.NotifyInfoService
-import com.dylanc.dontforget.utils.alertNewVersionDialog
-import com.dylanc.dontforget.utils.bindView
+import com.dylanc.dontforget.utils.bind
+import com.dylanc.dontforget.utils.materialDialog
 import com.dylanc.dontforget.utils.requestViewModels
-import com.dylanc.dontforget.viewmodel.shared.SharedViewModel
+import com.dylanc.dontforget.utils.title
 import com.dylanc.dontforget.viewmodel.request.LoginRequestViewModel
 import com.dylanc.dontforget.viewmodel.request.VersionRequestViewModel
+import com.dylanc.dontforget.viewmodel.shared.SharedViewModel
+import com.dylanc.dontforget.widget.alertNewVersionDialog
 import com.dylanc.utilktx.putSpValue
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.menu_item_switch.view.*
@@ -46,10 +45,21 @@ class MainFragment : Fragment() {
   private lateinit var appBarConfiguration: AppBarConfiguration
   private lateinit var notifyInfoService: NotifyInfoService
   private var bound = false
+  private val connection = object : ServiceConnection {
+    override fun onServiceConnected(name: ComponentName, service: IBinder) {
+      val binder = service as NotifyInfoService.NotifyBinder
+      notifyInfoService = binder.service
+      bound = true
+    }
+
+    override fun onServiceDisconnected(name: ComponentName) {
+      bound = false
+    }
+  }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
     inflater.inflate(R.layout.fragment_main, container, false)
-      .apply { bindView(this, viewModel) }
+      .bind(viewLifecycleOwner, viewModel)
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -65,14 +75,28 @@ class MainFragment : Fragment() {
 
     val switchNotification = nav_view.menu.findItem(R.id.nav_notification).actionView.switch_drawer
     switchNotification.setOnCheckedChangeListener(clickProxy::onNotificationSwitchChecked)
-    sharedViewModel.isShowNotification.observe(viewLifecycleOwner) {
-      switchNotification.isChecked = sharedViewModel.isShowNotification.value!!
+    viewModel.isShowNotification.observe(viewLifecycleOwner) {
+      switchNotification.isChecked = viewModel.isShowNotification.value!!
     }
 
     val switchNightMode = nav_view.menu.findItem(R.id.nav_night_mode).actionView.switch_drawer
     switchNightMode.setOnCheckedChangeListener(clickProxy::onNightModeSwitchChecked)
-    sharedViewModel.isNightMode.observe(viewLifecycleOwner) {
-      switchNightMode.isChecked = sharedViewModel.isNightMode.value!!
+    viewModel.isNightMode.observe(viewLifecycleOwner) {
+      switchNightMode.isChecked = viewModel.isNightMode.value!!
+    }
+
+    viewModel.isShowNotification.observe(viewLifecycleOwner) { isChecked ->
+      if (isChecked) {
+        NotifyInfoService.startRepeatedly(requireActivity())
+      } else {
+        NotifyInfoService.stop(requireActivity())
+      }
+    }
+
+    sharedViewModel.showNotificationEvent.observe(viewLifecycleOwner) {
+      if (viewModel.isShowNotification.value!!) {
+        NotifyInfoService.startRepeatedly(requireActivity())
+      }
     }
   }
 
@@ -86,18 +110,6 @@ class MainFragment : Fragment() {
   override fun onStop() {
     super.onStop()
     requireActivity().unbindService(connection)
-  }
-
-  private val connection = object : ServiceConnection {
-    override fun onServiceConnected(name: ComponentName, service: IBinder) {
-      val binder = service as NotifyInfoService.NotifyBinder
-      notifyInfoService = binder.service
-      bound = true
-    }
-
-    override fun onServiceDisconnected(name: ComponentName) {
-      bound = false
-    }
   }
 
   inner class ClickProxy {
@@ -122,22 +134,21 @@ class MainFragment : Fragment() {
     }
 
     private fun onIntervalsBtnClick() {
-      MaterialAlertDialogBuilder(requireContext())
-        .setTitle("请选择刷新的间隔时间")
-        .setSingleChoiceItems(arrayOf("5 分钟", "10 分钟", "1 小时"), 0) { dialog, which ->
+      materialDialog {
+        title = "请选择刷新的间隔时间"
+        setSingleChoiceItems(arrayOf("5 分钟", "10 分钟", "1 小时"), 0) { dialog, which ->
           when (which) {
             0 -> putSpValue(KEY_UPDATE_INTERVALS, 5)
             1 -> putSpValue(KEY_UPDATE_INTERVALS, 10)
             2 -> putSpValue(KEY_UPDATE_INTERVALS, 60)
             else -> return@setSingleChoiceItems
           }
-          sharedViewModel.showNotification(false)
-          sharedViewModel.showNotification(true)
+          viewModel.showNotification(false)
+          viewModel.showNotification(true)
           drawer_layout.closeDrawers()
           dialog.dismiss()
         }
-        .create()
-        .show()
+      }.show()
     }
 
     fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -151,21 +162,20 @@ class MainFragment : Fragment() {
     }
 
     private fun onLogoutBtnClick() {
-      loginRequestViewModel.logout()
-        .observe(viewLifecycleOwner, Observer {
-          findNavController().navigate(R.id.action_mainFragment_to_loginFragment)
-        })
+      loginRequestViewModel.logout().observe(viewLifecycleOwner) {
+        findNavController().navigate(R.id.action_mainFragment_to_loginFragment)
+      }
     }
 
     fun onNotificationSwitchChecked(isChecked: Boolean) {
-      sharedViewModel.showNotification(isChecked)
+      viewModel.showNotification(isChecked)
       if (!isChecked && bound) {
         notifyInfoService.hideNotification()
       }
     }
 
     fun onNightModeSwitchChecked(isChecked: Boolean) {
-      sharedViewModel.changeNightMode(isChecked)
+      viewModel.changeNightMode(isChecked)
     }
   }
 

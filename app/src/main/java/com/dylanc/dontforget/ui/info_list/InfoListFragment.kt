@@ -8,19 +8,15 @@ import androidx.databinding.library.baseAdapters.BR
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
 import androidx.navigation.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.constant.KEY_INFO
-import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.ui.info_list.adapter.InfoAdapter
-import com.dylanc.dontforget.utils.alertItems
-import com.dylanc.dontforget.utils.bindView
-import com.dylanc.dontforget.utils.requestViewModels
-import com.dylanc.dontforget.viewmodel.shared.SharedViewModel
+import com.dylanc.dontforget.utils.*
 import com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel
+import com.dylanc.dontforget.viewmodel.shared.SharedViewModel
 import com.dylanc.utilktx.bundleOf
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -36,35 +32,18 @@ class InfoListFragment : Fragment() {
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
     inflater.inflate(R.layout.fragment_info_list, container, false)
-      .apply {
-        bindView(
-          this, viewModel,
-          BR.adapter to adapter,
-          BR.requestViewModel to requestViewModel,
-          BR.clickProxy to clickProxy,
-          BR.eventHandler to eventHandler
-        )
-      }
+      .bind(
+        viewLifecycleOwner, viewModel,
+        BR.adapter to adapter,
+        BR.requestViewModel to requestViewModel,
+        BR.clickProxy to clickProxy,
+        BR.eventHandler to eventHandler
+      )
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    requestViewModel.initInfoList()
-      .observe(viewLifecycleOwner) {
-        startNotifyInfoService()
-      }
-    sharedViewModel.isShowNotification
-      .observe(viewLifecycleOwner) { isChecked ->
-        if (isChecked) {
-          startNotifyInfoService()
-        } else {
-          NotifyInfoService.stop(activity)
-        }
-      }
-  }
-
-  private fun startNotifyInfoService() {
-    if (sharedViewModel.isShowNotification.value!!) {
-      NotifyInfoService.startRepeatedly(activity)
+    requestViewModel.initInfoList().observe(viewLifecycleOwner) {
+      sharedViewModel.showNotificationEvent.post()
     }
   }
 
@@ -80,14 +59,15 @@ class InfoListFragment : Fragment() {
     }
 
     fun onItemLongClick(item: DontForgetInfo) {
-      alertItems("关闭提醒", "删除") { text, _ ->
-        when (text) {
-          "关闭提醒" -> {
-          }
-          "删除" -> {
-            requestViewModel.deleteInfo(item)
-              .observe(viewLifecycleOwner) {
+      materialDialog {
+        items("关闭提醒", "删除") { text, _ ->
+          when (text) {
+            "关闭提醒" -> {
+            }
+            "删除" -> {
+              requestViewModel.deleteInfo(item).observe(viewLifecycleOwner) {
               }
+            }
           }
         }
       }.show()
@@ -97,10 +77,9 @@ class InfoListFragment : Fragment() {
   inner class EventHandler {
 
     val onRefreshListener = SwipeRefreshLayout.OnRefreshListener {
-      requestViewModel.refreshInfoList()
-        .observe(viewLifecycleOwner) {
-          startNotifyInfoService()
-        }
+      requestViewModel.refreshInfoList().observe(viewLifecycleOwner) {
+        sharedViewModel.showNotificationEvent.post()
+      }
     }
   }
 

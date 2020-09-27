@@ -8,39 +8,54 @@ import com.dylanc.dontforget.data.repository.InfoRepository
 import com.dylanc.retrofit.helper.coroutines.LoadingLiveData
 import com.dylanc.retrofit.helper.coroutines.catch
 import com.dylanc.retrofit.helper.coroutines.showLoading
+import kotlinx.coroutines.flow.flow
 
 class InfoRequestViewModel @ViewModelInject constructor(
   private val infoRepository: InfoRepository
 ) : RequestViewModel() {
 
+  val list = infoRepository.allInfo
+
   val isRefreshing = LoadingLiveData()
 
   fun initInfoList() =
-    infoRepository.initInfoList()
+    flow {
+      emit(infoRepository.initInfoList())
+    }
       .showLoading(isRefreshing)
       .catch(exception)
       .asLiveData()
 
   fun refreshInfoList() =
-    infoRepository.refreshInfoList()
+    flow {
+      emit(infoRepository.refreshInfoList())
+    }
       .showLoading(isRefreshing)
       .catch(exception)
       .asLiveData()
 
   fun addInfo(title: String?) =
-    infoRepository.addInfo(title)
+    flow {
+      checkNotNull(title) { "请输入标题" }
+      emit(infoRepository.addInfo(title))
+    }
       .showLoading(isLoading)
       .catch(exception)
       .asLiveData()
 
   fun updateInfo(id: Int, title: String?, date: String) =
-    infoRepository.updateInfo(id, title, date)
+    flow {
+      checkNotNull(title) { "请输入标题" }
+      emit(infoRepository.updateInfo(id, title, date))
+    }
       .showLoading(isLoading)
       .catch(exception)
       .asLiveData()
 
   fun deleteInfo(info: DontForgetInfo) =
-    infoRepository.deleteInfo(info)
+    flow {
+      emit(infoRepository.deleteInfo(info))
+    }
       .showLoading(isLoading)
       .catch(exception)
       .asLiveData()

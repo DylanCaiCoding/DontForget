@@ -5,9 +5,6 @@ import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.bean.parseData
 import com.dylanc.dontforget.data.db.InfoDao
 import com.dylanc.dontforget.utils.exceptFirstEmpty
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.withContext
 import java.util.*
 
 /**
@@ -29,42 +26,39 @@ class InfoRepository(
       }
     }
 
-  fun initInfoList() = flow {
-    val list = if (localDataSource.getAll().isEmpty()) {
-      val newList = remoteDataSource.refreshInfoList()
-      localDataSource.insertAll(newList)
-      newList
+  suspend fun initInfoList(): List<DontForgetInfo> {
+    return if (localDataSource.getAll().isEmpty()) {
+      val list = remoteDataSource.refreshInfoList()
+      localDataSource.insertAll(list)
+      list
     } else {
       localDataSource.getAll()
     }
-    emit(list)
   }
 
-  fun refreshInfoList() = flow {
+  suspend fun refreshInfoList(): List<DontForgetInfo> {
     val list = remoteDataSource.refreshInfoList()
     localDataSource.deleteAll()
     localDataSource.insertAll(list)
-    emit(list)
+    return list
   }
 
-  fun addInfo(title: String?) = flow {
-    checkNotNull(title) { "请输入标题" }
+  suspend fun addInfo(title: String): DontForgetInfo {
     val info = remoteDataSource.requestAddInfo(title)
     localDataSource.insertInfo(info)
-    emit(info)
+    return info
   }
 
-  fun updateInfo(id: Int, title: String?, date: String) = flow {
-    checkNotNull(title) { "请输入标题" }
+  suspend fun updateInfo(id: Int, title: String, date: String): DontForgetInfo {
     val info = remoteDataSource.requestUpdateInfo(id, title, date)
     localDataSource.insertInfo(info)
-    emit(info)
+    return info
   }
 
-  fun deleteInfo(info: DontForgetInfo) = flow {
+  suspend fun deleteInfo(info: DontForgetInfo): Any {
     val deleteInfo = remoteDataSource.requestDeleteInfo(info.id)
     localDataSource.deleteInfo(info)
-    emit(deleteInfo)
+    return deleteInfo
   }
 }
 
