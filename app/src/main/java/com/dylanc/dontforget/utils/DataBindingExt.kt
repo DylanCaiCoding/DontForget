@@ -28,12 +28,13 @@ fun ComponentActivity.bindContentView(
     }
 
 fun View.bind(owner: LifecycleOwner, viewModel: ViewModel, vararg bindingParams: Pair<Int, Any>): View =
-  DataBindingUtil.bind<ViewDataBinding>(this)!!
-    .apply {
-      setVariable(BR.viewModel, viewModel)
-      for (bindingParam in bindingParams) {
-        setVariable(bindingParam.first, bindingParam.second)
-      }
-      lifecycleOwner = owner
+  DataBindingUtil.bind<ViewDataBinding>(this)!!.bind(owner, viewModel, *bindingParams).root
+
+fun <T : ViewDataBinding> T.bind(owner: LifecycleOwner, viewModel: ViewModel, vararg bindingParams: Pair<Int, Any>) =
+  apply {
+    setVariable(BR.viewModel, viewModel)
+    for (bindingParam in bindingParams) {
+      setVariable(bindingParam.first, bindingParam.second)
     }
-    .root
+    lifecycleOwner = owner
+  }

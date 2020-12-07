@@ -42,9 +42,10 @@ class InfoListFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    requestViewModel.initInfoList().observe(viewLifecycleOwner) {
-      sharedViewModel.showNotificationEvent.post()
-    }
+    requestViewModel.initInfoList()
+      .observe(viewLifecycleOwner) {
+        sharedViewModel.showNotificationEvent.post()
+      }
   }
 
   inner class ClickProxy {

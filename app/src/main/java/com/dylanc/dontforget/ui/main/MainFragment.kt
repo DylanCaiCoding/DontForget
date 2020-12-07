@@ -10,6 +10,8 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Switch
+import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -20,6 +22,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.binding.setOnCheckedChangeListener
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
+import com.dylanc.dontforget.databinding.FragmentMainBinding
 import com.dylanc.dontforget.service.NotifyInfoService
 import com.dylanc.dontforget.utils.bind
 import com.dylanc.dontforget.utils.materialDialog
@@ -31,12 +34,11 @@ import com.dylanc.dontforget.viewmodel.shared.SharedViewModel
 import com.dylanc.dontforget.widget.alertNewVersionDialog
 import com.dylanc.utilktx.putSpValue
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_main.*
-import kotlinx.android.synthetic.main.menu_item_switch.view.*
 
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
+  private lateinit var binding: FragmentMainBinding
   private val viewModel: MainViewModel by viewModels()
   private val loginRequestViewModel: LoginRequestViewModel by requestViewModels()
   private val versionRequestViewModel: VersionRequestViewModel by requestViewModels()
@@ -57,32 +59,36 @@ class MainFragment : Fragment() {
     }
   }
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-    inflater.inflate(R.layout.fragment_main, container, false)
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    binding = FragmentMainBinding.inflate(inflater, container, false)
       .bind(viewLifecycleOwner, viewModel)
+    return binding.root
+  }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    binding.apply {
+      val navController = requireActivity().findNavController(R.id.fragment_main)
+      appBarConfiguration = AppBarConfiguration(setOf(R.id.infoListFragment), drawerLayout)
+      toolbar.setupWithNavController(navController, appBarConfiguration)
+      toolbar.title = "搜索"
+      toolbar.inflateMenu(R.menu.main)
+      toolbar.setOnMenuItemClickListener(clickProxy::onOptionsItemSelected)
+      navView.setupWithNavController(navController)
+      navView.setNavigationItemSelectedListener(clickProxy::onNavItemSelected)
 
-    val navController = requireActivity().findNavController(R.id.fragment_main)
-    appBarConfiguration = AppBarConfiguration(setOf(R.id.infoListFragment), drawer_layout)
-    toolbar.setupWithNavController(navController, appBarConfiguration)
-    toolbar.title = "搜索"
-    toolbar.inflateMenu(R.menu.main)
-    toolbar.setOnMenuItemClickListener(clickProxy::onOptionsItemSelected)
-    nav_view.setupWithNavController(navController)
-    nav_view.setNavigationItemSelectedListener(clickProxy::onNavItemSelected)
+      val viewModel = this@MainFragment.viewModel
+      val switchNotification: SwitchCompat = navView.menu.findItem(R.id.nav_notification).actionView.findViewById(R.id.switch_drawer)
+      switchNotification.setOnCheckedChangeListener(clickProxy::onNotificationSwitchChecked)
+      viewModel.isShowNotification.observe(viewLifecycleOwner) {
+        switchNotification.isChecked = viewModel.isShowNotification.value!!
+      }
 
-    val switchNotification = nav_view.menu.findItem(R.id.nav_notification).actionView.switch_drawer
-    switchNotification.setOnCheckedChangeListener(clickProxy::onNotificationSwitchChecked)
-    viewModel.isShowNotification.observe(viewLifecycleOwner) {
-      switchNotification.isChecked = viewModel.isShowNotification.value!!
-    }
-
-    val switchNightMode = nav_view.menu.findItem(R.id.nav_night_mode).actionView.switch_drawer
-    switchNightMode.setOnCheckedChangeListener(clickProxy::onNightModeSwitchChecked)
-    viewModel.isNightMode.observe(viewLifecycleOwner) {
-      switchNightMode.isChecked = viewModel.isNightMode.value!!
+      val switchNightMode: SwitchCompat = navView.menu.findItem(R.id.nav_night_mode).actionView.findViewById(R.id.switch_drawer)
+      switchNightMode.setOnCheckedChangeListener(clickProxy::onNightModeSwitchChecked)
+      viewModel.isNightMode.observe(viewLifecycleOwner) {
+        switchNightMode.isChecked = viewModel.isNightMode.value!!
+      }
     }
 
     viewModel.isShowNotification.observe(viewLifecycleOwner) { isChecked ->
@@ -117,7 +123,7 @@ class MainFragment : Fragment() {
       when (menuItem.itemId) {
         R.id.nav_check_update -> {
           onCheckBtnClick()
-          drawer_layout.closeDrawers()
+          binding.drawerLayout.closeDrawers()
         }
         R.id.nav_intervals -> {
           onIntervalsBtnClick()
@@ -145,7 +151,7 @@ class MainFragment : Fragment() {
           }
           viewModel.showNotification(false)
           viewModel.showNotification(true)
-          drawer_layout.closeDrawers()
+          binding.drawerLayout.closeDrawers()
           dialog.dismiss()
         }
       }.show()

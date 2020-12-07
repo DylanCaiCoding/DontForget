@@ -18,7 +18,7 @@ buildscript {
         gradle_version = '4.0.1'
         hilt_version = '2.28.1-alpha'
         junit_version = '4.13'
-        kotlin_version = '1.4.10'
+        kotlin_version = '1.4.20'
         leak_canary_version = '1.6.3'
         lifecycle_version = '2.2.0'
         live_eventbus_ktx_version = "1.0.0"

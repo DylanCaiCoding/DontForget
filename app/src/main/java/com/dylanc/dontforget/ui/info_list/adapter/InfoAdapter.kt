@@ -3,30 +3,32 @@ package com.dylanc.dontforget.ui.info_list.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
-import com.dylanc.dontforget.R
-import com.dylanc.dontforget.base.SimpleListAdapter
-import com.dylanc.dontforget.base.SimpleViewHolder
+import androidx.recyclerview.widget.ListAdapter
+import com.dylanc.dontforget.base.BindingViewHolder
 import com.dylanc.dontforget.data.bean.DontForgetInfo
-import kotlinx.android.synthetic.main.recycler_item_info.view.*
+import com.dylanc.dontforget.databinding.RecyclerItemInfoBinding
 
 class InfoAdapter(
   private val onItemClick: (DontForgetInfo) -> Unit,
   private val onItemLongClick: (DontForgetInfo) -> Unit
-) : SimpleListAdapter<DontForgetInfo>(InfoDiffCallback()) {
+) : ListAdapter<DontForgetInfo, BindingViewHolder<RecyclerItemInfoBinding>>(InfoDiffCallback()) {
 
-  override fun getLayout(inflater: LayoutInflater, parent: ViewGroup) =
-    R.layout.recycler_item_info
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+    BindingViewHolder(RecyclerItemInfoBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
-  override fun onBindViewHolder(holder: SimpleViewHolder, item: DontForgetInfo) {
-    holder.itemView.apply {
-      tv_title.text = item.title
-      setOnClickListener {
-        onItemClick(item)
-      }
-      isLongClickable = true
-      setOnLongClickListener {
-        onItemLongClick(item)
-        true
+  override fun onBindViewHolder(holder: BindingViewHolder<RecyclerItemInfoBinding>, position: Int) {
+    holder.binding.apply {
+      val item = getItem(position)
+      tvTitle.text = item.title
+      root.apply {
+        setOnClickListener {
+          onItemClick(item)
+        }
+        isLongClickable = true
+        setOnLongClickListener {
+          onItemLongClick(item)
+          true
+        }
       }
     }
   }

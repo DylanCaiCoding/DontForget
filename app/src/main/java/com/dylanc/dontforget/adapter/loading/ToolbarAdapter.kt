@@ -5,9 +5,9 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.navigation.findNavController
 import com.dylanc.dontforget.R
+import com.dylanc.dontforget.databinding.LayoutToolbarBinding
 import com.dylanc.loadinghelper.LoadingHelper
 import com.dylanc.utilktx.topActivity
-import kotlinx.android.synthetic.main.layout_toolbar.view.*
 
 /**
  * @author Dylan Cai
@@ -19,14 +19,15 @@ class ToolbarAdapter(
   private val menuId: Int = 0,
   private val onMenuItemClickListener: ((MenuItem) -> Boolean)? = null
 ) : LoadingHelper.Adapter<LoadingHelper.ViewHolder>() {
+  private lateinit var binding: LayoutToolbarBinding
 
-  override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup) =
-    LoadingHelper.ViewHolder(
-      inflater.inflate(R.layout.layout_toolbar, parent, false)
-    )
+  override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): LoadingHelper.ViewHolder {
+    binding = LayoutToolbarBinding.inflate(inflater, parent, false)
+    return LoadingHelper.ViewHolder(binding.root)
+  }
 
   override fun onBindViewHolder(holder: LoadingHelper.ViewHolder) {
-    holder.rootView.apply {
+    binding.apply {
       if (!title.isNullOrBlank()) {
         toolbar.title = title
       }

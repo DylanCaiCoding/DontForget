@@ -97,12 +97,11 @@ class InfoRemoteDataSource(private val api: InfoApi) {
 
   private suspend fun loadAllInfo(): List<DontForgetInfo> {
     val pageList = requestInfoList()
+    list.addAll(pageList.list)
     return if (pageList.over) {
-      list.addAll(pageList.list)
       list
     } else {
       page++
-      list.addAll(pageList.list)
       loadAllInfo()
     }
   }
