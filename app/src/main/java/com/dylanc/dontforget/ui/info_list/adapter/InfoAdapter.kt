@@ -1,22 +1,24 @@
 package com.dylanc.dontforget.ui.info_list.adapter
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.dylanc.dontforget.base.BindingViewHolder
+import com.dylanc.dontforget.base.newBindingViewHolder
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.databinding.RecyclerItemInfoBinding
+
+typealias InfoViewHolder = BindingViewHolder<RecyclerItemInfoBinding>
 
 class InfoAdapter(
   private val onItemClick: (DontForgetInfo) -> Unit,
   private val onItemLongClick: (DontForgetInfo) -> Unit
-) : ListAdapter<DontForgetInfo, BindingViewHolder<RecyclerItemInfoBinding>>(InfoDiffCallback()) {
+) : ListAdapter<DontForgetInfo, InfoViewHolder>(InfoDiffCallback()) {
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-    BindingViewHolder(RecyclerItemInfoBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfoViewHolder =
+    newBindingViewHolder(parent)
 
-  override fun onBindViewHolder(holder: BindingViewHolder<RecyclerItemInfoBinding>, position: Int) {
+  override fun onBindViewHolder(holder: InfoViewHolder, position: Int) {
     holder.binding.apply {
       val item = getItem(position)
       tvTitle.text = item.title
