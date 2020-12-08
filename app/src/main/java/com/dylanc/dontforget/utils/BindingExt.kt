@@ -2,13 +2,18 @@
 
 package com.dylanc.dontforget.utils
 
+import android.app.Activity
+import android.app.Dialog
+import android.view.LayoutInflater
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.databinding.library.baseAdapters.BR
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import androidx.viewbinding.ViewBinding
 
 /**
  * @author Dylan Cai
@@ -38,3 +43,20 @@ fun <T : ViewDataBinding> T.bind(owner: LifecycleOwner, viewModel: ViewModel, va
     }
     lifecycleOwner = owner
   }
+
+inline fun <reified T : ViewBinding> Fragment.lazyInflate(): Lazy<T> = lazy {
+  inflateBinding(layoutInflater)
+}
+
+inline fun <reified T : ViewBinding> Activity.lazyInflate(): Lazy<T> = lazy {
+  inflateBinding(layoutInflater)
+}
+
+inline fun <reified T : ViewBinding> Dialog.lazyInflate(): Lazy<T> = lazy {
+  inflateBinding(layoutInflater)
+}
+
+inline fun <reified T : ViewBinding> inflateBinding(layoutInflater: LayoutInflater): T {
+  val method = T::class.java.getMethod("inflate", LayoutInflater::class.java)
+  return method.invoke(null, layoutInflater) as T
+}

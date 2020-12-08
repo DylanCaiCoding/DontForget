@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Switch
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -24,10 +23,7 @@ import com.dylanc.dontforget.adapter.binding.setOnCheckedChangeListener
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
 import com.dylanc.dontforget.databinding.FragmentMainBinding
 import com.dylanc.dontforget.service.NotifyInfoService
-import com.dylanc.dontforget.utils.bind
-import com.dylanc.dontforget.utils.materialDialog
-import com.dylanc.dontforget.utils.requestViewModels
-import com.dylanc.dontforget.utils.title
+import com.dylanc.dontforget.utils.*
 import com.dylanc.dontforget.viewmodel.request.LoginRequestViewModel
 import com.dylanc.dontforget.viewmodel.request.VersionRequestViewModel
 import com.dylanc.dontforget.viewmodel.shared.SharedViewModel
@@ -38,7 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
-  private lateinit var binding: FragmentMainBinding
+  private val binding: FragmentMainBinding by lazyInflate()
   private val viewModel: MainViewModel by viewModels()
   private val loginRequestViewModel: LoginRequestViewModel by requestViewModels()
   private val versionRequestViewModel: VersionRequestViewModel by requestViewModels()
@@ -60,8 +56,7 @@ class MainFragment : Fragment() {
   }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-    binding = FragmentMainBinding.inflate(inflater, container, false)
-      .bind(viewLifecycleOwner, viewModel)
+    binding.bind(viewLifecycleOwner, viewModel)
     return binding.root
   }
 
@@ -83,7 +78,6 @@ class MainFragment : Fragment() {
       viewModel.isShowNotification.observe(viewLifecycleOwner) {
         switchNotification.isChecked = viewModel.isShowNotification.value!!
       }
-
       val switchNightMode: SwitchCompat = navView.menu.findItem(R.id.nav_night_mode).actionView.findViewById(R.id.switch_drawer)
       switchNightMode.setOnCheckedChangeListener(clickProxy::onNightModeSwitchChecked)
       viewModel.isNightMode.observe(viewLifecycleOwner) {
