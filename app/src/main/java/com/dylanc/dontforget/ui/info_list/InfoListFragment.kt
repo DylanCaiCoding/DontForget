@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.databinding.library.baseAdapters.BR
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -17,7 +18,6 @@ import com.dylanc.dontforget.ui.info_list.adapter.InfoAdapter
 import com.dylanc.dontforget.utils.*
 import com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel
 import com.dylanc.dontforget.viewmodel.shared.SharedViewModel
-import com.dylanc.utilktx.bundleOf
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

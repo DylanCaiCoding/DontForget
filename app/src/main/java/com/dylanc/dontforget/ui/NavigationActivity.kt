@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.utils.isDarkMode
-import com.dylanc.utilktx.isStatusBarLightMode
+import com.dylanc.grape.isStatusBarLightMode
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

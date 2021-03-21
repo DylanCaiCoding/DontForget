@@ -11,8 +11,8 @@ import com.dylanc.dontforget.R
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
 import com.dylanc.dontforget.data.repository.InfoRepository
 import com.dylanc.dontforget.ui.NavigationActivity
-import com.dylanc.utilktx.intentOf
-import com.dylanc.utilktx.spValueOf
+import com.dylanc.grape.intentOf
+import com.dylanc.grape.sharedPreferences
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
@@ -30,8 +30,9 @@ class NotifyInfoService : Service() {
     private const val CHANNEL_ID = "dont_forget"
     private const val CHANNEL_NAME = "勿忘消息"
     private const val REQUEST_CODE_ALARM_NOTIFY = 0
+    private val intervalMillis: Int by sharedPreferences(KEY_UPDATE_INTERVALS, 6)
 
-//    fun startRepeatedly(activity: Activity?,intervalMillis:Long) {
+    //    fun startRepeatedly(activity: Activity?,intervalMillis:Long) {
     fun startRepeatedly(activity: Activity) {
       if (alreadyStarted) {
         return
@@ -43,7 +44,7 @@ class NotifyInfoService : Service() {
       )
       val alarmManager = activity.getSystemService(Context.ALARM_SERVICE) as AlarmManager
       val triggerAtMillis = Date().time
-      val intervalMillis = 60 * 1000 * spValueOf(KEY_UPDATE_INTERVALS, 6)
+//      val intervalMillis = 60 * 1000 * spValueOf(KEY_UPDATE_INTERVALS, 6)
       alarmManager.setRepeating(
         AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis.toLong(), pendingIntent
       )

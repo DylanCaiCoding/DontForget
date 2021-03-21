@@ -5,9 +5,9 @@ import androidx.lifecycle.asLiveData
 import com.dylanc.dontforget.base.RequestViewModel
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.repository.InfoRepository
-import com.dylanc.retrofit.helper.coroutines.LoadingLiveData
-import com.dylanc.retrofit.helper.coroutines.catch
-import com.dylanc.retrofit.helper.coroutines.showLoading
+import com.dylanc.retrofit.helper.coroutines.livedata.LoadingLiveData
+import com.dylanc.retrofit.helper.coroutines.livedata.catch
+import com.dylanc.retrofit.helper.coroutines.livedata.showLoading
 import kotlinx.coroutines.flow.flow
 
 class InfoRequestViewModel @ViewModelInject constructor(

@@ -5,7 +5,7 @@ import com.dylanc.dontforget.data.bean.User
 import com.dylanc.dontforget.data.bean.parseData
 import com.dylanc.dontforget.data.db.InfoDao
 import com.dylanc.dontforget.data.db.UserDao
-import com.dylanc.dontforget.data.net.clearCookieJar
+import com.dylanc.retrofit.helper.cookie.clearPersistentCookies
 
 /**
  * @author Dylan Cai
@@ -27,7 +27,7 @@ class UserRepository(
   suspend fun logout(): Any {
     val data = remoteDataSource.requestLogout()
     localDataSource.logout()
-    clearCookieJar()
+    clearPersistentCookies()
     return data
   }
 

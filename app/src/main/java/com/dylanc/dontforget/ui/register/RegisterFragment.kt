@@ -14,7 +14,7 @@ import com.dylanc.dontforget.utils.bind
 import com.dylanc.dontforget.utils.requestViewModels
 import com.dylanc.dontforget.utils.setToolbar
 import com.dylanc.dontforget.viewmodel.request.LoginRequestViewModel
-import com.dylanc.utilktx.toast
+import com.dylanc.grape.toast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

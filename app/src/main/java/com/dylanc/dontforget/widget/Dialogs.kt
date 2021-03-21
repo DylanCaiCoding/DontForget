@@ -5,8 +5,7 @@ import com.dylanc.dontforget.BuildConfig
 import com.dylanc.dontforget.data.bean.AppVersion
 import com.dylanc.dontforget.utils.downloadApk
 import com.dylanc.dontforget.utils.materialDialog
-import com.dylanc.utilktx.toast
-
+import com.dylanc.grape.toast
 
 fun Fragment.alertNewVersionDialog(appVersion: AppVersion) {
   if (appVersion.version.toInt() <= BuildConfig.VERSION_CODE) {

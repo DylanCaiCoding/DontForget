@@ -1,7 +1,6 @@
 package com.dylanc.dontforget.data.repository
 
-import com.dylanc.utilktx.putSpValue
-import com.dylanc.utilktx.spValueOf
+import com.dylanc.grape.sharedPreferences
 
 
 class SettingRepository(
@@ -19,11 +18,7 @@ class SettingLocalDataSource {
     const val KEY_NIGHT_MODE = "night_mode"
   }
 
-  var isShowNotification: Boolean
-    get() = spValueOf(KEY_SHOW_NOTIFICATION, true)
-    set(value) = putSpValue(KEY_SHOW_NOTIFICATION, value)
+  var isShowNotification: Boolean by sharedPreferences(KEY_SHOW_NOTIFICATION ,true)
 
-  var isNightMode: Boolean
-    get() = spValueOf(KEY_NIGHT_MODE, false)
-    set(value) = putSpValue(KEY_NIGHT_MODE, value)
+  var isNightMode: Boolean by sharedPreferences(KEY_NIGHT_MODE ,false)
 }

@@ -8,12 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.dylanc.dontforget.base.RequestViewModel
 import com.dylanc.dontforget.data.constant.AuthenticationState
 import com.dylanc.dontforget.data.repository.UserRepository
-import com.dylanc.retrofit.helper.coroutines.catch
-import com.dylanc.retrofit.helper.coroutines.showLoading
+import com.dylanc.retrofit.helper.coroutines.livedata.catch
+import com.dylanc.retrofit.helper.coroutines.livedata.showLoading
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class LoginRequestViewModel @ViewModelInject constructor(
   private val userRepository: UserRepository

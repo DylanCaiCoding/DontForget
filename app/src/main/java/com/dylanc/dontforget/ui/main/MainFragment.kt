@@ -28,13 +28,13 @@ import com.dylanc.dontforget.viewmodel.request.LoginRequestViewModel
 import com.dylanc.dontforget.viewmodel.request.VersionRequestViewModel
 import com.dylanc.dontforget.viewmodel.shared.SharedViewModel
 import com.dylanc.dontforget.widget.alertNewVersionDialog
-import com.dylanc.utilktx.putSpValue
+import com.dylanc.grape.sharedPreferences
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
-  private val binding: FragmentMainBinding by lazyInflate()
+  private lateinit var binding: FragmentMainBinding
   private val viewModel: MainViewModel by viewModels()
   private val loginRequestViewModel: LoginRequestViewModel by requestViewModels()
   private val versionRequestViewModel: VersionRequestViewModel by requestViewModels()
@@ -56,6 +56,7 @@ class MainFragment : Fragment() {
   }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    binding = FragmentMainBinding.inflate(inflater, container, false)
     binding.bind(viewLifecycleOwner, viewModel)
     return binding.root
   }
@@ -113,6 +114,8 @@ class MainFragment : Fragment() {
   }
 
   inner class ClickProxy {
+    private var intervalMillis: Int by sharedPreferences(KEY_UPDATE_INTERVALS, 6)
+
     fun onNavItemSelected(menuItem: MenuItem) = run {
       when (menuItem.itemId) {
         R.id.nav_check_update -> {
@@ -138,9 +141,9 @@ class MainFragment : Fragment() {
         title = "请选择刷新的间隔时间"
         setSingleChoiceItems(arrayOf("5 分钟", "10 分钟", "1 小时"), 0) { dialog, which ->
           when (which) {
-            0 -> putSpValue(KEY_UPDATE_INTERVALS, 5)
-            1 -> putSpValue(KEY_UPDATE_INTERVALS, 10)
-            2 -> putSpValue(KEY_UPDATE_INTERVALS, 60)
+            0 -> intervalMillis = 5
+            1 -> intervalMillis = 10
+            2 -> intervalMillis = 60
             else -> return@setSingleChoiceItems
           }
           viewModel.showNotification(false)

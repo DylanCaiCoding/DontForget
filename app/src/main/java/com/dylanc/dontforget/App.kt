@@ -4,12 +4,12 @@ package com.dylanc.dontforget
 
 import android.app.Application
 import com.dylanc.dontforget.adapter.loading.LoadingAdapter
-import com.dylanc.dontforget.data.net.persistentCookies
+import com.dylanc.grape.isJson
+import com.dylanc.grape.logJson
 import com.dylanc.loadinghelper.LoadingHelper
 import com.dylanc.loadinghelper.ViewType
+import com.dylanc.retrofit.helper.cookie.persistentCookies
 import com.dylanc.retrofit.helper.initRetrofit
-import com.dylanc.utilktx.isJson
-import com.dylanc.utilktx.logJson
 import dagger.hilt.android.HiltAndroidApp
 
 /**
