@@ -29,12 +29,13 @@ import com.dylanc.dontforget.viewmodel.request.VersionRequestViewModel
 import com.dylanc.dontforget.viewmodel.shared.SharedViewModel
 import com.dylanc.dontforget.widget.alertNewVersionDialog
 import com.dylanc.grape.sharedPreferences
+import com.dylanc.viewbinding.binding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainFragment : Fragment() {
+class MainFragment : Fragment(R.layout.fragment_main) {
 
-  private lateinit var binding: FragmentMainBinding
+  private val binding: FragmentMainBinding by binding()
   private val viewModel: MainViewModel by viewModels()
   private val loginRequestViewModel: LoginRequestViewModel by requestViewModels()
   private val versionRequestViewModel: VersionRequestViewModel by requestViewModels()
@@ -55,14 +56,15 @@ class MainFragment : Fragment() {
     }
   }
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-    binding = FragmentMainBinding.inflate(inflater, container, false)
-    binding.bind(viewLifecycleOwner, viewModel)
-    return binding.root
-  }
+//  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+//    binding = FragmentMainBinding.inflate(inflater, container, false)
+//    binding.bind(viewLifecycleOwner, viewModel)
+//    return binding.root
+//  }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    binding.bind(viewLifecycleOwner, viewModel)
     binding.apply {
       val navController = requireActivity().findNavController(R.id.fragment_main)
       appBarConfiguration = AppBarConfiguration(setOf(R.id.infoListFragment), drawerLayout)
@@ -140,10 +142,10 @@ class MainFragment : Fragment() {
       materialDialog {
         title = "请选择刷新的间隔时间"
         setSingleChoiceItems(arrayOf("5 分钟", "10 分钟", "1 小时"), 0) { dialog, which ->
-          when (which) {
-            0 -> intervalMillis = 5
-            1 -> intervalMillis = 10
-            2 -> intervalMillis = 60
+          intervalMillis = when (which) {
+            0 -> 5
+            1 -> 10
+            2 -> 60
             else -> return@setSingleChoiceItems
           }
           viewModel.showNotification(false)

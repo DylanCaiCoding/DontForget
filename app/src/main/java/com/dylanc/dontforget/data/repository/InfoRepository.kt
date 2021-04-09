@@ -1,5 +1,6 @@
 package com.dylanc.dontforget.data.repository
 
+import androidx.lifecycle.LiveData
 import com.dylanc.dontforget.data.api.InfoApi
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.bean.parseData
@@ -64,7 +65,7 @@ class InfoRepository(
 
 class InfoLocalDataSource(private val infoDao: InfoDao) {
 
-  val allInfo = infoDao.getAllInfoLiveData().exceptFirstEmpty()
+  val allInfo: LiveData<List<DontForgetInfo>?> = infoDao.getAllInfoLiveData().exceptFirstEmpty()
 
   suspend fun getAll() =
     infoDao.getAll()
