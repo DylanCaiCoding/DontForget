@@ -2,9 +2,7 @@
 
 package com.dylanc.dontforget.utils
 
-import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.*
 import com.dylanc.dontforget.base.RequestLoading
 import com.dylanc.dontforget.base.RequestViewModel
@@ -63,17 +61,3 @@ class RequestViewModelLazy<VM : RequestViewModel>(
 
   override fun isInitialized() = cached != null
 }
-
-val applicationViewModelStore: ViewModelStore by lazy { ViewModelStore() }
-
-@MainThread
-inline fun <reified VM : ViewModel> Fragment.applicationViewModels(
-  noinline factoryProducer: () -> ViewModelProvider.Factory = { ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application) }
-): Lazy<VM> =
-  ViewModelLazy(VM::class, { applicationViewModelStore }, factoryProducer)
-
-@MainThread
-inline fun <reified VM : ViewModel> FragmentActivity.applicationViewModels(
-  noinline factoryProducer: () -> ViewModelProvider.Factory = { ViewModelProvider.AndroidViewModelFactory.getInstance(application) }
-): Lazy<VM> =
-  ViewModelLazy(VM::class, { applicationViewModelStore }, factoryProducer)

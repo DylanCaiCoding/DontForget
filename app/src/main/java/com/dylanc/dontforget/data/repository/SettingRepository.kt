@@ -1,6 +1,6 @@
 package com.dylanc.dontforget.data.repository
 
-import com.dylanc.grape.sharedPreferences
+import com.dylanc.longan.sharedPreferences
 
 
 class SettingRepository(

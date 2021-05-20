@@ -68,23 +68,19 @@ dependencies {
     // Material design
     implementation "com.google.android.material:material:$material_version"
 
-    // Loading
-    implementation "com.dylanc:loadinghelper:$loading_helper_version"
-
-    // Retrofit
-    implementation "com.dylanc:retrofit-helper-core:$retrofit_helper_version"
-    kapt "com.dylanc:retrofit-helper-compiler:$retrofit_helper_version"
-    implementation "com.dylanc:retrofit-helper-coroutines:$retrofit_helper_version"
-
     // Hilt
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
     implementation 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02'
     kapt 'androidx.hilt:hilt-compiler:1.0.0-alpha02'
 
-    implementation 'com.kunminx.archi:unpeek-livedata:3.2.3-beta10'
-    implementation 'com.dylanc:viewbinding-ktx:1.1.2'
-    implementation 'com.dylanc:grape:0.5.4'
+    implementation 'com.github.DylanCaiCoding:LoadingHelper:2.2.0'
+    implementation 'com.github.DylanCaiCoding.ViewBindingKTX:viewbinding-ktx:1.2.0'
+    implementation 'com.github.DylanCaiCoding.ViewBindingKTX:viewbinding-base:1.2.0'
+    implementation 'com.github.DylanCaiCoding.RetrofitHelper:retrofithelper-core:2.0.0-alpha'
+    kapt 'com.github.DylanCaiCoding.RetrofitHelper:retrofithelper-compiler:2.0.0-alpha'
+    implementation 'com.github.DylanCaiCoding.RetrofitHelper:retrofithelper-coroutines:2.0.0-alpha'
+    implementation 'com.github.DylanCaiCoding:Longan:0.1.1'
 
     // Testing
     testImplementation "junit:junit:$junit_version"

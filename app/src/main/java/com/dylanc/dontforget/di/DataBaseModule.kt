@@ -1,10 +1,9 @@
 package com.dylanc.dontforget.di
 
-import android.app.Application
-import androidx.room.Room
 import com.dylanc.dontforget.data.db.AppDatabase
 import com.dylanc.dontforget.data.db.InfoDao
 import com.dylanc.dontforget.data.db.UserDao
+import com.dylanc.dontforget.utils.roomDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,8 +16,7 @@ object DataBaseModule {
 
   @Provides
   @Singleton
-  fun provideAppDataBase(application: Application): AppDatabase =
-    Room.databaseBuilder(application, AppDatabase::class.java, "app_db").build()
+  fun provideAppDataBase(): AppDatabase = roomDatabase("app_db")
 
   @Provides
   @Singleton

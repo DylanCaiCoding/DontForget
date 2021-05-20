@@ -3,9 +3,9 @@ package com.dylanc.dontforget.data.net
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import com.dylanc.dontforget.R
-import com.dylanc.grape.finishAllActivities
-import com.dylanc.grape.toast
-import com.dylanc.grape.topActivity
+import com.dylanc.longan.finishAllActivities
+import com.dylanc.longan.toast
+import com.dylanc.longan.topActivity
 
 class GlobalExceptionObserver(
   private val onError: (Throwable) -> Unit = { toast(it.message) }

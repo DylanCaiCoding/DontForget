@@ -19,7 +19,3 @@ inline fun <T :List<*>> LiveData<T>.exceptFirstEmpty(): LiveData<T?> {
     }
   }
 }
-
-inline fun UnPeekLiveData<Any>.post(){
-  value = Any()
-}

@@ -6,8 +6,7 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.drakeet.multitype.MultiTypeAdapter
-import com.dylanc.dontforget.utils.AdapterDataEmptyObserver
-import com.dylanc.dontforget.utils.observeDataEmpty
+import com.dylanc.longan.observeDataEmpty
 
 @Suppress("UNCHECKED_CAST")
 @BindingAdapter(value = ["adapter", "list", "emptyView"])

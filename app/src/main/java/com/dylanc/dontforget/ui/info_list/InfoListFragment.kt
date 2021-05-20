@@ -18,6 +18,7 @@ import com.dylanc.dontforget.ui.info_list.adapter.InfoAdapter
 import com.dylanc.dontforget.utils.*
 import com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel
 import com.dylanc.dontforget.viewmodel.shared.SharedViewModel
+import com.dylanc.longan.alertDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -44,7 +45,7 @@ class InfoListFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     requestViewModel.initInfoList()
       .observe(viewLifecycleOwner) {
-        sharedViewModel.showNotificationEvent.post()
+        sharedViewModel.showNotificationEvent.value = Any()
       }
   }
 
@@ -60,7 +61,7 @@ class InfoListFragment : Fragment() {
     }
 
     fun onItemLongClick(item: DontForgetInfo) {
-      materialDialog {
+      alertDialog {
         items("关闭提醒", "删除") { text, _ ->
           when (text) {
             "关闭提醒" -> {
@@ -79,7 +80,7 @@ class InfoListFragment : Fragment() {
 
     val onRefreshListener = SwipeRefreshLayout.OnRefreshListener {
       requestViewModel.refreshInfoList().observe(viewLifecycleOwner) {
-        sharedViewModel.showNotificationEvent.post()
+        sharedViewModel.showNotificationEvent.value = Any()
       }
     }
   }

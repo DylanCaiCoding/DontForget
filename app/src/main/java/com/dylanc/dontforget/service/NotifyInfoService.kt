@@ -11,8 +11,8 @@ import com.dylanc.dontforget.R
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
 import com.dylanc.dontforget.data.repository.InfoRepository
 import com.dylanc.dontforget.ui.NavigationActivity
-import com.dylanc.grape.intentOf
-import com.dylanc.grape.sharedPreferences
+import com.dylanc.longan.intentOf
+import com.dylanc.longan.sharedPreferences
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
@@ -60,7 +60,7 @@ class NotifyInfoService : Service() {
     }
   }
 
-  override fun onBind(intent: Intent): IBinder? {
+  override fun onBind(intent: Intent): IBinder {
     return binder
   }
 

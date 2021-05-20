@@ -12,7 +12,7 @@ import com.dylanc.dontforget.R
 import com.dylanc.dontforget.utils.bind
 import com.dylanc.dontforget.utils.requestViewModels
 import com.dylanc.dontforget.viewmodel.request.LoginRequestViewModel
-import com.dylanc.grape.toast
+import com.dylanc.longan.toast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

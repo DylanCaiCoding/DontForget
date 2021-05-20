@@ -6,10 +6,8 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -28,8 +26,9 @@ import com.dylanc.dontforget.viewmodel.request.LoginRequestViewModel
 import com.dylanc.dontforget.viewmodel.request.VersionRequestViewModel
 import com.dylanc.dontforget.viewmodel.shared.SharedViewModel
 import com.dylanc.dontforget.widget.alertNewVersionDialog
-import com.dylanc.grape.sharedPreferences
+import com.dylanc.longan.sharedPreferences
 import com.dylanc.viewbinding.binding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -139,7 +138,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private fun onIntervalsBtnClick() {
-      materialDialog {
+      MaterialAlertDialogBuilder(requireContext()).apply {
         title = "请选择刷新的间隔时间"
         setSingleChoiceItems(arrayOf("5 分钟", "10 分钟", "1 小时"), 0) { dialog, which ->
           intervalMillis = when (which) {

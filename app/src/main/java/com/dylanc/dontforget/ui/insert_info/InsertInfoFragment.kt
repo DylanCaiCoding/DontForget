@@ -17,7 +17,7 @@ import com.dylanc.dontforget.utils.bind
 import com.dylanc.dontforget.utils.requestViewModels
 import com.dylanc.dontforget.utils.setToolbar
 import com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel
-import com.dylanc.grape.TAG
+import com.dylanc.longan.TAG
 import com.dylanc.viewbinding.binding
 import dagger.hilt.android.AndroidEntryPoint
 

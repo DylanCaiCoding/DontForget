@@ -4,8 +4,8 @@ package com.dylanc.dontforget
 
 import android.app.Application
 import com.dylanc.dontforget.adapter.loading.LoadingAdapter
-import com.dylanc.grape.isJson
-import com.dylanc.grape.logJson
+import com.dylanc.longan.isJson
+import com.dylanc.longan.logJson
 import com.dylanc.loadinghelper.LoadingHelper
 import com.dylanc.loadinghelper.ViewType
 import com.dylanc.retrofit.helper.cookie.persistentCookies
