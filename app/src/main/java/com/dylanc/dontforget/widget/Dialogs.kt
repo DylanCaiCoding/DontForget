@@ -14,7 +14,7 @@ fun Fragment.alertNewVersionDialog(appVersion: AppVersion) {
   }
   alertDialog {
     title = "检查到新版本 v${appVersion.versionShort}"
-    if (appVersion.changelog.isNullOrBlank()) message = appVersion.changelog!!
+    if (!appVersion.changelog.isNullOrBlank()) message = appVersion.changelog
     positiveButton("更新") {
       requireContext().downloadApk(appVersion.installUrl, "dontforget.apk")
     }

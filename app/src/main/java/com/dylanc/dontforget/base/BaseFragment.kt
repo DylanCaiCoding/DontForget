@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("unused")
+
 package com.dylanc.dontforget.base
 
 import android.os.Bundle
@@ -22,70 +24,60 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
-import androidx.annotation.LayoutRes
+import androidx.databinding.ViewDataBinding
+import androidx.viewbinding.ViewBinding
 import com.dylanc.dontforget.adapter.loading.NavIconType
 import com.dylanc.dontforget.adapter.loading.ToolbarAdapter
 import com.dylanc.loadinghelper.LoadingHelper
 import com.dylanc.loadinghelper.ViewType
+import com.dylanc.viewbinding.base.inflateBindingWithGeneric
 
 /**
- * 一种封装思路，用法更接近 BaseActivity，考虑的是把 BaseActivity 改成 BaseFragment 时尽量少改代码。
- *
- * 使用该基类时注意以下事项：
- * 重写 onCreate 方法并调用 setContentView 方法设置布局，这个写法与 Activity 保持一致。
- * 控件初始化或逻辑代码建议写在 onActivityCreated 中。
- * 设置标题栏的方法应该根据项目需要进行编写，下面提供了参考示例。
+ * ViewBindingKTX + LoadingHelper 的封装范例
  *
  * @author Dylan Cai
  */
-@Suppress("unused")
-abstract class BaseFragment : androidx.fragment.app.Fragment() {
+abstract class BaseFragment<VB : ViewBinding>(
+  @IdRes private val contentViewId: Int = 0,
+  private val contentAdapter: LoadingHelper.ContentAdapter<*>? = null
+) : androidx.fragment.app.Fragment() {
 
-  lateinit var loadingHelper: LoadingHelper
-    private set
-  private var layoutResID: Int = 0
-  private var contentViewId: Int = 0
-  private var contentAdapter: LoadingHelper.ContentAdapter<*>? = null
+  lateinit var loadingHelper: LoadingHelper private set
+  private var _binding: VB? = null
+  val binding: VB get() = _binding!!
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? {
-    val rootView = inflater.inflate(layoutResID, container, false)
-    return if (contentViewId > 0) {
-      val contentView = rootView.findViewById<View>(contentViewId)
-      loadingHelper = LoadingHelper(contentView, contentAdapter)
-      loadingHelper.setOnReloadListener(this::onReload)
-      rootView
-    } else {
-      loadingHelper = LoadingHelper(rootView, contentAdapter)
-      loadingHelper.setOnReloadListener(this::onReload)
-      loadingHelper.decorView
+  ): View {
+    _binding = inflateBindingWithGeneric<VB>(inflater, container, false)
+      .also { if (it is ViewDataBinding) it.lifecycleOwner = viewLifecycleOwner }
+    return binding.root.let { rootView ->
+      if (contentViewId > 0) {
+        loadingHelper = LoadingHelper(rootView.findViewById<View>(contentViewId), contentAdapter)
+        loadingHelper.setOnReloadListener(this::onReload)
+        rootView
+      } else {
+        loadingHelper = LoadingHelper(rootView)
+        loadingHelper.setOnReloadListener(this::onReload)
+        loadingHelper.decorView
+      }
     }
   }
 
-  @JvmOverloads
-  fun setContentView(
-    @LayoutRes layoutResID: Int,
-    @IdRes contentViewId: Int = 0,
-    contentAdapter: LoadingHelper.ContentAdapter<*>? = null
-  ) {
-    this.layoutResID = layoutResID
-    this.contentViewId = contentViewId
-    this.contentAdapter = contentAdapter
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
-  /**
-   * 这是添加通用标题栏的示例方法。
-   */
   @JvmOverloads
-  fun setToolbar(
+  fun addToolbar(
     title: String, type: NavIconType = NavIconType.NONE,
     menuId: Int = 0, listener: ((MenuItem) -> Boolean)? = null
   ) {
     loadingHelper.register(ViewType.TITLE, ToolbarAdapter(title, type, menuId, listener))
-    loadingHelper.setDecorHeader(ViewType.TITLE)
+    loadingHelper.addChildDecorHeader(ViewType.TITLE)
   }
 
   fun showLoadingView() = loadingHelper.showLoadingView()
