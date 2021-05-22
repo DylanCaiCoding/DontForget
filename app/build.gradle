@@ -80,7 +80,7 @@ dependencies {
     implementation 'com.github.DylanCaiCoding.RetrofitHelper:retrofithelper-core:2.0.0-alpha'
     kapt 'com.github.DylanCaiCoding.RetrofitHelper:retrofithelper-compiler:2.0.0-alpha'
     implementation 'com.github.DylanCaiCoding.RetrofitHelper:retrofithelper-coroutines:2.0.0-alpha'
-    implementation 'com.github.DylanCaiCoding:Longan:0.1.1'
+    implementation 'com.github.DylanCaiCoding:Longan:0.1.2'
 
     // Testing
     testImplementation "junit:junit:$junit_version"

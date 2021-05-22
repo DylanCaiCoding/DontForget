@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import androidx.navigation.findNavController
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.databinding.LayoutToolbarBinding
-import com.dylanc.longan.topActivity
 import com.dylanc.loadinghelper.LoadingHelper
+import com.dylanc.longan.topActivity
 
 /**
  * @author Dylan Cai
@@ -27,7 +27,7 @@ class ToolbarAdapter(
   }
 
   override fun onBindViewHolder(holder: LoadingHelper.ViewHolder) {
-    binding.apply {
+    with(binding) {
       if (!title.isNullOrBlank()) {
         toolbar.title = title
       }

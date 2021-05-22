@@ -1,28 +1,29 @@
 package com.dylanc.dontforget.ui.info_list
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.databinding.library.baseAdapters.BR
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.dylanc.dontforget.R
+import com.dylanc.dontforget.base.BaseFragment
 import com.dylanc.dontforget.data.bean.DontForgetInfo
 import com.dylanc.dontforget.data.constant.KEY_INFO
+import com.dylanc.dontforget.databinding.FragmentInfoListBinding
 import com.dylanc.dontforget.ui.info_list.adapter.InfoAdapter
-import com.dylanc.dontforget.utils.*
+import com.dylanc.dontforget.utils.bind
+import com.dylanc.dontforget.utils.requestViewModels
 import com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel
 import com.dylanc.dontforget.viewmodel.shared.SharedViewModel
 import com.dylanc.longan.alertDialog
+import com.dylanc.longan.items
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class InfoListFragment : Fragment() {
+class InfoListFragment : BaseFragment<FragmentInfoListBinding>() {
 
   private val viewModel: InfoListViewModel by viewModels()
   private val requestViewModel: InfoRequestViewModel by requestViewModels()
@@ -31,18 +32,15 @@ class InfoListFragment : Fragment() {
   private val eventHandler = EventHandler()
   private val adapter = InfoAdapter(clickProxy::onItemClick, clickProxy::onItemLongClick)
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-    inflater.inflate(R.layout.fragment_info_list, container, false)
-      .bind(
-        viewLifecycleOwner, viewModel,
-        BR.adapter to adapter,
-        BR.requestViewModel to requestViewModel,
-        BR.clickProxy to clickProxy,
-        BR.eventHandler to eventHandler
-      )
-
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    binding.bind(
+      viewModel,
+      BR.adapter to adapter,
+      BR.requestViewModel to requestViewModel,
+      BR.clickProxy to clickProxy,
+      BR.eventHandler to eventHandler
+    )
     requestViewModel.initInfoList()
       .observe(viewLifecycleOwner) {
         sharedViewModel.showNotificationEvent.value = Any()
@@ -62,7 +60,7 @@ class InfoListFragment : Fragment() {
 
     fun onItemLongClick(item: DontForgetInfo) {
       alertDialog {
-        items("关闭提醒", "删除") { text, _ ->
+        items("关闭提醒", "删除") { _, text, _ ->
           when (text) {
             "关闭提醒" -> {
             }

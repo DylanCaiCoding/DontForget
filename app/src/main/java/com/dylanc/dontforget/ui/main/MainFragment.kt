@@ -9,7 +9,6 @@ import android.os.IBinder
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SwitchCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
@@ -18,6 +17,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.dylanc.dontforget.R
 import com.dylanc.dontforget.adapter.binding.setOnCheckedChangeListener
+import com.dylanc.dontforget.base.BaseFragment
 import com.dylanc.dontforget.data.constant.KEY_UPDATE_INTERVALS
 import com.dylanc.dontforget.databinding.FragmentMainBinding
 import com.dylanc.dontforget.service.NotifyInfoService
@@ -26,15 +26,13 @@ import com.dylanc.dontforget.viewmodel.request.LoginRequestViewModel
 import com.dylanc.dontforget.viewmodel.request.VersionRequestViewModel
 import com.dylanc.dontforget.viewmodel.shared.SharedViewModel
 import com.dylanc.dontforget.widget.alertNewVersionDialog
+import com.dylanc.longan.alertDialog
 import com.dylanc.longan.sharedPreferences
-import com.dylanc.viewbinding.binding
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainFragment : Fragment(R.layout.fragment_main) {
+class MainFragment : BaseFragment<FragmentMainBinding>() {
 
-  private val binding: FragmentMainBinding by binding()
   private val viewModel: MainViewModel by viewModels()
   private val loginRequestViewModel: LoginRequestViewModel by requestViewModels()
   private val versionRequestViewModel: VersionRequestViewModel by requestViewModels()
@@ -55,16 +53,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
   }
 
-//  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-//    binding = FragmentMainBinding.inflate(inflater, container, false)
-//    binding.bind(viewLifecycleOwner, viewModel)
-//    return binding.root
-//  }
-
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    binding.bind(viewLifecycleOwner, viewModel)
-    binding.apply {
+    binding.bind(viewModel)
+    with(binding){
       val navController = requireActivity().findNavController(R.id.fragment_main)
       appBarConfiguration = AppBarConfiguration(setOf(R.id.infoListFragment), drawerLayout)
       toolbar.setupWithNavController(navController, appBarConfiguration)
@@ -138,14 +130,14 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private fun onIntervalsBtnClick() {
-      MaterialAlertDialogBuilder(requireContext()).apply {
+      alertDialog {
         title = "请选择刷新的间隔时间"
-        setSingleChoiceItems(arrayOf("5 分钟", "10 分钟", "1 小时"), 0) { dialog, which ->
+        singleChoiceItems(listOf("5 分钟", "10 分钟", "1 小时"), 0) { dialog, which ->
           intervalMillis = when (which) {
             0 -> 5
             1 -> 10
             2 -> 60
-            else -> return@setSingleChoiceItems
+            else -> return@singleChoiceItems
           }
           viewModel.showNotification(false)
           viewModel.showNotification(true)

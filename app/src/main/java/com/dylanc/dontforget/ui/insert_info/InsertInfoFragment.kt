@@ -8,10 +8,13 @@ import androidx.navigation.fragment.navArgs
 import com.dylanc.dontforget.adapter.loading.NavIconType
 import com.dylanc.dontforget.base.BaseFragment
 import com.dylanc.dontforget.databinding.FragmentInsertInfoBinding
+import com.dylanc.dontforget.utils.bind
 import com.dylanc.dontforget.utils.requestViewModels
 import com.dylanc.dontforget.viewmodel.request.InfoRequestViewModel
+import com.dylanc.viewbinding.BR
+import dagger.hilt.android.AndroidEntryPoint
 
-//@AndroidEntryPoint
+@AndroidEntryPoint
 class InsertInfoFragment : BaseFragment<FragmentInsertInfoBinding>() {
 
   private val viewModel: InsertInfoViewModel by viewModels()
@@ -20,8 +23,7 @@ class InsertInfoFragment : BaseFragment<FragmentInsertInfoBinding>() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    binding.viewModel = viewModel
-    binding.clickProxy = ClickProxy()
+    binding.bind(viewModel,BR.clickProxy to ClickProxy())
     addToolbar(toolbarTitle, NavIconType.BACK)
     viewModel.title.value = args.info?.title
   }

@@ -8,6 +8,6 @@ import androidx.lifecycle.ViewModel
  * @since 2020/4/25
  */
 class LoginViewModel : ViewModel() {
-  val username: MutableLiveData<String> = MutableLiveData()
+  val username: MutableLiveData<String> = MutableLiveData("dylancai")
   val password: MutableLiveData<String> = MutableLiveData()
 }

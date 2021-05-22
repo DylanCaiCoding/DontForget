@@ -37,11 +37,11 @@ import com.dylanc.viewbinding.base.inflateBindingWithGeneric
  *
  * @author Dylan Cai
  */
-abstract class BaseFragment<VB : ViewBinding>(
-  @IdRes private val contentViewId: Int = 0,
-  private val contentAdapter: LoadingHelper.ContentAdapter<*>? = null
-) : androidx.fragment.app.Fragment() {
+abstract class BaseFragment<VB : ViewBinding> : androidx.fragment.app.Fragment() {
 
+  @IdRes
+  protected var contentViewId: Int = 0
+  protected var contentAdapter: LoadingHelper.ContentAdapter<*>? = null
   lateinit var loadingHelper: LoadingHelper private set
   private var _binding: VB? = null
   val binding: VB get() = _binding!!
@@ -55,12 +55,10 @@ abstract class BaseFragment<VB : ViewBinding>(
       .also { if (it is ViewDataBinding) it.lifecycleOwner = viewLifecycleOwner }
     return binding.root.let { rootView ->
       if (contentViewId > 0) {
-        loadingHelper = LoadingHelper(rootView.findViewById<View>(contentViewId), contentAdapter)
-        loadingHelper.setOnReloadListener(this::onReload)
+        loadingHelper = loadingHelperOf(rootView.findViewById(contentViewId))
         rootView
       } else {
-        loadingHelper = LoadingHelper(rootView)
-        loadingHelper.setOnReloadListener(this::onReload)
+        loadingHelper = loadingHelperOf(rootView)
         loadingHelper.decorView
       }
     }
@@ -91,4 +89,7 @@ abstract class BaseFragment<VB : ViewBinding>(
   fun showCustomView(viewType: Any) = loadingHelper.showView(viewType)
 
   open fun onReload() {}
+
+  private fun loadingHelperOf(view: View) =
+    LoadingHelper(view, contentAdapter).apply { setOnReloadListener(::onReload) }
 }

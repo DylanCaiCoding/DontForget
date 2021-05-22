@@ -8,5 +8,7 @@ import com.dylanc.retrofit.helper.annotations.BaseUrl
 @BaseUrl
 const val BASE_URL = "https://www.wanandroid.com/"
 
+const val VERSION_URL = "http://api.bq04.com/"
+
 const val KEY_INFO = "info"
 const val KEY_UPDATE_INTERVALS = "update_intervals"

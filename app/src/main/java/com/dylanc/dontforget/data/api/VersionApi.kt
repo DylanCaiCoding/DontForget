@@ -1,11 +1,12 @@
 package com.dylanc.dontforget.data.api
 
 import com.dylanc.dontforget.data.bean.AppVersion
+import com.dylanc.dontforget.data.constant.VERSION_URL
 import com.dylanc.retrofit.helper.annotations.ApiUrl
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-@ApiUrl("http://api.bq04.com/")
+@ApiUrl(VERSION_URL)
 interface VersionApi {
 
   @GET("/apps/latest/5f5ee3b123389f4c1b0fb730")

@@ -17,6 +17,15 @@ fun Fragment.alertNewVersionDialog(appVersion: AppVersion) {
     if (!appVersion.changelog.isNullOrBlank()) message = appVersion.changelog
     positiveButton("更新") {
       requireContext().downloadApk(appVersion.installUrl, "dontforget.apk")
+//      downloadRequest(appVersion.installUrl) {
+//        title = "正在下载"
+//        allowedNetworkTypes = DownloadManager.Request.NETWORK_WIFI
+//        notificationVisibility = DownloadManager.Request.VISIBILITY_VISIBLE
+//        allowedOverRoaming = false
+//        destinationInExternalFilesDir(Environment.DIRECTORY_DOWNLOADS, "dontforget.apk")
+//      }.download {
+//        startActivity(installAPKIntentOf(it))
+//      }
     }
     negativeButton("取消") {
       it.dismiss()
