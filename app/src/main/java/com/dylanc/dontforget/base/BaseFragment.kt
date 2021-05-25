@@ -23,13 +23,10 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.IdRes
-import androidx.databinding.ViewDataBinding
 import androidx.viewbinding.ViewBinding
 import com.dylanc.dontforget.adapter.loading.NavIconType
 import com.dylanc.dontforget.adapter.loading.ToolbarAdapter
 import com.dylanc.loadinghelper.LoadingHelper
-import com.dylanc.loadinghelper.ViewType
 import com.dylanc.viewbinding.base.inflateBindingWithGeneric
 
 /**
@@ -39,28 +36,25 @@ import com.dylanc.viewbinding.base.inflateBindingWithGeneric
  */
 abstract class BaseFragment<VB : ViewBinding> : androidx.fragment.app.Fragment() {
 
-  @IdRes
-  protected var contentViewId: Int = 0
-  protected var contentAdapter: LoadingHelper.ContentAdapter<*>? = null
-  lateinit var loadingHelper: LoadingHelper private set
   private var _binding: VB? = null
   val binding: VB get() = _binding!!
+
+  lateinit var loadingHelper: LoadingHelper private set
+  protected open val contentViewId get() = 0
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    _binding = inflateBindingWithGeneric<VB>(inflater, container, false)
-      .also { if (it is ViewDataBinding) it.lifecycleOwner = viewLifecycleOwner }
-    return binding.root.let { rootView ->
-      if (contentViewId > 0) {
-        loadingHelper = loadingHelperOf(rootView.findViewById(contentViewId))
-        rootView
-      } else {
-        loadingHelper = loadingHelperOf(rootView)
-        loadingHelper.decorView
-      }
+    _binding = inflateBindingWithGeneric(inflater, container, false)
+    val rootView = binding.root
+    return if (contentViewId > 0) {
+      loadingHelper = LoadingHelper(rootView.findViewById(contentViewId), ::onReload)
+      rootView
+    } else {
+      loadingHelper = LoadingHelper(rootView, ::onReload)
+      loadingHelper.decorView
     }
   }
 
@@ -74,8 +68,7 @@ abstract class BaseFragment<VB : ViewBinding> : androidx.fragment.app.Fragment()
     title: String, type: NavIconType = NavIconType.NONE,
     menuId: Int = 0, listener: ((MenuItem) -> Boolean)? = null
   ) {
-    loadingHelper.register(ViewType.TITLE, ToolbarAdapter(title, type, menuId, listener))
-    loadingHelper.addChildDecorHeader(ViewType.TITLE)
+    loadingHelper.addChildDecorHeader(ToolbarAdapter(title, type, menuId, listener))
   }
 
   fun showLoadingView() = loadingHelper.showLoadingView()
@@ -90,6 +83,6 @@ abstract class BaseFragment<VB : ViewBinding> : androidx.fragment.app.Fragment()
 
   open fun onReload() {}
 
-  private fun loadingHelperOf(view: View) =
-    LoadingHelper(view, contentAdapter).apply { setOnReloadListener(::onReload) }
+  private fun LoadingHelper(view: View, onReload: () -> Unit) =
+    LoadingHelper(view).apply { setOnReloadListener(onReload) }
 }

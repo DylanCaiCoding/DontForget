@@ -16,41 +16,45 @@
 
 package com.dylanc.dontforget.base
 
+import android.os.Bundle
+import android.os.PersistableBundle
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.viewbinding.ViewBinding
 import com.dylanc.dontforget.adapter.loading.NavIconType
 import com.dylanc.dontforget.adapter.loading.ToolbarAdapter
 import com.dylanc.loadinghelper.LoadingHelper
 import com.dylanc.loadinghelper.ViewType
+import com.dylanc.viewbinding.base.inflateBindingWithGeneric
 
 /**
- * 这是耦合度较低的封装方式，没有任何抽象方法，可以很方便地将基类里的代码拷贝到其它项目的基类里使用。
- *
- * 使用该基类时注意以下事项：
- * 显示对应视图之前需要注册适配器，可以设置全局适配器，某个页面想修改样式时再注册个新的适配器。
- * 设置标题栏的方法应该根据项目需要进行编写，下面提供了参考示例。
+ * ViewBindingKTX + LoadingHelper 的封装范例
  *
  * @author Dylan Cai
  */
 @Suppress("unused")
-abstract class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
 
-  lateinit var loadingHelper: LoadingHelper
-    private set
+  @IdRes
+  protected var contentViewId: Int = 0
+  lateinit var loadingHelper: LoadingHelper private set
+  lateinit var binding: VB private set
 
-  @JvmOverloads
-  fun setContentView(
-    @LayoutRes layoutResID: Int,
-    @IdRes contentViewId: Int = android.R.id.content,
-    contentAdapter: LoadingHelper.ContentAdapter<*>? = null
-  ) {
-    super.setContentView(layoutResID)
-    loadingHelper = LoadingHelper((findViewById<View>(contentViewId) as ViewGroup).getChildAt(0), contentAdapter)
-    loadingHelper.setOnReloadListener(this::onReload)
+  override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+    super.onCreate(savedInstanceState, persistentState)
+    binding = inflateBindingWithGeneric(layoutInflater)
+    val rootView = binding.root
+    setContentView(rootView)
+    loadingHelper = if (contentViewId > 0) {
+      LoadingHelper(rootView.findViewById<View>(contentViewId))
+    } else {
+      LoadingHelper(rootView)
+    }
+    loadingHelper.setOnReloadListener(::onReload)
   }
 
   /**
@@ -61,8 +65,7 @@ abstract class BaseActivity : AppCompatActivity() {
     title: String, type: NavIconType = NavIconType.NONE,
     menuId: Int = 0, listener: ((MenuItem) -> Boolean)? = null
   ) {
-    loadingHelper.register(ViewType.TITLE, ToolbarAdapter(title, type, menuId, listener))
-    loadingHelper.setDecorHeader(ViewType.TITLE)
+    loadingHelper.setDecorHeader(ToolbarAdapter(title, type, menuId, listener))
   }
 
   fun showLoadingView() = loadingHelper.showLoadingView()
